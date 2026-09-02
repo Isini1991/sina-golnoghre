@@ -1,0 +1,12 @@
+# Only deploy these:
+# index.html
+# assets/
+
+# Ignore everything else:
+versions/
+*.md
+*.log
+*.py
+_diagA.html
+color-reveal-sample.html
+gallery-demo-*.html
