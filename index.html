@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>سینا گل‌نقره — Bass / Sound / Live</title>
+<style>
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Medium.ttf') format('truetype');font-weight:500;font-display:swap}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
+@font-face{font-family:'Lalezar';src:url('assets/fonts/Lalezar-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#000;color:#fff;
+  font-family:'Vazirmatn',system-ui,sans-serif;
+  height:100vh;overflow:hidden;
+}
+::selection{background:rgba(255,120,50,.35)}
+
+/* ====== stage / entry (scene 0 — fixed) ====== */
+.stage{
+  position:fixed;inset:0;height:100svh;width:100%;
+  overflow:hidden;background:#000;z-index:5;
+}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* ====== HUD ====== */
+.hud{position:absolute;inset:0;pointer-events:none;z-index:5}
+.enterwrap{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:6;pointer-events:none;
+}
+.enterbtn{
+  pointer-events:auto;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  background:none;border:0;color:#fff;font-family:inherit;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .9s ease,transform .9s ease;
+}
+.enterbtn.ready{opacity:1;transform:none}
+.enterbtn.gone{opacity:0!important;transform:translateY(-12px);pointer-events:none;transition:opacity .7s ease,transform .7s ease}
+.enterbtn .ring{
+  width:112px;height:112px;border-radius:50%;position:relative;
+  border:1px solid rgba(255,122,47,.45);
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,90,31,.05);backdrop-filter:blur(6px);
+  transition:border-color .3s ease,background .3s ease,box-shadow .3s ease;
+}
+.enterbtn .ring::before{
+  content:'';position:absolute;inset:-1px;border-radius:50%;
+  border:1px solid rgba(255,122,47,.55);
+  animation:enterpulse 2.6s ease-out infinite;
+}
+@keyframes enterpulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.55);opacity:0}}
+.enterbtn .word{font-family:'Lalezar',Vazirmatn,sans-serif;font-size:26px;font-weight:400;line-height:1;color:#ffd9c2}
+.enterbtn .cap{font-size:9px;letter-spacing:.42em;color:rgba(255,255,255,.38);direction:ltr}
+.enterbtn:hover .ring{border-color:rgba(255,122,47,.9);background:rgba(255,90,31,.14);box-shadow:0 0 42px rgba(255,77,18,.35)}
+
+.frame{
+  position:absolute;inset:16px;border:1px solid rgba(255,255,255,.06);
+  border-radius:22px;pointer-events:none;z-index:4;
+}
+.vignette{
+  position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:radial-gradient(130% 90% at 50% 42%,transparent 42%,rgba(0,0,0,.55) 100%);
+}
+
+/* ====== site after the entry ====== */
+.continuecue{
+  position:absolute;left:50%;bottom:28px;transform:translateX(-50%) translateY(8px);
+  z-index:7;opacity:0;pointer-events:none;transition:opacity .8s ease,transform .8s ease;
+  color:rgba(255,255,255,.42);font-size:11px;letter-spacing:.16em;white-space:nowrap;
+}
+.continuecue.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.continuecue b{display:inline-block;color:#ff6a2a;font-size:17px;margin-right:8px;font-weight:400;animation:cuefloat 1.8s ease-in-out infinite}
+@keyframes cuefloat{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+.site-nav{
+  position:fixed;top:20px;left:26px;z-index:20;display:flex;align-items:center;gap:22px;
+  direction:ltr;opacity:0;pointer-events:none;transform:translateY(-8px);
+  transition:opacity .8s ease,transform .8s ease;
+}
+body.site-ready .site-nav{opacity:1;pointer-events:auto;transform:none}
+.site-nav .mark{font-family:'Lalezar',Vazirmatn,sans-serif;font-size:20px;color:#fff;line-height:1}
+.site-nav .links{display:flex;gap:14px}
+.site-nav a{color:rgba(255,255,255,.44);text-decoration:none;font-size:10px;letter-spacing:.12em;transition:color .25s ease}
+.site-nav a:hover,.site-nav a:focus-visible{color:#ff6a2a}
+/* ====== fixed scenes (page never moves — scroll is only input) ====== */
+.site-content{position:fixed;inset:0;z-index:7;pointer-events:none;opacity:0;transition:opacity .9s ease}
+body.site-ready .site-content{opacity:1;pointer-events:auto}
+.chapter{position:absolute;inset:0;overflow:hidden;border-top:1px solid rgba(255,255,255,.07);opacity:0;visibility:hidden;pointer-events:none;will-change:opacity,transform,filter}
+.chapter.on{pointer-events:auto}
+.stage{}
+.stage.gone{pointer-events:none}
+.site-nav a.cur{color:#ff6a2a}
+.chapter-shell{width:min(1240px,88vw);margin:0 auto}
+.eyebrow{font-size:10px;letter-spacing:.28em;color:#ff6a2a;margin-bottom:18px;direction:ltr}
+.chapter-title{font-family:'Lalezar',Vazirmatn,sans-serif;font-weight:400;font-size:clamp(42px,6.6vw,94px);line-height:1.06;color:#fff;margin-bottom:24px}
+.chapter-copy{font-size:14px;line-height:2;color:rgba(255,255,255,.55);max-width:430px}
+.chapter-copy strong{color:#fff;font-weight:500}
+
+/* ====== 01 / instrument ====== */
+.instrument-chapter{background:radial-gradient(70% 75% at 72% 44%,rgba(107,48,17,.18),transparent 66%),#050505}
+.instrument-sticky{position:absolute;inset:0;display:flex;align-items:center;gap:5vw;width:min(1400px,100%);margin:0 auto;padding:0 6vw;direction:ltr}
+/* instrument scene scroll zone: 60% of virtual scroll = peg frame timeline */
+.instrument-progress i{transition:width .1s linear}
+.instrument-copy{order:1;flex:0 0 34%;direction:rtl;text-align:right}
+.instrument-copy .big-index{font-family:'Lalezar',Vazirmatn,sans-serif;color:rgba(255,255,255,.08);font-size:clamp(90px,14vw,210px);line-height:.75;margin-bottom:12px}
+.instrument-copy .chapter-title{font-size:clamp(38px,5.4vw,76px)}
+.instrument-visual{order:2;position:relative;flex:1;min-width:0;height:min(78vh,720px);display:flex;align-items:center;justify-content:center}
+.instrument-visual::before{content:'';position:absolute;width:72%;height:72%;border-radius:50%;background:radial-gradient(circle,rgba(207,114,39,.16),transparent 68%);filter:blur(26px);pointer-events:none}
+#pegCanvas{position:relative;width:100%;height:100%;display:block}
+.instrument-note{position:absolute;right:2%;bottom:5%;font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.36);direction:ltr}
+.instrument-note i{display:inline-block;width:22px;height:1px;background:#ff6a2a;vertical-align:middle;margin-left:8px}
+.instrument-progress{position:absolute;left:0;bottom:5%;width:110px;height:1px;background:rgba(255,255,255,.14)}
+.instrument-progress i{display:block;height:100%;width:0;background:#ff6a2a;transition:width .12s linear}
+
+/* ====== 02 / sound ====== */
+.sound-chapter{background:#070707}
+.sound-layout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:9vw;align-items:center;direction:ltr}
+.sound-copy{direction:rtl;text-align:right}
+.sound-copy .chapter-title{font-size:clamp(42px,5.8vw,82px)}
+.sound-copy p{max-width:390px}
+.bandcamp-link{display:inline-flex;align-items:center;gap:12px;margin-top:34px;padding:12px 0;color:#ffb17f;text-decoration:none;font-size:12px;border-bottom:1px solid rgba(255,106,42,.5);transition:color .25s ease,border-color .25s ease}
+.bandcamp-link:hover,.bandcamp-link:focus-visible{color:#fff;border-color:#fff}
+.bandcamp-link span{font-size:18px;line-height:1}
+.sound-field{position:relative;min-height:430px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(255,255,255,.08);direction:ltr}
+.sound-field::before,.sound-field::after{content:'';position:absolute;border:1px solid rgba(255,106,42,.26);border-radius:50%;width:clamp(230px,28vw,420px);height:clamp(230px,28vw,420px);animation:orbitpulse 4.8s ease-in-out infinite}
+.sound-field::after{width:clamp(150px,18vw,280px);height:clamp(150px,18vw,280px);border-color:rgba(255,255,255,.16);animation-delay:-1.3s}
+@keyframes orbitpulse{0%,100%{transform:scale(.94);opacity:.35}50%{transform:scale(1.06);opacity:.8}}
+.sound-core{position:relative;width:110px;height:110px;border-radius:50%;border:1px solid rgba(255,106,42,.7);display:flex;align-items:center;justify-content:center;color:#ffb17f;font-size:12px;box-shadow:0 0 50px rgba(255,88,24,.14)}
+.sound-core::before{content:'';position:absolute;inset:14px;border-radius:50%;border:1px dashed rgba(255,255,255,.28);animation:spin 18s linear infinite}
+.sound-core::after{content:'';position:absolute;left:-110px;right:-110px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,106,42,.65),transparent);box-shadow:0 0 24px rgba(255,106,42,.4)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sound-label{position:absolute;bottom:18px;left:20px;color:rgba(255,255,255,.26);font-size:9px;letter-spacing:.22em}
+
+/* ====== 03 / live — projection theater ====== */
+.live-chapter{background:#050505;display:flex;align-items:center}
+.live-chapter .chapter-shell{max-height:100svh;overflow-y:auto;overscroll-behavior:contain;padding:8vh 0 5vh;scrollbar-width:none;width:min(1100px,92vw)}
+.live-chapter .chapter-shell::-webkit-scrollbar{display:none}
+.live-heading{display:flex;align-items:end;justify-content:space-between;direction:rtl;margin-bottom:30px}
+.live-heading .chapter-title{margin:0}
+.live-heading .chapter-copy{max-width:300px;margin-bottom:8px}
+
+.projector{position:relative;padding:26px 22px 24px;border:1px solid rgba(255,255,255,.07);border-radius:18px;background:radial-gradient(120% 90% at 12% 8%,rgba(255,106,42,.07),transparent 55%),#0b0b0b;box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.05)}
+.beam{position:absolute;inset:auto 0 0 0;height:34%;pointer-events:none;background:conic-gradient(from 200deg at 50% 100%,rgba(255,140,60,.28),rgba(255,90,31,.05) 36%,transparent 55%);filter:blur(6px);mix-blend-mode:screen;animation:beamresp 5.5s ease-in-out infinite;z-index:0}
+@keyframes beamresp{0%,100%{opacity:.55;transform:scaleY(1)}50%{opacity:.95;transform:scaleY(1.08)}}
+.screen-frame{position:relative;border-radius:14px;background:#000;padding:14px;border:1px solid rgba(255,255,255,.09);box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.lens{position:absolute;top:-12px;left:20px;width:46px;height:24px;border-radius:6px 6px 3px 3px;background:linear-gradient(#3a3a3a,#1c1c1c);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;z-index:2}
+.lens i{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe9c9,#ff8a3c 40%,#7a2c00 78%);box-shadow:0 0 18px rgba(255,138,60,.8),0 0 4px rgba(255,255,255,.5)}
+.screen{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:8px;background:#000}
+.screen::after{content:'';position:absolute;inset:0;background:radial-gradient(130% 100% at 50% 45%,transparent 55%,rgba(0,0,0,.55));pointer-events:none;z-index:3}
+#liveImage{width:100%;height:100%;display:block;object-fit:cover;filter:saturate(.82) contrast(.96) brightness(.98);transition:opacity .38s ease;animation:kenburns 26s ease-in-out infinite alternate;z-index:1;position:relative}
+@keyframes kenburns{0%{transform:scale(1.02) translate(0,0)}100%{transform:scale(1.12) translate(-1.4%,-1%)}}
+.screen-grain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.16;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");animation:grainjitter .9s steps(3) infinite}
+@keyframes grainjitter{0%{transform:translate(0,0)}33%{transform:translate(-1.5%,1%)}66%{transform:translate(1%,-1.5%)}100%{transform:translate(0,0)}}
+.screen-shade{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(115deg,rgba(255,140,60,.10),transparent 38%),linear-gradient(0deg,rgba(0,0,0,.42),transparent 30%);animation:flicker 3.2s infinite}
+@keyframes flicker{0%,100%{opacity:.9}9%{opacity:.72}10%{opacity:.94}38%{opacity:.86}39%{opacity:.96}72%{opacity:.8}73%{opacity:.93}}
+.reel-tape{display:flex;align-items:center;gap:12px;margin-top:12px;direction:ltr;justify-content:center;color:rgba(255,255,255,.38)}
+.reel-tape i{width:26px;height:1px;background:rgba(255,255,255,.2)}
+.reel-tape b{font-family:'Lalezar',Vazirmatn,sans-serif;font-weight:400;font-size:27px;line-height:1;color:#ff8a3c;letter-spacing:.04em}
+.reel-tape span{font-size:9px;letter-spacing:.32em;color:rgba(255,255,255,.45)}
+
+/* filmstrip: sprocket holes + frames on a reel */
+.filmstrip{position:relative;display:flex;gap:8px;margin-top:18px;padding:17px 12px 19px;overflow-x:auto;overscroll-behavior:contain;background:#101010;border:1px solid rgba(255,255,255,.07);border-radius:10px;scrollbar-width:none}
+.filmstrip::-webkit-scrollbar{display:none}
+.filmstrip::before,.filmstrip::after{content:'';position:absolute;left:10px;right:10px;height:7px;background:repeating-linear-gradient(90deg,#222 0 12px,rgba(0,0,0,.85) 12px 20px);border-radius:2px}
+.filmstrip::before{top:6px}
+.filmstrip::after{bottom:6px}
+.live-thumb{appearance:none;border:0;padding:0;background:#000;cursor:pointer;flex:0 0 128px;aspect-ratio:16/10;overflow:hidden;position:relative;opacity:.5;transition:opacity .25s ease,box-shadow .25s ease;border-radius:3px}
+.live-thumb img{width:100%;height:100%;display:block;object-fit:cover;filter:grayscale(.85) contrast(1.05)}
+.live-thumb:hover{opacity:.9}
+.live-thumb.active{opacity:1;box-shadow:0 0 0 2px #ff8a3c,0 0 26px rgba(255,138,60,.35);outline:none}
+.live-thumb.active img{filter:grayscale(0) contrast(1.02);transform:scale(1.04)}
+.live-thumb img{transition:transform .3s ease,filter .3s ease}
+
+.live-video{margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:center;direction:rtl}
+.live-video video{width:100%;height:225px;object-fit:cover;background:#000;border:1px solid rgba(255,255,255,.08);border-radius:8px;box-shadow:0 18px 44px rgba(0,0,0,.5)}
+.live-video p{color:rgba(255,255,255,.42);font-size:12px;line-height:2;max-width:360px}
+
+/* ====== 04 / biography ====== */
+.bio-chapter{background:radial-gradient(60% 80% at 20% 50%,rgba(255,106,42,.07),transparent 65%),#070707;display:flex;align-items:center}
+.bio-chapter .chapter-shell{max-height:100svh;overflow-y:auto;overscroll-behavior:contain;padding:9vh 0 6vh;scrollbar-width:none}
+.bio-chapter .chapter-shell::-webkit-scrollbar{display:none}
+.bio-layout{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:10vw;align-items:start;direction:ltr}
+.bio-lead{direction:rtl;text-align:right;position:relative;top:0}
+.bio-lead .chapter-title{font-size:clamp(48px,7vw,100px)}
+.bio-lead p{font-size:15px;line-height:2.15;color:rgba(255,255,255,.56);max-width:400px}
+.bio-timeline{direction:rtl;text-align:right;border-right:1px solid rgba(255,255,255,.16);padding-right:34px}
+.bio-event{position:relative;padding:0 0 52px}
+.bio-event::before{content:'';position:absolute;right:-40px;top:7px;width:10px;height:10px;border:1px solid #ff6a2a;border-radius:50%;background:#070707;box-shadow:0 0 16px rgba(255,106,42,.4)}
+.bio-event .year{font-size:11px;letter-spacing:.18em;color:#ff6a2a;direction:ltr;margin-bottom:10px}
+.bio-event h3{font-family:'Lalezar',Vazirmatn,sans-serif;font-size:32px;font-weight:400;margin-bottom:8px}
+.bio-event p{color:rgba(255,255,255,.48);font-size:13px;line-height:2;max-width:500px}
+
+/* ====== 05 / contact ====== */
+.contact-chapter{background:#000;display:flex;align-items:center}
+.contact-layout{display:flex;align-items:end;justify-content:space-between;gap:40px;direction:rtl}
+.contact-layout .chapter-title{font-size:clamp(48px,8vw,116px);margin-bottom:0}
+.contact-copy{max-width:360px;text-align:right}
+.contact-links{display:flex;flex-wrap:wrap;gap:18px;margin-top:28px;direction:ltr;justify-content:flex-end}
+.contact-links a{color:rgba(255,255,255,.55);text-decoration:none;font-size:11px;border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:6px;transition:color .25s ease,border-color .25s ease}
+.contact-links a:hover,.contact-links a:focus-visible{color:#ff6a2a;border-color:#ff6a2a}
+.contact-sign{margin-top:14vh;display:flex;justify-content:space-between;color:rgba(255,255,255,.22);font-size:9px;letter-spacing:.2em;direction:ltr}
+
+@media(max-width:820px){
+  .frame{inset:10px;border-radius:16px}.enterbtn .ring{width:96px;height:96px}
+  .site-nav{top:14px;left:14px;gap:12px}.site-nav .links{gap:8px}.site-nav .links a:nth-child(n+3){display:none}
+  .continuecue{bottom:20px}
+  .chapter-shell{width:88vw}
+  .instrument-chapter .instrument-sticky{flex-direction:column;justify-content:center;gap:0;padding:70px 6vw 20px}.instrument-copy{order:1;flex:0 0 auto;width:100%;text-align:center}.instrument-copy .big-index{font-size:70px;margin-bottom:4px}.instrument-copy .chapter-title{font-size:46px;margin-bottom:10px}.instrument-copy .chapter-copy{margin:0 auto;font-size:12px;line-height:1.8}.instrument-visual{order:2;width:100%;height:54vh;min-height:280px;flex:0 0 auto}.instrument-note{right:0;bottom:0}.instrument-progress{left:0;bottom:0}
+  .sound-chapter{padding:14vh 0}.sound-layout{display:flex;flex-direction:column;gap:30px}.sound-copy{width:100%;text-align:center}.sound-copy .chapter-title{font-size:50px}.sound-copy p{margin:auto}.bandcamp-link{margin-top:22px}.sound-field{width:100%;min-height:280px;border-left:0;border-top:1px solid rgba(255,255,255,.08)}
+  .live-chapter .chapter-shell{padding:7vh 0 4vh}.live-heading{display:block;text-align:center}.live-heading .chapter-title{margin-bottom:14px}.live-heading .chapter-copy{margin:0 auto}.projector{padding:18px 12px 16px}.screen-frame{padding:9px}.beam{height:26%}.live-thumb{flex:0 0 104px}.live-video{display:flex;flex-direction:column;gap:18px}.live-video video{height:44vw}.live-video p{max-width:none;text-align:center}
+  .bio-chapter .chapter-shell{padding:8vh 0 4vh}.bio-layout{display:flex;flex-direction:column;gap:36px}.bio-lead{position:static;text-align:center;width:100%}.bio-lead p{margin:auto}.bio-timeline{width:92%;align-self:flex-start;padding-right:25px}.bio-event{padding-bottom:30px}.bio-event::before{right:-31px}.bio-event h3{font-size:28px}
+  .contact-chapter .contact-layout{display:block;text-align:center}.contact-layout .chapter-title{font-size:60px}.contact-copy{margin:24px auto 0;text-align:center}.contact-links{justify-content:center}.contact-sign{margin-top:8vh}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .enterbtn .ring::before{animation:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ STAGE (sticky canvas) ============ -->
+<div class="stage" id="stage">
+  <canvas id="gl"></canvas>
+
+
+  <div class="vignette"></div>
+  <div class="frame"></div>
+
+  <div class="hud">
+    <div class="enterwrap">
+      <button class="enterbtn" id="enterbtn" type="button">
+        <span class="ring"><span class="word">ورود</span></span>
+        <span class="cap">COLOR · REVEAL</span>
+      </button>
+    </div>
+    <div class="continuecue" id="continueCue"><b>↓</b>برای ادامه، اسکرول کن</div>
+  </div>
+</div>
+
+<nav class="site-nav" aria-label="ناوبری اصلی">
+  <span class="mark">سینا</span>
+  <div class="links">
+    <a href="#instrument">ساز</a>
+    <a href="#sound">صدا</a>
+    <a href="#live">صحنه</a>
+    <a href="#bio">بیو</a>
+    <a href="#contact">تماس</a>
+  </div>
+</nav>
+
+<main class="site-content" id="site-content">
+  <section class="chapter instrument-chapter" id="instrument">
+    <div class="instrument-sticky">
+      <div class="instrument-copy">
+        <div class="big-index">۰۱</div>
+        <div class="eyebrow">THE INSTRUMENT / DINGWALL NG2</div>
+        <h2 class="chapter-title">امضای<br>دست‌ساز</h2>
+        <p class="chapter-copy">سردسته‌ی <strong>Dingwall NG2</strong>؛ جایی که فرم، فلز و کششِ سیم قبل از شنیده‌شدنِ هر نت، شخصیت صدا را می‌سازند.</p>
+      </div>
+      <div class="instrument-visual">
+        <canvas id="pegCanvas" aria-label="انیمیشن سردسته‌ی Dingwall NG2"></canvas>
+        <div class="instrument-note"><i></i>DINGWALL NG2</div>
+        <div class="instrument-progress"><i id="pegProgress"></i></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter sound-chapter" id="sound">
+    <div class="chapter-shell sound-layout">
+      <div class="sound-copy">
+        <div class="eyebrow">02 / THE LOW END</div>
+        <h2 class="chapter-title">پایین‌ترین نت،<br>باقیِ فضا را می‌سازد.</h2>
+        <p class="chapter-copy">موسیقی سینا را از یک پلیر معمولی جدا می‌کنیم؛ صدا اینجا مثل یک میدان در تاریکی نفس می‌کشد. قطعه‌ها و اجراها از این نقطه شنیده می‌شوند.</p>
+        <a class="bandcamp-link" href="https://carnivalesqueband.bandcamp.com" target="_blank" rel="noopener"><span>↗</span> شنیدن در Bandcamp</a>
+      </div>
+      <div class="sound-field" aria-hidden="true">
+        <div class="sound-core">SOUND</div>
+        <div class="sound-label">SIGNAL /  LOW FREQUENCY</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter live-chapter" id="live">
+    <div class="chapter-shell">
+      <div class="live-heading">
+        <div>
+          <div class="eyebrow">03 / LIVE ARCHIVE</div>
+          <h2 class="chapter-title">روی صحنه</h2>
+        </div>
+        <p class="chapter-copy">چند لحظه از نور، بدن و صدای زنده؛ نه یک گالری، یک نوارِ حافظه.</p>
+      </div>
+
+      <div class="projector">
+        <div class="beam" aria-hidden="true"></div>
+
+        <div class="screen-frame">
+          <div class="lens" aria-hidden="true"><i></i></div>
+          <div class="screen">
+            <img id="liveImage" src="assets/live/live-01.webp" alt="سینا گل‌نقره روی صحنه">
+            <div class="screen-grain" aria-hidden="true"></div>
+            <div class="screen-shade" aria-hidden="true"></div>
+          </div>
+          <div class="reel-tape">
+            <i></i><b id="liveCount">01</b><span>LIVE FRAME</span><i></i>
+          </div>
+        </div>
+
+        <div class="filmstrip" id="liveRail" aria-label="انتخاب فریم‌های اجرای زنده"></div>
+      </div>
+
+      <div class="live-video">
+        <video controls preload="metadata" poster="assets/live/live-06.webp">
+          <source src="content/Bass_guitar_tuning_pegs_rotating_202608271408.mp4" type="video/mp4">
+        </video>
+        <p>یک برش کوتاه از جزئیات مکانیکی ساز؛ تصویری که بین آرشیوِ صحنه و لمسِ ساز پل می‌زند.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter bio-chapter" id="bio">
+    <div class="chapter-shell bio-layout">
+      <div class="bio-lead">
+        <div class="eyebrow">04 / THE PERSON</div>
+        <h2 class="chapter-title">سینا</h2>
+        <p>نوازنده‌ی گیتار بیس، آهنگساز و مهندس صدای زنده؛ مسیری که از سال ۱۳۸۳ بین ساز، گروه و اتاق صدا حرکت کرده است.</p>
+      </div>
+      <div class="bio-timeline">
+        <article class="bio-event"><div class="year">۱۳۸۳</div><h3>شروع با گیتار بیس</h3><p>فعالیت موسیقایی سینا با نوازندگی گیتار بیس آغاز شد و با مسترکلاس‌های بابک ریاحی‌پور ادامه پیدا کرد.</p></article>
+        <article class="bio-event"><div class="year">۲۰۱۵</div><h3>ساز و دانش صدا</h3><p>گذراندن دوره‌های مهندسی صدا زیر نظر روزبه اسماعیلی و سپهر حقیقی، مسیر نوازندگی را به کارِ استودیو و اجرای زنده پیوند زد.</p></article>
+        <article class="bio-event"><div class="year">۲۰۱۳ — امروز</div><h3>گروه‌ها و پروژه‌ها</h3><p>از مونهد و ماخولا تا کارنیوالسک، مگو و جلیل؛ در سبک‌های راک فارسی، آلترنیتیو، تجربی، پراگرسیو و فیوژن.</p></article>
+        <article class="bio-event"><div class="year">۲۰۲۳</div><h3>صحنه‌های دبی</h3><p>حضور روی صحنه به‌عنوان نوازنده‌ی بیس با سیاوش شمس، فتانه و کوروس؛ در کنار فعالیت حرفه‌ای به‌عنوان مهندس صدای زنده.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter contact-chapter" id="contact">
+    <div class="chapter-shell">
+      <div class="contact-layout">
+        <h2 class="chapter-title">همکاری؟</h2>
+        <div class="contact-copy">
+          <div class="eyebrow">05 / CONTACT</div>
+          <p class="chapter-copy">برای اجرا، تولید موسیقی یا همکاری در مهندسی صدای زنده.</p>
+          <div class="contact-links">
+            <a href="https://www.instagram.com/sina.golnoghreh" target="_blank" rel="noopener">Instagram / Sina</a>
+            <a href="https://carnivalesqueband.bandcamp.com" target="_blank" rel="noopener">Bandcamp</a>
+            <a href="https://www.instagram.com/makhoola.official" target="_blank" rel="noopener">Makhoola</a>
+            <a href="https://www.instagram.com/carnivalesqueband" target="_blank" rel="noopener">Carnivalesque</a>
+          </div>
+        </div>
+      </div>
+      <div class="contact-sign"><span>SINA GOLNEJAD</span><span>BASS / SOUND / LIVE</span></div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ================================================================
+   Color-Reveal — raw WebGL2, no libraries.
+   Phases (scroll-driven):
+     1. blur 15→2, B&W, low contrast        (p 0 → .38)
+     2. blur 2→0, B&W, contrast .75→1.1     (p .38 → .62)
+     3. color sweeps from geometric logo,
+        soft-edged, not global               (p .62 → 1)
+   Image occupies the RIGHT third, fades to black leftward,
+   text appears on the black zone in phase 3.
+================================================================ */
+(function(){
+'use strict';
+
+var canvas = document.getElementById('gl');
+var gl = canvas.getContext('webgl2', {alpha:false, antialias:true, powerPreference:'high-performance', preserveDrawingBuffer:true});
+if(!gl){
+  document.body.insertAdjacentHTML('afterbegin',
+    '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#888;font-family:sans-serif;z-index:99">WebGL2 پشتیبانی نمی‌شود</div>');
+  return;
+}
+
+/* ---------- shaders ---------- */
+var VS = `#version 300 es
+precision highp float;
+in vec2 aPos;
+out vec2 vUv;
+void main(){
+  vUv = aPos * .5 + .5;
+  vUv.y = 1. - vUv.y;
+  gl_Position = vec4(aPos, 0., 1.);
+}`;
+
+var FS = `#version 300 es
+precision highp float;
+in vec2 vUv;
+out vec4 outColor;
+
+uniform sampler2D uTexB;   // background plate
+uniform sampler2D uTexF;   // subject plate (alpha = cutout)
+uniform vec2  uMouse;      // smoothed pointer -1..1 (parallax)
+uniform float uDepth;      // parallax intensity 0..1
+uniform vec2  uRes;        // canvas px
+uniform vec2  uImgRes;     // image px
+uniform float uBlur;       // 0..15
+uniform float uContrast;   // .75..1.1
+uniform float uReveal;     // 0..1   color phase
+uniform float uTextIn;     // 0..1   text fade-in
+uniform float uTime;
+
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
+
+vec3 sampB(vec2 uv){
+  if(uv.x<0.||uv.x>1.||uv.y<0.||uv.y>1.) return vec3(0.);
+  return texture(uTexB, uv).rgb;
+}
+vec4 sampF(vec2 uv){
+  if(uv.x<0.||uv.x>1.||uv.y<0.||uv.y>1.) return vec4(0.);
+  return texture(uTexF, uv);
+}
+/* blurred subject sampling (9-tap + wide pass) — fg softens with the bg */
+vec4 blurF(vec2 uv){
+  vec2 off = vec2(uBlur * .0014) * vec2(1., uRes.x/uRes.y);
+  vec3 s = vec3(0.); float a = 0.; vec4 t;
+  t = sampF(uv + vec2(-off.x,-off.y)); s += t.rgb*t.a; a += t.a;
+  t = sampF(uv + vec2( 0.,   -off.y)); s += t.rgb*t.a; a += t.a;
+  t = sampF(uv + vec2( off.x,-off.y)); s += t.rgb*t.a; a += t.a;
+  t = sampF(uv + vec2(-off.x, 0.));    s += t.rgb*t.a; a += t.a;
+  t = sampF(uv);                       s += t.rgb*t.a; a += t.a;
+  t = sampF(uv + vec2( off.x, 0.));    s += t.rgb*t.a; a += t.a;
+  t = sampF(uv + vec2(-off.x, off.y)); s += t.rgb*t.a; a += t.a;
+  t = sampF(uv + vec2( 0.,    off.y)); s += t.rgb*t.a; a += t.a;
+  t = sampF(uv + vec2( off.x, off.y)); s += t.rgb*t.a; a += t.a;
+  vec4 r = vec4(s / max(a, 1e-4), a / 9.);
+  if(uBlur > 5.){
+    vec2 o2 = off * 1.9;
+    vec3 s2 = vec3(0.); float a2 = 0.;
+    t = sampF(uv + vec2(-o2.x, 0.)); s2 += t.rgb*t.a; a2 += t.a;
+    t = sampF(uv + vec2( o2.x, 0.)); s2 += t.rgb*t.a; a2 += t.a;
+    t = sampF(uv + vec2(0., -o2.y)); s2 += t.rgb*t.a; a2 += t.a;
+    t = sampF(uv + vec2(0.,  o2.y)); s2 += t.rgb*t.a; a2 += t.a;
+    vec4 r2 = vec4(s2 / max(a2, 1e-4), a2 / 4.);
+    r = mix(r, r2, .38);
+  }
+  return r;
+}
+/* cinematic warm grade so even cold stage light reads as color */
+vec3 grade(vec3 c){
+  c = max(mix(vec3(dot(c, vec3(.2126,.7152,.0722))), c, 2.05), vec3(0.));
+  c *= vec3(1.16, .99, .82);
+  return pow(max(c, vec3(0.)), vec3(.93, 1.0, 1.10));
+}
+
+/* gentler grade for the subject — less crushing, less punch */
+vec3 gradeF(vec3 c){
+  c = max(mix(vec3(dot(c, vec3(.2126,.7152,.0722))), c, 1.35), vec3(0.));
+  c *= vec3(1.08, .99, .90);
+  return pow(max(c, vec3(0.)), vec3(.97, 1.0, 1.05));
+}
+
+/* soft-edged rounded hexagon SDF — the "geometric logo" origin */
+float sdHex(vec2 p, float r){
+  const vec3 k = vec3(-0.866025404, 0.5, 0.577350269);
+  p = abs(p);
+  p -= 2.0*min(dot(k.xy, p), 0.0)*k.xy;
+  p -= vec2(clamp(p.x, -k.z*r, k.z*r), r);
+  return length(p)*sign(p.y);
+}
+
+void main(){
+  float aspect = uRes.x / uRes.y;
+  float imgAspect = uImgRes.x / uImgRes.y;
+
+  /* ---- image occupies right ~38% of frame, cover-fit, fade to black left ---- */
+  float slotW = .42;
+  float slotH = 1.0;
+  vec2 luv = vec2((vUv.x - (1. - slotW)) / slotW, vUv.y);
+
+  /* parallax offsets: bg drifts against, subject with the pointer (deep → near) */
+  vec2 oBg = uMouse * .014 * uDepth;
+  vec2 oFg = uMouse * .045 * uDepth;
+
+  float slotAspect = (slotW * aspect) / slotH;
+  vec2 base = luv;
+  if(imgAspect > slotAspect){
+    float s = slotAspect / imgAspect;
+    base.x = (luv.x - .5) * s + .5;
+  }else{
+    float s = imgAspect / slotAspect;
+    base.y = (luv.y - .5) * s + .5;
+  }
+  /* bg overscan for parallax; subject slightly zoomed OUT so it fits the frame fully */
+  vec2 cuvB = (base - .5) * .94 + .5 + oBg;   // bg: farther + counter-drift
+  vec2 cuvF = (base - .5) * 1.06 + .5 + oFg + vec2(0., -.055);  // subject: smaller + nudged lower
+
+  /* soft fade: full image at right edge → black toward the slot's left edge */
+  float ramp = smoothstep(.0, .58, luv.x);
+  float outside = smoothstep(-0.06, .02, luv.x);
+  float fadeIn  = ramp * outside;
+
+  /* vertical soft edge so image doesn't touch top/bottom borders */
+  float vfade = smoothstep(.0,.06,luv.y) * smoothstep(1.,.94,luv.y);
+  fadeIn *= vfade;
+
+  /* ---------- layers: bg then subject (9-tap blur when far) ---------- */
+  vec3 bgc;
+  if(uBlur < .08){
+    bgc = sampB(cuvB);
+  }else{
+    vec2 off = vec2(uBlur * .0016) * vec2(1., uRes.x/uRes.y);
+    vec3 s = vec3(0.);
+    s += sampB(cuvB + vec2(-off.x,-off.y));
+    s += sampB(cuvB + vec2( 0.,   -off.y));
+    s += sampB(cuvB + vec2( off.x,-off.y));
+    s += sampB(cuvB + vec2(-off.x, 0.));
+    s += sampB(cuvB);
+    s += sampB(cuvB + vec2( off.x, 0.));
+    s += sampB(cuvB + vec2(-off.x, off.y));
+    s += sampB(cuvB + vec2( 0.,    off.y));
+    s += sampB(cuvB + vec2( off.x, off.y));
+    bgc = s / 9.;
+    if(uBlur > 5.){
+      vec2 o2 = off * 1.9;
+      vec3 s2 = vec3(0.);
+      s2 += sampB(cuvB + vec2(-o2.x, 0.));
+      s2 += sampB(cuvB + vec2( o2.x, 0.));
+      s2 += sampB(cuvB + vec2(0., -o2.y));
+      s2 += sampB(cuvB + vec2(0.,  o2.y));
+      bgc = mix(bgc, s2/4., .38);
+    }
+  }
+  vec4 fgc = uBlur < .08 ? sampF(cuvF) : blurF(cuvF);
+
+  /* ---------- grayscale + contrast per layer (fg softer) ---------- */
+  float gB = dot(bgc, vec3(.2126,.7152,.0722));
+  vec3 bwB = (vec3(gB) - .5) * uContrast + .5;
+  float gF = dot(fgc.rgb, vec3(.2126,.7152,.0722));
+  vec3 bwF = (vec3(gF) - .5) * (uContrast * .68) + .5;
+
+  /* ---------- two-layer reveal: BACKGROUND colors first, subject follows ---------- */
+  float maskF = fgc.a;                          // exact subject cutout
+  vec2 hexC = vec2(.62, .5);
+  vec2 pH = (luv - hexC) * vec2(slotW * aspect, 1.0);
+  float dHex = sdHex(pH * 2.4, 1.05);
+
+  float front = uReveal * 4.2 - 1.55;           // starts below every pixel → no pop-in
+  float mBg = uReveal > 0.001 ? smoothstep(dHex - .60, dHex + .80, front) : 0.;
+  float mSub = uReveal > 0.001 ? smoothstep(dHex - .32, dHex + .45, front - .85) : 0.;
+  float m = clamp(mix(mBg, mSub, maskF), 0., 1.);
+
+  /* color develops gradually behind the wave — like a print coming up */
+  vec3 colB = mix(bwB, grade(bgc), mBg * (.30 + .70 * uReveal));
+  vec3 colF = mix(bwF, gradeF(fgc.rgb), mSub * (.30 + .70 * uReveal));
+
+  /* composite subject over background with soft edges */
+  vec3 finalCol = mix(colB, colF, maskF);
+
+  /* soft traveling glow — two rings hugging the wavefronts, fade in slowly */
+  if(uReveal > 0.001){
+    float fade = smoothstep(0., .14, uReveal);
+    float ringB = 1. - smoothstep(0., .38, abs(front - dHex));
+    float ringS = 1. - smoothstep(0., .30, abs((front - .85) - dHex));
+    finalCol += vec3(1., .40, .10) * ringB * (1.-maskF) * .16 * fade;
+    finalCol += vec3(1., .50, .14) * ringS * maskF * .18 * fade;
+  }
+
+  /* ---------- micro dust: tiny bright motes drifting in the slot only ---------- */
+  float dust = 0.;
+  {
+    float sc = 110.;
+    vec2 g1 = luv * vec2(sc * slotW * aspect, sc);
+    vec2 cell = floor(g1);
+    vec2 f = fract(g1);
+    float h = hash(cell);
+    if(h > .965){
+      vec2 pos = vec2(fract(h * 93.7), fract(h * 57.3));
+      pos.x += sin(uTime * .22 + h * 41.0) * .25;
+      pos.y += uTime * .012;
+      float d = length(f - fract(pos));
+      float tw = .55 + .45 * sin(uTime * (1.1 + h * 2.4) + h * 90.);
+      dust += smoothstep(.20, .0, d) * tw;
+    }
+    float sc2 = 200.;
+    vec2 g2 = luv * vec2(sc2 * slotW * aspect, sc2) + 7.31;
+    vec2 cell2 = floor(g2);
+    vec2 f2 = fract(g2);
+    float h2 = hash(cell2);
+    if(h2 > .978){
+      vec2 pos = vec2(fract(h2 * 71.3), fract(h2 * 23.1));
+      pos.y += uTime * .02;
+      float d = length(f2 - fract(pos));
+      float tw = .5 + .5 * sin(uTime * (2.0 + h2 * 3.0) + h2 * 130.);
+      dust += smoothstep(.16, .0, d) * tw;
+    }
+  }
+  float dustZone = fadeIn * smoothstep(.0, .18, luv.x);
+  dustZone *= .45 + .55 * uReveal;              // more life once color arrives
+  finalCol += vec3(1., .72, .38) * dust * dustZone * .8;
+
+  /* warm bleed rising over the black side as reveal completes */
+  float bleed = smoothstep(.36, .0, luv.x) * uReveal * uReveal;
+  bleed *= vfade;
+  finalCol += vec3(.55,.18,.04) * bleed * .30;
+
+  /* ---------- text zone (appears on black left side, phase 3) ---------- */
+  // text is drawn as DOM; here we only keep left side pure black for it
+  // add faint grid noise on black area so it isn't dead-flat
+  float grid = step(.5, fract(luv.x*24.) )*step(.5, fract(luv.y*14.));
+  finalCol += vec3(.012) * (1.-fadeIn) * grid;
+
+  /* ---------- grain ---------- */
+  float gr = hash(vUv*vec2(1440.,810.) + uTime*.7) * .055 - .0275;
+  finalCol += gr * mix(1.2, .7, m);
+
+  /* multiply by image mask so left is truly black; but keep glow over black in phase3 */
+  finalCol *= max(fadeIn, m * .95);
+
+  /* ---------- vignette ---------- */
+  vec2 q = vUv*2.-1.;
+  finalCol *= 1. - dot(q,q)*.14;
+  finalCol *= mix(.85, 1., smoothstep(1.35,.25,length(q)));
+
+  outColor = vec4(clamp(finalCol,0.,1.), 1.);
+}`;
+
+/* ---------- program ---------- */
+function sh(type, src){
+  var s = gl.createShader(type);
+  gl.shaderSource(s, src); gl.compileShader(s);
+  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+    console.error('shader:', gl.getShaderInfoLog(s));
+  return s;
+}
+var prog = gl.createProgram();
+gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
+gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+gl.linkProgram(prog);
+if(!gl.getProgramParameter(prog, gl.LINK_STATUS))
+  console.error('link:', gl.getProgramInfoLog(prog));
+gl.useProgram(prog);
+
+var buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+var loc = gl.getAttribLocation(prog, 'aPos');
+gl.enableVertexAttribArray(loc);
+gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+var U = {};
+['uTexB','uTexF','uMouse','uDepth','uRes','uImgRes','uBlur','uContrast','uReveal','uTextIn','uTime']
+  .forEach(function(n){ U[n] = gl.getUniformLocation(prog, n); });
+
+/* ---------- textures: bg plate + subject plate ---------- */
+var imgReady = false, imgW = 1920, imgH = 1280;
+var TEX_MAX = 1280;   // decode cap: big enough for the slot, kind to VRAM
+
+function makeTex(){
+  var t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,255]));
+  return t;
+}
+
+/* decode via an offscreen 2D canvas:
+   - GPU-safe upload path (avoids the image-decode race we hit headless)
+   - no NPOT mipmap rules (we blur in-shader anyway)
+   - downscale caps VRAM */
+function loadTex(t, image){
+  var w = image.naturalWidth, h = image.naturalHeight;
+  var scale = Math.min(1, TEX_MAX / Math.max(w, h));
+  var cv = document.createElement('canvas');
+  cv.width  = Math.max(2, Math.round(w * scale));
+  cv.height = Math.max(2, Math.round(h * scale));
+  cv.getContext('2d').drawImage(image, 0, 0, cv.width, cv.height);
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cv);
+}
+
+var texB = makeTex();
+var texF = makeTex();
+
+var bgImg = new Image();
+bgImg.src = 'assets/dual/background.webp';
+bgImg.onload = function(){
+  imgW = bgImg.naturalWidth; imgH = bgImg.naturalHeight;
+  loadTex(texB, bgImg);
+  imgReady = true;
+  if(enterBtn) enterBtn.classList.add('ready');
+};
+var fgImg = new Image();
+fgImg.src = 'assets/dual/foreground.webp';
+fgImg.onload = function(){
+  loadTex(texF, fgImg);
+};
+
+/* ---------- mouse parallax (smoothed) ---------- */
+var mouse = {x:0, y:0, tx:0, ty:0, depth:0, tdepth:0};
+window.addEventListener('mousemove', function(e){
+  mouse.tx = (e.clientX / window.innerWidth  - .5) * 2;
+  mouse.ty = (e.clientY / window.innerHeight - .5) * 2;
+  mouse.tdepth = 1;
+}, {passive:true});
+window.addEventListener('mouseout', function(e){
+  if(!e.relatedTarget){ mouse.tdepth = 0; }
+});
+
+/* ---------- resize ---------- */
+var W = 0, H = 0;
+function resize(){
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* ---------- journey driver (button, not scroll) ---------- */
+var state = {p:0, blur:15, contrast:.75, reveal:0, textIn:0, phase:1};
+var target = {p:0};
+var journey = {playing:false,complete:false,t0:0,dur:3500};
+var enterBtn = document.getElementById('enterbtn');
+var continueCue = document.getElementById('continueCue');
+function finishJourney(){
+  if(journey.complete) return;
+  journey.playing = false;
+  journey.complete = true;
+  target.p = 1;
+  document.body.classList.add('site-ready');
+  if(continueCue) continueCue.classList.add('show');
+}
+function startJourney(){
+  if(journey.playing || journey.complete || state.p > .001) return;
+  journey.playing = true;
+  journey.t0 = performance.now();
+  if(continueCue) continueCue.classList.remove('show');
+  enterBtn.classList.add('gone');
+}
+if(enterBtn) enterBtn.addEventListener('click', startJourney);
+/* timeline pump: drives the journey even when rAF throttles (bg tab) */
+setInterval(function(){
+  if(!journey.playing) return;
+  var jp = Math.min(1, (performance.now() - journey.t0) / journey.dur);
+  target.p = jp;
+  if(jp >= 1) finishJourney();
+}, 120);
+
+/* ---------- rendering loop ---------- */
+window.__reveal = { getState: function(){ return {
+  p: +state.p.toFixed(3), targetP: +target.p.toFixed(3), blur: +state.blur.toFixed(2),
+  contrast: +state.contrast.toFixed(2), reveal: +state.reveal.toFixed(3),
+  textIn: +state.textIn.toFixed(3), phase: state.phase, imgReady: imgReady,
+  journey: journey.complete ? 'complete' : (journey.playing ? 'playing' : 'idle')
+}; } };
+window.__reveal.start = startJourney;
+
+/* ---------- render loop ---------- */
+var t0 = performance.now(), last = t0, raf;
+function tick(now){
+  raf = requestAnimationFrame(tick);
+  if(document.hidden) return;
+  /* stage hidden (scenes active) → skip GL work until back on top */
+  if(vScroll.v > sceneCenter.instrument * .55) return;
+
+  // button-driven journey: advance target along the 0→100 timeline
+  if(journey.playing){
+    var jp = Math.min(1, (now - journey.t0) / journey.dur);
+    target.p = jp;
+    if(jp >= 1) finishJourney();
+  }
+
+  // critically-damped-ish easing
+  state.p += (target.p - state.p) * .09;
+  if(Math.abs(target.p - state.p) < .0004) state.p = target.p;
+
+  var p = state.p;
+  var blur, contrast, reveal, textIn, phase;
+
+  if(p < .38){                       // phase 1: blur + B&W
+    var t1 = p / .38;
+    blur = 15 - 13 * t1;             // 15 → 2
+    contrast = .75;
+    reveal = 0; textIn = 0; phase = 1;
+  }else if(p < .55){                 // phase 2: focus, still B&W
+    var t2 = (p - .38) / .17;
+    var e2 = t2*t2*(3-2*t2);
+    blur = 2 * (1 - e2);             // 2 → 0
+    contrast = .75 + .35 * e2;       // .75 → 1.10
+    reveal = 0; textIn = 0; phase = 2;
+  }else{                             // phase 3: color from hexagon — long, gentle
+    var t3 = (p - .55) / .45;
+    var e3 = t3*t3*t3*(t3*(t3*6-15)+10);   // smootherstep: gentle start & landing
+    blur = 0;
+    contrast = 1.10;
+    reveal = e3;
+    textIn = Math.min(1, Math.max(0, e3 - .10) * 1.55);
+    phase = 3;
+  }
+  state.blur = blur; state.contrast = contrast;
+  state.reveal = reveal; state.textIn = textIn; state.phase = phase;
+
+  // mouse smoothing (slow cinematic lag)
+  mouse.x += (mouse.tx - mouse.x) * .06;
+  mouse.y += (mouse.ty - mouse.y) * .06;
+  mouse.depth += (mouse.tdepth - mouse.depth) * .04;
+
+  // draw
+  gl.useProgram(prog);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texB);
+  gl.uniform1i(U.uTexB, 0);
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, texF);
+  gl.uniform1i(U.uTexF, 1);
+  gl.uniform2f(U.uMouse, mouse.x, mouse.y);
+  gl.uniform1f(U.uDepth, mouse.depth);
+  gl.uniform2f(U.uRes, canvas.width, canvas.height);
+  gl.uniform2f(U.uImgRes, imgW, imgH);
+  gl.uniform1f(U.uBlur, blur);
+  gl.uniform1f(U.uContrast, contrast);
+  gl.uniform1f(U.uReveal, reveal);
+  gl.uniform1f(U.uTextIn, textIn);
+  gl.uniform1f(U.uTime, (now - t0) * .001);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  // DOM text overlay opacity (phase 3)
+  var txt = document.getElementById('headline');
+  if(txt) txt.style.opacity = (textIn * .96).toFixed(3);
+  var sub = document.getElementById('subline');
+  if(sub) sub.style.opacity = (Math.max(0, textIn - .25) / .75).toFixed(3);
+}
+raf = requestAnimationFrame(tick);
+
+/* ---------- sync force-render (verification/debug) ---------- */
+window.__reveal.force = function(pv){
+  state.p = pv; target.p = pv;
+  var p = state.p, blur, contrast, reveal, textIn, phase;
+  if(p < .38){
+    var t1 = p / .38; blur = 15 - 13 * t1; contrast = .75; reveal = 0; textIn = 0; phase = 1;
+  }else if(p < .55){
+    var t2 = (p - .38) / .17; var e2 = t2*t2*(3-2*t2);
+    blur = 2 * (1 - e2); contrast = .75 + .35 * e2; reveal = 0; textIn = 0; phase = 2;
+  }else{
+    var t3 = (p - .55) / .45; var e3 = t3*t3*t3*(t3*(t3*6-15)+10);
+    blur = 0; contrast = 1.10; reveal = e3;
+    textIn = Math.min(1, Math.max(0, e3 - .10) * 1.55); phase = 3;
+  }
+  state.blur = blur; state.contrast = contrast;
+  state.reveal = reveal; state.textIn = textIn; state.phase = phase;
+  gl.useProgram(prog);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texB);
+  gl.uniform1i(U.uTexB, 0);
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, texF);
+  gl.uniform1i(U.uTexF, 1);
+  gl.uniform2f(U.uMouse, 0.35, -0.25);
+  gl.uniform1f(U.uDepth, 1.0);
+  gl.uniform2f(U.uRes, canvas.width, canvas.height);
+  gl.uniform2f(U.uImgRes, imgW, imgH);
+  gl.uniform1f(U.uBlur, blur);
+  gl.uniform1f(U.uContrast, contrast);
+  gl.uniform1f(U.uReveal, reveal);
+  gl.uniform1f(U.uTextIn, textIn);
+  gl.uniform1f(U.uTime, 4.2);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  var txt = document.getElementById('headline');
+  if(txt) txt.style.opacity = (textIn * .96).toFixed(3);
+  var sub = document.getElementById('subline');
+  if(sub) sub.style.opacity = (Math.max(0, textIn - .25) / .75).toFixed(3);
+};
+var overlay = document.createElement('div');
+overlay.style.cssText = 'position:absolute;left:0;top:0;bottom:0;width:57vw;z-index:4;pointer-events:none;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:0 3.2vw;text-align:right;';
+overlay.innerHTML =
+  '<h1 id="headline" style="opacity:0;transition:opacity .12s linear;font-family:\'Lalezar\',Vazirmatn,sans-serif;font-size:clamp(44px,7vw,92px);font-weight:400;line-height:1.15;margin:0">' +
+    'سینا <span style="color:#ff5a1f">گل‌نقره</span>' +
+  '</h1>';
+document.getElementById('stage').appendChild(overlay);
+
+/* ================================================================
+   VIRTUAL SCROLL ENGINE — Luca-style: the page never moves.
+   Wheel/touch/keys feed a virtual value 0..1; every scene is placed
+   continuously on that axis and rendered cinematically each frame
+   (slide + focus + scale) instead of a hard opacity toggle.
+   ================================================================ */
+var SCENES = ['instrument','sound','live','bio','contact'];
+var sceneEls = {}, navLinks = {};
+SCENES.forEach(function(id){
+  sceneEls[id] = document.getElementById(id);
+  var a = document.querySelector('.site-nav a[href="#' + id + '"]');
+  if(a) navLinks[id] = a;
+});
+/* scene ranges on the 0..1 axis (instrument long: 240 frames live inside) */
+var SCENE_RANGE = {instrument:.26, sound:.14, live:.16, bio:.16, contact:.08};
+var RANGE_TOTAL = SCENE_RANGE.instrument + SCENE_RANGE.sound + SCENE_RANGE.live + SCENE_RANGE.bio + SCENE_RANGE.contact;
+/* cumulative start + center of each scene */
+var sceneStart = (function(){
+  var acc = 0, map = {};
+  SCENES.forEach(function(id){ map[id] = acc; acc += SCENE_RANGE[id]; });
+  return map;
+})();
+var sceneCenter = {};
+SCENES.forEach(function(id){ sceneCenter[id] = sceneStart[id] + SCENE_RANGE[id] * .5; });
+function sceneP(id){
+  var v = vScroll.v - sceneStart[id];
+  return Math.max(0, Math.min(1, v / SCENE_RANGE[id]));
+}
+var vScroll = {v:0, target:0, scene:null};
+var stageEl = document.getElementById('stage');
+
+/* cinematic per-frame placement: only the nearest scenes are involved,
+   everything else sits at opacity 0 with zero cost */
+var FX = {
+  tail: 0.055,                     // fade distance (axis) entering/leaving a scene
+  slide: 46,                       // px of vertical travel during a pass
+  blur: 7,                         // px of focus blur at the edges
+  scale: 0.016                     // depth scale at the edges
+};
+function placeScene(id){
+  var el = sceneEls[id];
+  if(!el) return;
+  var v = vScroll.v;
+  /* visibility window: [start - tail, end + tail] — strictly zero outside.
+     first scene starts EARLY-capped so it stays invisible at v=0 (entry owns) */
+  var s = sceneStart[id], r = SCENE_RANGE[id];
+  var winS = (id === SCENES[0]) ? s + FX.tail * .6 : s - FX.tail;
+  var aIn  = Math.min(1, Math.max(0, (v - winS) / FX.tail));
+  var aOut = 1 - Math.min(1, Math.max(0, (v - (s + r)) / FX.tail));
+  var a = Math.min(aIn, aOut);
+  a = a * a * (3 - 2 * a);                    // smoothstep both edges
+  var d = (v - sceneCenter[id]) / (r * .5 + FX.tail * 2);
+  if(a < .003){
+    el.style.opacity = '0'; el.style.visibility = 'hidden';
+    el.style.transform = 'none'; el.style.filter = 'none';
+    return;
+  }
+  el.style.opacity = a.toFixed(3);
+  el.style.visibility = 'visible';
+  el.style.transform = 'translate3d(0,' + (-d * FX.slide).toFixed(1) + 'px,0) scale(' +
+    (1 - Math.min(.5, Math.abs(d)) * FX.scale).toFixed(4) + ')';
+  el.style.filter = a > .97 ? 'none' : 'blur(' + (Math.abs(d) * FX.blur).toFixed(2) + 'px)';
+  el.classList.toggle('on', a > .5);
+}
+function setScene(id){
+  if(vScroll.scene === id) return;
+  vScroll.scene = id;
+  if(!id && pegFrameIndex !== 0){ pegFrameIndex = 0; drawPeg(); }
+  stageEl.classList.toggle('gone', !!id);
+  SCENES.forEach(function(s){
+    var a = navLinks[s];
+    if(a) a.classList.toggle('cur', s === id);
+  });
+}
+function applyScroll(){
+  var v = vScroll.v;
+  SCENES.forEach(placeScene);
+  /* stage (color-reveal) exits up-front with its own cinematic fade.
+     exit fully by the time the first scene is fully in (tail*1.8) */
+  var sv = v / (FX.tail * 1.8);
+  var sa = Math.max(0, 1 - sv);
+  sa = sa * sa * (3 - 2 * sa);
+  stageEl.style.opacity = sa.toFixed(3);
+  stageEl.style.transform = 'translate3d(0,' + (-v * 90).toFixed(1) + 'px,0)';
+  var sblur = Math.max(0, sv - 1) * 6;
+  stageEl.style.filter = sblur > .02 ? 'blur(' + sblur.toFixed(2) + 'px)' : 'none';
+  /* active scene = the one centered nearest v; instrument updates its frames.
+     before leaving the entry stage (v≈0) nothing is "active" — GL stage owns */
+  var cur = null, best = 1e9;
+  SCENES.forEach(function(id){
+    var dd = Math.abs(v - sceneCenter[id]);
+    if(dd < best){ best = dd; cur = id; }
+  });
+  if(v < sceneCenter.instrument * .55) cur = null;
+  setScene(cur);
+  if(cur === 'instrument') updatePeg();
+}
+/* smoothed virtual scroll loop (rAF independent of the GL tick) */
+(function vLoop(){
+  requestAnimationFrame(vLoop);
+  var d = vScroll.target - vScroll.v;
+  if(Math.abs(d) < .00002){ vScroll.v = vScroll.target; applyScroll(); return; }
+  vScroll.v += d * .11;
+  applyScroll();
+})();
+/* wheel: hijack and feed virtual value.
+   Inner scrollable shells keep native scroll — but ONLY while they can
+   actually move in that direction; at their edge the wheel hands off
+   to the virtual scroll again (so you can leave a long scene). */
+function shellAfford(t, dy){
+  var sh = t.closest ? t.closest('.chapter-shell') : null;
+  if(!sh || sh.scrollHeight <= sh.clientHeight + 4) return null;
+  var atTop = sh.scrollTop <= 0;
+  var atBottom = sh.scrollTop + sh.clientHeight >= sh.scrollHeight - 1;
+  if((dy > 0 && !atBottom) || (dy < 0 && !atTop)) return sh;
+  return null;
+}
+window.addEventListener('wheel', function(e){
+  if(!journey.complete){
+    /* entry: any scroll intent plays the reveal journey */
+    if(e.deltaY > 0) startJourney();
+    return;
+  }
+  e.preventDefault();
+  var sh = shellAfford(e.target, e.deltaY);
+  if(sh){ /* native inner scroll happens now */ return; }
+  vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, vScroll.target + e.deltaY * .00042));
+}, {passive:false});
+/* keyboard */
+window.addEventListener('keydown', function(e){
+  if(!journey.complete) return;
+  var step = .012, handled = false;
+  switch(e.key){
+    case 'ArrowDown': case 'PageDown': vScroll.target = Math.min(RANGE_TOTAL, vScroll.target + step * 4); handled = true; break;
+    case 'ArrowUp': case 'PageUp': vScroll.target = Math.max(0, vScroll.target - step * 4); handled = true; break;
+    case 'Home': vScroll.target = 0; handled = true; break;
+    case 'End': vScroll.target = RANGE_TOTAL; handled = true; break;
+  }
+  if(handled) e.preventDefault();
+}, {passive:false});
+/* touch swipe */
+var touchY0 = null;
+window.addEventListener('touchstart', function(e){
+  touchY0 = shellAfford(e.target, 0) ? null : e.touches[0].clientY;
+}, {passive:true});
+window.addEventListener('touchmove', function(e){
+  if(!journey.complete || touchY0 === null) return;
+  var dy = touchY0 - e.touches[0].clientY;
+  if(Math.abs(dy) > 2){
+    if(shellAfford(e.target, dy)){ touchY0 = e.touches[0].clientY; return; }
+    e.preventDefault();
+    vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, vScroll.target + dy * .0011));
+    touchY0 = e.touches[0].clientY;
+  }
+}, {passive:false});
+/* nav links jump directly on the virtual axis */
+Object.keys(navLinks).forEach(function(id){
+  navLinks[id].addEventListener('click', function(e){
+    e.preventDefault();
+    if(!journey.complete){ startJourney(); return; }
+    vScroll.target = sceneStart[id] + SCENE_RANGE[id] * .45;
+  });
+});
+
+/* ---------- instrument frame sequence (driven by virtual scroll) ---------- */
+var pegCanvas = document.getElementById('pegCanvas');
+var pegCtx = pegCanvas ? pegCanvas.getContext('2d') : null;
+var pegFrames = [], pegFrameIndex = 0, pegCount = 240;
+function pegSrc(i){ return 'assets/headstock-frames/f' + String(i + 1).padStart(3, '0') + '.webp'; }
+function sizePegCanvas(){
+  if(!pegCanvas || !pegCtx) return;
+  var r = pegCanvas.getBoundingClientRect();
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var w = Math.max(2, Math.round(r.width * dpr)), h = Math.max(2, Math.round(r.height * dpr));
+  if(pegCanvas.width !== w || pegCanvas.height !== h){ pegCanvas.width = w; pegCanvas.height = h; }
+  drawPeg();
+}
+function drawPeg(){
+  if(!pegCanvas || !pegCtx) return;
+  var w = pegCanvas.width, h = pegCanvas.height;
+  pegCtx.fillStyle = '#030303'; pegCtx.fillRect(0, 0, w, h);
+  var im = pegFrames[pegFrameIndex];
+  if(!im || !im.complete || !im.naturalWidth) return;
+  var scale = Math.min(w / im.naturalWidth, h / im.naturalHeight);
+  var dw = im.naturalWidth * scale, dh = im.naturalHeight * scale;
+  pegCtx.drawImage(im, (w - dw) * .5, (h - dh) * .5, dw, dh);
+}
+function updatePeg(){
+  if(!pegCanvas) return;
+  /* virtual scroll: whole site journey = 0..1. Instrument scene owns its scene range */
+  var p = sceneP('instrument');
+  pegFrameIndex = Math.round(p * (pegCount - 1));
+  var bar = document.getElementById('pegProgress');
+  if(bar) bar.style.width = (p * 100).toFixed(1) + '%';
+  drawPeg();
+}
+for(var pi = 0; pi < pegCount; pi++){
+  (function(idx){
+    var im = new Image(); im.decoding = 'async';
+    im.onload = function(){ if(idx === pegFrameIndex) drawPeg(); };
+    im.src = pegSrc(idx); pegFrames[idx] = im;
+  })(pi);
+}
+window.addEventListener('resize', function(){ sizePegCanvas(); drawPeg(); });
+setTimeout(function(){ sizePegCanvas(); }, 80);
+
+/* ---------- live archive rail ---------- */
+var liveRail = document.getElementById('liveRail');
+var liveImage = document.getElementById('liveImage');
+var liveCount = document.getElementById('liveCount');
+var liveIndex = 1;
+function liveSrc(i){ return 'assets/live/live-' + String(i).padStart(2, '0') + '.webp'; }
+function selectLive(i){
+  if(!liveImage || i === liveIndex) return;
+  liveIndex = i;
+  liveImage.style.opacity = '0';
+  setTimeout(function(){
+    liveImage.src = liveSrc(i);
+    liveImage.onload = function(){ liveImage.style.opacity = '1'; };
+    liveImage.style.opacity = '1';
+  }, 170);
+  if(liveCount) liveCount.textContent = String(i).padStart(2, '0');
+  if(liveRail) liveRail.querySelectorAll('.live-thumb').forEach(function(btn, n){ btn.classList.toggle('active', n === i - 1); });
+}
+if(liveRail){
+  for(var li = 1; li <= 16; li++){
+    (function(idx){
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'live-thumb' + (idx === 1 ? ' active' : '');
+      btn.setAttribute('aria-label', 'فریم اجرای زنده ' + idx);
+      var im = document.createElement('img'); im.src = liveSrc(idx); im.alt = ''; im.loading = 'lazy';
+      btn.appendChild(im); btn.addEventListener('click', function(){ selectLive(idx); }); liveRail.appendChild(btn);
+    })(li);
+  }
+}
+window.__sina = { getState: function(){ return {
+  journey: journey.complete ? 'complete' : (journey.playing ? 'playing' : 'idle'),
+  scene: vScroll.scene, v: +vScroll.v.toFixed(3), vTarget: +vScroll.target.toFixed(3),
+  pegIndex: pegFrameIndex, pegCount: pegCount, liveIndex: liveIndex,
+  liveFrames: liveRail ? liveRail.querySelectorAll('.live-thumb').length : 0
+}; } };
+/* expose virtual-scroll driver for verification & nav testing */
+window.__sina.goto = function(v){ vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, v)); };
+
+/* expose cleanup (unused but tidy) */
+window.__reveal.destroy = function(){ cancelAnimationFrame(raf); };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════
+  سینا گل‌نقره — نوازنده گیتار بیس · Sina Golnoghreh — Bassist
+  Single-file cinematic scroll experience (three.js r128)
+  Fully offline via file:// · Brief: PROMPT.md
+  ═════════════════════════════ sina-bass · 2026 ════════════
+-->
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سینا گل‌نقره — نوازنده گیتار بیس</title>
+<meta name="description" content="سینا گل‌نقره؛ نوازنده گیتار بیس، آهنگساز و مهندس صدای زنده.">
+<link rel="icon" href="data:,">
+<style>
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Regular.ttf') format('truetype');font-weight:400;font-display:block}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Medium.ttf') format('truetype');font-weight:500;font-display:block}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-SemiBold.ttf') format('truetype');font-weight:600;font-display:block}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Bold.ttf') format('truetype');font-weight:700;font-display:block}
+
+:root{
+  --bg:#000; --ink:#F2F0EA; --muted:#9A968C;
+  --gold:#D9A441; --gold-dim:rgba(217,164,65,.35); --gold-faint:rgba(217,164,65,.10);
+  --live:#E5484D;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:#000;scroll-behavior:auto;scrollbar-width:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;min-height:100vh;-webkit-font-smoothing:antialiased}
+::selection{background:var(--gold-dim);color:#fff}
+
+#gl{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-index:0}
+#vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse 120% 90% at 50% 45%,transparent 55%,rgba(0,0,0,.55) 100%)}
+#grain{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.05}
+#grain::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")}
+
+#progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:50}
+#progress .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold-dim),var(--gold))}
+
+#lang{position:fixed;top:18px;inset-inline-end:22px;z-index:60;font-size:12px;letter-spacing:.14em;font-family:inherit;background:rgba(0,0,0,.35);border:1px solid rgba(242,240,234,.18);color:var(--muted);padding:7px 14px;border-radius:100px;cursor:pointer;transition:.25s}
+#lang:hover,#lang:focus-visible{border-color:var(--gold);color:var(--gold);outline:none}
+
+#rail{position:fixed;inset-inline-start:22px;top:50%;transform:translateY(-50%);z-index:55;display:flex;flex-direction:column;gap:14px}
+#rail button{width:26px;height:26px;border:none;background:none;cursor:pointer;position:relative;display:grid;place-items:center;padding:0}
+#rail button::before{content:'';width:5px;height:5px;border-radius:50%;background:rgba(242,240,234,.25);transition:.3s}
+#rail button:hover::before{background:var(--muted)}
+#rail button.on::before{background:var(--gold);box-shadow:0 0 8px var(--gold-dim);transform:scale(1.4)}
+#rail button:focus-visible{outline:1px solid var(--gold);outline-offset:2px;border-radius:50%}
+#rail .num{position:absolute;inset-inline-start:34px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--muted);opacity:0;transition:.25s;white-space:nowrap}
+#rail button:hover .num,#rail button.on .num{opacity:1}
+
+main{position:relative;z-index:10}
+section{min-height:100vh;position:relative;display:flex;align-items:center}
+.wrap{width:min(1200px,92vw);margin-inline:auto}
+.ch{padding:14vh 0 12vh}
+.kicker{font-size:12px;letter-spacing:.32em;color:var(--gold);text-transform:uppercase;margin-bottom:2.2rem}
+h1{font-size:clamp(3rem,9vw,7.5rem);font-weight:700;line-height:1.08}
+h2{font-size:clamp(2.2rem,5.5vw,4.2rem);font-weight:700;line-height:1.15;margin-bottom:.6em}
+.lede{font-size:clamp(1.05rem,1.6vw,1.3rem);color:var(--muted);line-height:2;max-width:34em;margin-bottom:1.2em}
+p{line-height:2.1}
+
+.w{display:inline-block;opacity:0;transform:translateY(1.1em) rotate(1.2deg);transition:opacity .7s cubic-bezier(.2,.6,.2,1),transform .7s cubic-bezier(.2,.6,.2,1);transition-delay:calc(var(--i)*70ms)}
+.on .w{opacity:1;transform:none}
+.fade{opacity:0;transform:translateY(14px);transition:opacity .8s ease,transform .8s ease;transition-delay:calc(var(--d,0)*120ms)}
+.on .fade{opacity:1;transform:none}
+html.reduced .w,html.reduced .fade{transition:none;opacity:1;transform:none}
+
+.ch:nth-child(even) .wrap{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+
+#hero .wrap{display:flex;flex-direction:column;justify-content:center;min-height:100vh}
+#hero h1{margin:.3em 0 .15em}
+#hero .sub{color:var(--muted);font-size:clamp(1rem,1.8vw,1.35rem)}
+#hero .rule{width:64px;height:1px;background:var(--gold);margin-top:2.4rem;opacity:.8}
+
+#scroll-cue{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:56;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:11px;letter-spacing:.28em;transition:opacity .5s;pointer-events:none}
+#scroll-cue .line{width:1px;height:44px;background:linear-gradient(to bottom,var(--gold),transparent);animation:cue 2.2s ease-in-out infinite}
+@keyframes cue{0%,100%{transform:scaleY(.35);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+
+/* headstock — the signature moment */
+#headstock{min-height:320vh;display:block}
+#headstock .pin{position:sticky;top:0;height:100vh;overflow:hidden}
+#hs-img{position:absolute;height:115vh;width:auto;top:50%;right:-10vw;transform:translateY(-50%);mix-blend-mode:screen;filter:contrast(1.07) saturate(1.04);user-select:none;-webkit-user-drag:none;pointer-events:none;will-change:transform,opacity}
+#hs-label{position:absolute;bottom:9vh;left:8vw;font-size:13px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase}
+#hs-label b{color:var(--gold);font-weight:600}
+#hs-count{position:absolute;bottom:6.6vh;left:8vw;font-size:12px;color:var(--muted);letter-spacing:.2em;direction:ltr}
+#hs-count b{color:var(--gold);font-weight:600}
+
+.bgnum{position:absolute;top:8vh;inset-inline-end:4vw;font-size:26vw;font-weight:700;line-height:1;color:rgba(242,240,234,.026);pointer-events:none;user-select:none;z-index:-1}
+
+#bio .wrap{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:5vw;align-items:start}
+#bio .facts{border-inline-start:1px solid rgba(242,240,234,.12);padding-inline-start:2rem;display:flex;flex-direction:column;gap:1.6rem;margin-top:1rem}
+#bio .facts b{display:block;font-size:1.5rem;color:var(--gold);font-weight:700;line-height:1.2}
+#bio .facts span{font-size:.85rem;color:var(--muted)}
+#bio .body p+p{margin-top:1.3em}
+.hl{color:var(--ink)}
+.dim{color:var(--muted)}
+
+.track{display:flex;align-items:center;gap:1.2rem;padding:1.3rem .8rem;border-bottom:1px solid rgba(242,240,234,.1);cursor:pointer;transition:background .3s}
+.track:first-of-type{border-top:1px solid rgba(242,240,234,.1)}
+.track:hover,.track.playing{background:var(--gold-faint)}
+.track .no{font-size:.8rem;color:var(--muted);width:2ch;direction:ltr}
+.track .t{font-size:1.1rem;font-weight:500;flex:1}
+.track .meta{font-size:.7rem;color:var(--muted);letter-spacing:.2em;direction:ltr}
+.track .eq{display:none;align-items:flex-end;gap:2px;height:14px}
+.track.playing .eq{display:flex}
+.track.playing .no{display:none}
+.track .eq i{width:3px;background:var(--gold);animation:eq .9s ease-in-out infinite}
+.track .eq i:nth-child(2){animation-delay:.2s}
+.track .eq i:nth-child(3){animation-delay:.4s}
+@keyframes eq{0%,100%{height:4px}50%{height:14px}}
+#audio-note{margin-top:1.4rem;font-size:.8rem;color:var(--muted);opacity:.7;transition:color .3s}
+#audio-note.flash{color:var(--gold);opacity:1}
+
+.show{display:grid;grid-template-columns:110px 1fr auto;gap:1.6rem;align-items:baseline;padding:1.5rem .5rem;border-bottom:1px solid rgba(242,240,234,.1);transition:background .3s}
+.show:hover{background:rgba(242,240,234,.03)}
+.show .date{direction:ltr;text-align:left;font-size:.85rem;color:var(--muted)}
+.show .date b{display:block;font-size:1.6rem;color:var(--ink);font-weight:700}
+.show .where b{font-size:1.05rem;font-weight:600;display:block}
+.show .where span{font-size:.85rem;color:var(--muted)}
+.tag{font-size:10px;letter-spacing:.22em;color:var(--live);border:1px solid rgba(229,72,77,.35);padding:5px 10px;border-radius:100px;text-transform:uppercase}
+.tag.soon{color:var(--muted);border-color:rgba(242,240,234,.15)}
+
+#contact .wrap{text-align:center}
+#contact .links{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:3rem}
+#contact a.btn{display:inline-flex;align-items:center;gap:.6rem;color:var(--ink);text-decoration:none;font-size:.95rem;border:1px solid rgba(242,240,234,.18);padding:13px 22px;border-radius:100px;transition:.3s}
+#contact a.btn:hover,#contact a.btn:focus-visible{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);outline:none}
+#contact .fin{margin-top:14vh;font-size:12px;color:var(--muted);letter-spacing:.3em;opacity:.6}
+.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+@media(max-width:900px){
+  #bio .wrap{grid-template-columns:1fr}
+  #bio .facts{border-inline-start:none;border-top:1px solid rgba(242,240,234,.12);padding-inline-start:0;padding-top:1.6rem;flex-direction:row;flex-wrap:wrap;gap:2rem}
+  .bgnum{font-size:40vw}
+}
+@media(max-width:768px){
+  #rail{display:none}
+  #hs-img{height:80vh;right:-14vw}
+  .show{grid-template-columns:70px 1fr;gap:1rem}
+  .show .tag{grid-column:2;justify-self:start}
+  #lang{top:14px;inset-inline-end:14px}
+}
+@media(max-width:480px){
+  #hs-img{height:64vh;right:-18vw}
+}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="vignette"></div>
+<div id="grain"></div>
+<div id="progress"><div class="bar"></div></div>
+
+<button id="lang" aria-label="Switch language">EN</button>
+<nav id="rail" aria-label="فصل‌ها"></nav>
+<div id="scroll-cue"><span>SCROLL</span><div class="line"></div></div>
+
+<main>
+  <!-- 1 · HERO -->
+  <section id="hero" data-ch="0"><div class="wrap ch">
+    <p class="kicker" data-fa="بیسیست · آهنگساز · مهندس صدای زنده" data-en="Bassist · Composer · Live Sound Engineer">بیسیست · آهنگساز · مهندس صدای زنده</p>
+    <h1 data-split data-fa="سینا گل‌نقره" data-en="SINA GOLNOGHREH">سینا گل‌نقره</h1>
+    <p class="sub" data-split data-fa="نوازنده‌ی گیتار بیس، آهنگساز و مهندس صدای زنده" data-en="Bass guitarist, composer &amp; live sound engineer">نوازنده‌ی گیتار بیس، آهنگساز و مهندس صدای زنده</p>
+    <div class="rule"></div>
+  </div></section>
+
+  <!-- 2 · HEADSTOCK — signature moment -->
+  <section id="headstock" data-ch="1">
+    <div class="pin">
+      <img id="hs-img" src="assets/headstock-frames/f001.webp" alt="دسته‌ی گیتار Dingwall NG2">
+      <div id="hs-label">Dingwall <b>NG2</b></div>
+      <div id="hs-count" aria-hidden="true"><b>00</b> / 05</div>
+    </div>
+  </section>
+
+  <!-- 3 · BIO -->
+  <section id="bio" data-ch="2"><div class="wrap ch">
+    <div class="bgnum">۰۲</div>
+    <div class="body">
+      <p class="kicker" data-fa="درباره" data-en="About">درباره</p>
+      <h2 data-split data-fa="بیست سال پشت خط ریتم" data-en="Twenty years behind the rhythm line">بیست سال پشت خط ریتم</h2>
+      <p class="lede" data-fa="سینا گل‌نقره فعالیت موسیقایی‌اش را از سال ۱۳۸۳ با گیتار بیس آغاز کرد؛ از مسترکلاس‌های بابک ریاحی‌پور گذشت و پایه‌های علمی و عملی‌اش را زیر نظر روزبه اسماعیلی و سپهر حقیقی بنا نهاد." data-en="Sina Golnoghreh picked up the bass in 2004, trained through Babak Riahipour's masterclasses, and built his technical foundation under Roozbeh Esmaili and Sepehr Haghighi (2015).">سینا گل‌نقره فعالیت موسیقایی‌اش را از سال ۱۳۸۳ با گیتار بیس آغاز کرد؛ از مسترکلاس‌های بابک ریاحی‌پور گذشت و پایه‌های علمی و عملی‌اش را زیر نظر روزبه اسماعیلی و سپهر حقیقی بنا نهاد.</p>
+      <p data-d="1" data-fa="مسیر حرفه‌ای او با <span class='hl'>ماخولا</span> (راک فارسی؛ تور رشت، شیراز و برج آزادی تهران)، <span class='hl'>کارنیوالسک</span> (هشت آلبوم تجربی و پراگرسیو) و <span class='hl'>مونهد</span> (آلبوم «افق رویداد») شکل گرفته و با <span class='hl'>مگو</span>، <span class='hl'>جلیل</span> و سرپرستی موسیقی <span class='hl'>پینوکیوی موزیکال</span> (۲۰۱۹) کامل شده است." data-en="His professional path took shape with <span class='hl'>Makhoola</span> (Persian rock — Rasht, Shiraz and Tehran's Azadi Tower tours), <span class='hl'>Carnivalesque</span> (eight experimental/progressive albums) and <span class='hl'>Moonhad</span> (the album «Ofogh-e Rooydad»), alongside <span class='hl'>Magoo</span>, <span class='hl'>Jalil</span> and music direction for the 2019 musical <span class='hl'>Pinocchio</span>.">مسیر حرفه‌ای او با <span class='hl'>ماخولا</span> (راک فارسی؛ تور رشت، شیراز و برج آزادی تهران)، <span class='hl'>کارنیوالسک</span> (هشت آلبوم تجربی و پراگرسیو) و <span class='hl'>مونهد</span> (آلبوم «افق رویداد») شکل گرفته و با <span class='hl'>مگو</span>، <span class='hl'>جلیل</span> و سرپرستی موسیقی <span class='hl'>پینوکیوی موزیکال</span> (۲۰۱۹) کامل شده است.</p>
+      <p data-d="2" data-fa="<span class='dim'>از ۲۰۲۳ در دبی:</span> روی صحنه با <span class='hl'>سیاوش شمس</span>، فتانه و کوروس. در کنار نوازندگی، صدابردار ثابتِ <span class='hl'>بالزن</span> و مهندس صدای زنده‌ی ماخولا، نیواگ و مجتبی اخوان." data-en="<span class='dim'>Since 2023 in Dubai:</span> on stage with <span class='hl'>Siavash Shams</span>, Fattaneh and Korous. As a live sound engineer: house engineer for <span class='hl'>Balzan</span>, live mixing for Makhoola, Nivag and Mojtaba Akhvan."><span class='dim'>از ۲۰۲۳ در دبی:</span> روی صحنه با <span class='hl'>سیاوش شمس</span>، فتانه و کوروس. در کنار نوازندگی، صدابردار ثابتِ <span class='hl'>بالزن</span> و مهندس صدای زنده‌ی ماخولا، نیواگ و مجتبی اخوان.</p>
+    </div>
+    <div class="facts">
+      <div class="f fade" style="--d:2"><b data-fa="+۲۰" data-en="20+">+۲۰</b><span data-fa="سال نوازندگی" data-en="years on bass">سال نوازندگی</span></div>
+      <div class="f fade" style="--d:3"><b data-fa="۸" data-en="8">۸</b><span data-fa="آلبوم کارنیوالسک" data-en="Carnivalesque albums">آلبوم کارنیوالسک</span></div>
+      <div class="f fade" style="--d:4"><b data-fa="۳" data-en="3">۳</b><span data-fa="کشور روی صحنه" data-en="countries on stage">کشور روی صحنه</span></div>
+    </div>
+  </div></section>
+
+  <!-- 4 · MUSIC -->
+  <section id="music" data-ch="3"><div class="wrap ch">
+    <div class="bgnum">۰۳</div>
+    <p class="kicker" data-fa="شنیدن" data-en="Listen">شنیدن</p>
+    <h2 data-split data-fa="صدای سیم‌ها" data-en="The Sound of Strings">صدای سیم‌ها</h2>
+    <div class="tracks fade" style="--d:1">
+      <div class="track" data-track="1" tabindex="0" role="button" aria-label="پخش نمونه ۱">
+        <span class="no">01</span><span class="t" data-fa="کارنیوالسک — از آلبوم هشتم" data-en="Carnivalesque — from the eighth album">کارنیوالسک — از آلبوم هشتم</span><span class="meta">EXPERIMENTAL</span>
+        <span class="eq"><i></i><i></i><i></i></span>
+      </div>
+      <div class="track" data-track="2" tabindex="0" role="button" aria-label="پخش نمونه ۲">
+        <span class="no">02</span><span class="t" data-fa="ماخولا — اجرای زنده" data-en="Makhoola — live">ماخولا — اجرای زنده</span><span class="meta">LIVE</span>
+        <span class="eq"><i></i><i></i><i></i></span>
+      </div>
+      <div class="track" data-track="3" tabindex="0" role="button" aria-label="پخش نمونه ۳">
+        <span class="no">03</span><span class="t" data-fa="Dingwall NG2 — نمونه‌ی صدای ساز" data-en="Dingwall NG2 — instrument demo">Dingwall NG2 — نمونه‌ی صدای ساز</span><span class="meta">STUDIO</span>
+        <span class="eq"><i></i><i></i><i></i></span>
+      </div>
+    </div>
+    <p id="audio-note" data-fa="فایل صوتی‌ها به‌زودی همین‌جا می‌نشینند." data-en="Audio files will live here — coming soon.">فایل صوتی‌ها به‌زودی همین‌جا می‌نشینند.</p>
+  </div></section>
+
+  <!-- 5 · LIVE -->
+  <section id="live" data-ch="4"><div class="wrap ch">
+    <div class="bgnum">۰۴</div>
+    <p class="kicker" data-fa="روی صحنه" data-en="On Stage">روی صحنه</p>
+    <h2 data-split data-fa="صحنه و تور" data-en="Stage &amp; Tour">صحنه و تور</h2>
+    <div class="shows fade" style="--d:1">
+      <div class="show"><div class="date"><b>2023</b>Dubai</div><div class="where"><b data-fa="سیاوش شمس" data-en="Siavash Shams">سیاوش شمس</b><span data-fa="اجرا با خواننده‌ی مطرح پاپ" data-en="live with the pop star">اجرا با خواننده‌ی مطرح پاپ</span></div><span class="tag" data-fa="گذشته" data-en="Past">گذشته</span></div>
+      <div class="show"><div class="date"><b>2019</b>Tehran</div><div class="where"><b data-fa="برج آزادی" data-en="Azadi Tower">برج آزادی</b><span data-fa="تور ماخولا" data-en="Makhoola tour">تور ماخولا</span></div><span class="tag" data-fa="گذشته" data-en="Past">گذشته</span></div>
+      <div class="show"><div class="date"><b>—</b></div><div class="where"><b data-fa="تاریخ بعدی" data-en="Next date">تاریخ بعدی</b><span data-fa="به‌زودی اعلام می‌شود" data-en="announced soon">به‌زودی اعلام می‌شود</span></div><span class="tag soon" data-fa="به‌زودی" data-en="Soon">به‌زودی</span></div>
+    </div>
+  </div></section>
+
+  <!-- 6 · CONTACT -->
+  <section id="contact" data-ch="5"><div class="wrap ch">
+    <p class="kicker" data-fa="در تماس" data-en="Connect">در تماس</p>
+    <h2 data-split data-fa="بزن بریم پشت صحنه" data-en="Beyond the stage">بزن بریم پشت صحنه</h2>
+    <div class="links fade" style="--d:1">
+      <a class="btn" href="https://instagram.com/sina.golnoghreh" target="_blank" rel="noopener">
+        <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor" stroke="none"/></svg>
+        <span data-fa="اینستاگرام" data-en="Instagram">اینستاگرام</span>
+      </a>
+      <a class="btn" href="https://instagram.com/makhoola.official" target="_blank" rel="noopener">
+        <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor" stroke="none"/></svg>
+        <span data-fa="ماخولا" data-en="Makhoola">ماخولا</span>
+      </a>
+      <a class="btn" href="https://instagram.com/carnivalesqueband" target="_blank" rel="noopener">
+        <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor" stroke="none"/></svg>
+        <span data-fa="کارنیوالسک" data-en="Carnivalesque">کارنیوالسک</span>
+      </a>
+      <a class="btn" href="https://carnivalesqueband.bandcamp.com" target="_blank" rel="noopener">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M4 17h11l5-10H9z"/></svg>
+        <span>Bandcamp</span>
+      </a>
+    </div>
+    <div class="fin fade" style="--d:2" data-fa="© ۲۰۲۶ سینا گل‌نقره" data-en="© 2026 Sina Golnoghreh">© ۲۰۲۶ سینا گل‌نقره</div>
+  </div></section>
+</main>
+
+<audio id="player" preload="none"></audio>
+
+<noscript><style>.w,.fade{opacity:1 !important;transform:none !important}#hs-img{top:50%}</style></noscript>
+
+<script src="assets/three.min.js"></script>
+<script>
+'use strict';
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const clamp01=v=>Math.max(0,Math.min(1,v));
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduced)document.documentElement.classList.add('reduced');
+
+const CHAPTERS=['hero','headstock','bio','music','live','contact'];
+const PEGS=5, HS_FRAMES=240;
+const S={p:0,chapter:0,pegsDone:0,pegs:[0,0,0,0,0],frame:0,exit:0,lang:'fa'};
+window.__sina={getState:()=>({p:+S.p.toFixed(4),chapter:S.chapter,pegsDone:S.pegsDone,pegs:S.pegs.map(v=>+v.toFixed(2)),frame:S.frame,exit:S.exit,lang:S.lang})};
+
+/* ───────── WebGL atmosphere ───────── */
+const canvas=$('#gl');
+let webgl=false,renderer,scene,camera,dust;
+const curtains=[];
+const mouse={x:0,y:0};
+addEventListener('mousemove',e=>{mouse.x=(e.clientX/innerWidth-.5)*2;mouse.y=-(e.clientY/innerHeight-.5)*2;});
+try{
+  if(!window.THREE)throw new Error('three missing');
+  renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x000000);
+  scene.fog=new THREE.FogExp2(0x000000,0.030);
+  camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.1,120);
+  camera.position.set(0,0,14);
+  webgl=true;
+}catch(e){canvas.style.display='none';}
+
+if(webgl){
+  const N=innerWidth<768?140:260;
+  const pos=new Float32Array(N*3);
+  for(let i=0;i<N;i++){
+    pos[i*3]=(Math.random()-.5)*40;
+    pos[i*3+1]=(Math.random()-.5)*26;
+    pos[i*3+2]=(Math.random()-.5)*18-2;
+  }
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  dust=new THREE.Points(g,new THREE.PointsMaterial({color:0xD9A441,size:.16,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true}));
+  scene.add(dust);
+  for(let i=0;i<6;i++){
+    const m=new THREE.Mesh(
+      new THREE.PlaneGeometry(1.2+Math.random()*1.4,60),
+      new THREE.MeshBasicMaterial({color:0xD9A441,transparent:true,opacity:.05+Math.random()*.04,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false}));
+    m.position.set(-16+i*6.4+(Math.random()-.5)*2,0,-6-Math.random()*8);
+    m.rotation.y=(Math.random()-.5)*.35;
+    m.userData.v=.3+Math.random()*.5;
+    curtains.push(m);scene.add(m);
+  }
+  const PAL=[[0x000000,0xD9A441,.50],[0x000000,0xD9A441,.38],[0x000000,0x8C7A45,.34],[0x030303,0xD9A441,.44],[0x030303,0xE5484D,.38],[0x000000,0xD9A441,.48]];
+  const bg=new THREE.Color(),cB=new THREE.Color();
+  const lerp=(a,b,k)=>a+(b-a)*k, smooth=t=>t*t*(3-2*t);
+  const clock=new THREE.Clock();let T=0;
+  (function tick(){
+    requestAnimationFrame(tick);
+    if(document.hidden)return;
+    const dt=Math.min(clock.getDelta(),.05);T+=dt;
+    const ci=Math.min(4,Math.floor(S.p*6)), kt=smooth(S.p*6-ci), A=PAL[ci], B=PAL[ci+1];
+    bg.setHex(A[0]).lerp(cB.setHex(B[0]),kt);
+    scene.fog.color.copy(bg);scene.background.copy(bg);
+    dust.material.color.setHex(A[1]).lerp(cB.setHex(B[1]),kt);
+    dust.material.opacity=lerp(A[2],B[2],kt);
+    camera.position.z=14-S.p*4.5;
+    camera.position.x=lerp(camera.position.x,mouse.x*.8,.04);
+    camera.position.y=lerp(camera.position.y,mouse.y*.5,.04);
+    if(!reduced){camera.position.x+=Math.sin(T*.3)*.10;camera.position.y+=Math.cos(T*.22)*.07;}
+    camera.lookAt(0,0,0);
+    const pa=dust.geometry.attributes.position;
+    for(let i=0;i<pa.count;i++){
+      let y=pa.getY(i)-dt*(.15+(i%5)*.05);
+      if(y<-13)y+=26;
+      pa.setY(i,y);
+      pa.setX(i,pa.getX(i)+Math.sin(T*.5+i)*.003);
+    }
+    pa.needsUpdate=true;
+    for(const m of curtains){m.position.x+=m.userData.v*dt*.4;if(m.position.x>20)m.position.x=-20;}
+    renderer.render(scene,camera);
+  })();
+  addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+}
+
+/* ───────── headstock frames ───────── */
+const hsImg=$('#hs-img');
+let lastFrame=-1;
+function setFrame(i){
+  i=Math.max(0,Math.min(HS_FRAMES-1,Math.round(i)));
+  if(i===lastFrame)return;
+  lastFrame=i;S.frame=i;
+  const n=String(i+1).padStart(3,'0');
+  hsImg.src='assets/headstock-frames/f'+n+'.webp';
+}
+
+/* ───────── ratchet click (WebAudio, synthesized) ───────── */
+let AC=null;
+function ratchetClick(){
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==='suspended')AC.resume();
+    const t=AC.currentTime;
+    const o=AC.createOscillator();o.type='square';
+    o.frequency.setValueAtTime(2100,t);
+    o.frequency.exponentialRampToValueAtTime(320,t+.035);
+    const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=1800;f.Q.value=1.2;
+    const g=AC.createGain();
+    g.gain.setValueAtTime(.05,t);
+    g.gain.exponentialRampToValueAtTime(.0001,t+.05);
+    o.connect(f);f.connect(g);g.connect(AC.destination);
+    o.start(t);o.stop(t+.06);
+  }catch(e){}
+}
+
+/* ───────── headstock scroll logic ───────── */
+const hsSection=$('#headstock');
+let pegsDone=0;
+function updateHeadstock(){
+  const total=hsSection.offsetHeight-innerHeight;
+  if(total<=0)return;
+  const r=hsSection.getBoundingClientRect();
+  const local=clamp01(-r.top/total);
+  const enter=clamp01((-r.top+innerHeight)/(innerHeight*.55));
+  setFrame(local*(HS_FRAMES-1));
+  const stage=local*PEGS, done=Math.min(PEGS,Math.floor(stage)), frac=stage-done;
+  for(let i=0;i<PEGS;i++)S.pegs[i]=i<done?1:(i===done?+frac.toFixed(2):0);
+  S.pegsDone=done;
+  const cnt=$('#hs-count b');
+  if(cnt)cnt.textContent=String(done).padStart(2,'0');
+  if(done>pegsDone)ratchetClick();
+  pegsDone=done;
+  const exit=clamp01((local-.82)/.18);
+  S.exit=+exit.toFixed(3);
+  hsImg.style.transform='translateY(-50%) translateX('+(exit*26)+'vw) scale('+(1+exit*.05)+')';
+  hsImg.style.opacity=String(enter*(1-exit));
+  const lab=$('#hs-label'),cntEl=$('#hs-count');
+  const lo=String(enter*Math.max(0,1-exit*1.6));
+  if(lab)lab.style.opacity=lo;
+  if(cntEl)cntEl.style.opacity=lo;
+}
+
+/* ───────── word-split reveal ───────── */
+function wrapWords(el){
+  const words=el.textContent.trim().split(/\s+/);
+  el.textContent='';
+  words.forEach((w,i)=>{
+    const s=document.createElement('span');
+    s.className='w';s.style.setProperty('--i',i);s.textContent=w;
+    el.appendChild(s);
+    el.appendChild(document.createTextNode(' '));
+  });
+}
+$$('[data-split]').forEach(wrapWords);
+
+/* ───────── chapters + rail ───────── */
+const sections=$$('section[data-ch]');
+const railBtns=[];
+CHAPTERS.forEach((id,i)=>{
+  const b=document.createElement('button');
+  b.setAttribute('aria-label','بخش '+(i+1));
+  b.innerHTML='<span class="num">'+String(i+1).padStart(2,'0')+'</span>';
+  b.addEventListener('click',()=>document.getElementById(id).scrollIntoView({behavior:reduced?'auto':'smooth'}));
+  $('#rail').appendChild(b);railBtns.push(b);
+});
+function updateChapters(){
+  const mid=innerHeight*.5;
+  let active=0;
+  sections.forEach((sec,i)=>{
+    const r=sec.getBoundingClientRect();
+    const on=r.top<=mid&&r.bottom>mid;
+    if(on)active=i;
+    sec.classList.toggle('on',on||(i===0&&S.p<.03));
+  });
+  S.chapter=active;
+  railBtns.forEach((b,i)=>b.classList.toggle('on',i===active));
+}
+
+/* ───────── music player (plays if file exists, honest note if not) ───────── */
+const player=$('#player'), note=$('#audio-note');
+$$('.track').forEach(tr=>{
+  const go=()=>{
+    const i=+tr.dataset.track;
+    if(player.dataset.src===String(i)&&!player.paused){
+      player.pause();player.dataset.src='';tr.classList.remove('playing');return;
+    }
+    player.src='assets/audio/track-0'+i+'.mp3';
+    player.dataset.src=String(i);
+    const pr=player.play();
+    if(pr&&pr.catch)pr.then(()=>{
+      $$('.track').forEach(t=>t.classList.remove('playing'));
+      tr.classList.add('playing');
+    }).catch(()=>{
+      player.dataset.src='';
+      note.classList.add('flash');
+      setTimeout(()=>note.classList.remove('flash'),1400);
+    });
+  };
+  tr.addEventListener('click',go);
+  tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
+});
+player.addEventListener('ended',()=>{$$('.track').forEach(t=>t.classList.remove('playing'));player.dataset.src='';});
+
+/* ───────── i18n ───────── */
+const langBtn=$('#lang');
+langBtn.addEventListener('click',()=>{
+  const l=S.lang==='fa'?'en':'fa';
+  S.lang=l;
+  document.documentElement.lang=l;
+  document.documentElement.setAttribute('dir',l==='fa'?'rtl':'ltr');
+  document.title=l==='fa'?'سینا گل‌نقره — نوازنده گیتار بیس':'Sina Golnoghreh — Bassist';
+  $$('[data-fa]').forEach(el=>{
+    el.innerHTML=el.dataset[l];
+    if(el.hasAttribute('data-split'))wrapWords(el);
+  });
+  langBtn.textContent=l==='fa'?'EN':'فا';
+  refresh();
+});
+
+/* ───────── scroll wiring ───────── */
+function refresh(){
+  const max=document.documentElement.scrollHeight-innerHeight;
+  S.p=max>0?clamp01(scrollY/max):0;
+  $('#progress .bar').style.width=(S.p*100)+'%';
+  updateHeadstock();
+  updateChapters();
+  $('#scroll-cue').style.opacity=S.p<.012?1:0;
+}
+addEventListener('scroll',refresh,{passive:true});
+addEventListener('resize',refresh);
+addEventListener('load',refresh);
+refresh();
+})();
+</script>
+</body>
+</html>
