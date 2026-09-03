@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>سینا گل‌نقره — Bass / Sound / Live</title>
+<title>Ø³ÛŒÙ†Ø§ Ú¯Ù„â€ŒÙ†Ù‚Ø±Ù‡ â€” Bass / Sound / Live</title>
 <style>
 @font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
 @font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Medium.ttf') format('truetype');font-weight:500;font-display:swap}
@@ -22,7 +22,7 @@ body{
 }
 ::selection{background:rgba(255,120,50,.35)}
 
-/* ====== stage / entry (scene 0 — fixed) ====== */
+/* ====== stage / entry (scene 0 â€” fixed) ====== */
 .stage{
   position:fixed;inset:0;height:100svh;width:100%;
   overflow:hidden;background:#000;z-index:5;
@@ -85,7 +85,7 @@ body{
 .continuecue b{display:inline-block;color:#ff6a2a;font-size:17px;margin-right:8px;font-weight:400;animation:cuefloat 1.8s ease-in-out infinite}
 @keyframes cuefloat{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 
-/* ====== HERO — appears after the reveal completes (site-ready) ====== */
+/* ====== HERO â€” appears after the reveal completes (site-ready) ====== */
 .hero{
   position:absolute;left:0;top:0;bottom:0;width:56vw;
   display:flex;flex-direction:column;justify-content:center;align-items:flex-end;
@@ -114,7 +114,7 @@ body.site-ready .site-nav{opacity:1;pointer-events:auto;transform:none}
 .site-nav .links{display:flex;gap:14px}
 .site-nav a{color:rgba(255,255,255,.44);text-decoration:none;font-size:10px;letter-spacing:.12em;transition:color .25s ease}
 .site-nav a:hover,.site-nav a:focus-visible{color:#ff6a2a}
-/* ====== fixed scenes (page never moves — scroll is only input) ====== */
+/* ====== fixed scenes (page never moves â€” scroll is only input) ====== */
 .site-content{position:fixed;inset:0;z-index:7;pointer-events:none;opacity:0;transition:opacity .9s ease}
 body.site-ready .site-content{opacity:1}
 .chapter{position:absolute;inset:0;overflow:hidden;border-top:1px solid rgba(255,255,255,.07);opacity:0;visibility:hidden;pointer-events:none;will-change:opacity,transform,filter}
@@ -159,7 +159,7 @@ body.site-ready .site-content{opacity:1}
 .band-members b{font-weight:500;font-size:13px;color:#e8e8e8}
 .band-members b.me{color:#ffb17f}
 .band-members i{font-style:normal;font-size:10.5px;color:rgba(255,255,255,.38)}
-.band-members i::before{content:'—';margin-left:10px;color:rgba(255,106,42,.5)}
+.band-members i::before{content:'â€”';margin-left:10px;color:rgba(255,106,42,.5)}
 .sound-stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;border-left:1px solid rgba(255,255,255,.08);direction:ltr;padding:14px 0 14px 3vw}
 .album-figure{position:relative;margin:0;line-height:0}
 .album-figure::before,.album-figure::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(255,106,42,.26);border-radius:50%;width:124%;aspect-ratio:1;animation:orbitpulse 4.8s ease-in-out infinite;pointer-events:none}
@@ -181,7 +181,7 @@ body.site-ready .site-content{opacity:1}
 .sound-label{color:rgba(255,255,255,.26);font-size:9px;letter-spacing:.22em}
 @media (max-height:720px){.album-figure img{width:clamp(180px,20vw,240px)}.album-meta{max-width:400px}}
 
-/* ====== 03 / live — projection theater ====== */
+/* ====== 03 / live â€” projection theater ====== */
 .live-chapter{background:#050505;display:flex;align-items:center}
 .live-chapter .chapter-shell{max-height:100svh;overflow-y:auto;overscroll-behavior:contain;padding:8vh 0 5vh;scrollbar-width:none;width:min(1100px,92vw)}
 .live-chapter .chapter-shell::-webkit-scrollbar{display:none}
@@ -189,7 +189,7 @@ body.site-ready .site-content{opacity:1}
 .live-heading .chapter-title{margin:0}
 .live-heading .chapter-copy{max-width:300px;margin-bottom:8px}
 
-/* live photo tunnel — 3D corridor with depth of field */
+/* live photo tunnel â€” 3D corridor with depth of field */
 .tunnel{position:relative;height:min(70vh,620px);perspective:1150px;overflow:hidden;border-radius:18px;background:#020202;border:1px solid rgba(255,255,255,.06);box-shadow:0 30px 80px rgba(0,0,0,.55)}
 .tunnel-scene{position:absolute;inset:0;transform-style:preserve-3d}
 .t-frame{position:absolute;top:50%;left:50%;margin:0;will-change:transform,opacity,filter;transform-style:preserve-3d}
@@ -203,21 +203,21 @@ body.site-ready .site-content{opacity:1}
 
 
 
-/* ====== 04 / biography — orbit: circle dead-center, blocks emerge from its edge ====== */
+/* ====== 04 / biography â€” orbit: circle dead-center, blocks emerge from its edge ====== */
 .bio-chapter{background:radial-gradient(60% 80% at 20% 50%,rgba(255,106,42,.07),transparent 65%),#070707}
 .bio-chapter .chapter-shell{position:absolute;inset:0;z-index:3;width:100%;max-width:none;margin:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
 .bio-chapter .chapter-shell::-webkit-scrollbar{display:none}
 .bio-spacer{height:100svh}
 .bio-orbit{position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none;--bioD:min(58vh,44vw)}
 .bio-center{display:flex;flex-direction:column;align-items:center;gap:14px}
-/* 360 rotation stage — frame sequence on canvas, same pattern as the headstock */
+/* 360 rotation stage â€” frame sequence on canvas, same pattern as the headstock */
 .bio-stage{position:relative;width:var(--bioD);aspect-ratio:1;direction:ltr;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 40%,#121212,#050505 72%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 30px 80px rgba(0,0,0,.55)}
 .bio-stage::before{content:'';position:absolute;inset:0;border:1px dashed rgba(255,106,42,.22);border-radius:50%;animation:biospin 46s linear infinite}
-.bio-stage::after{content:'۳۶۰°';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Darvish',Vazirmatn,sans-serif;font-size:44px;color:rgba(255,255,255,.08)}
+.bio-stage::after{content:'Û³Û¶Û°Â°';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Darvish',Vazirmatn,sans-serif;font-size:44px;color:rgba(255,255,255,.08)}
 .bio-stage.has-frames::after{content:''}
 @keyframes biospin{to{transform:rotate(360deg)}}
 .bio-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-/* overlay blocks — transform/opacity/filter are written per-frame by bioOrbitUpdate() */
+/* overlay blocks â€” transform/opacity/filter are written per-frame by bioOrbitUpdate() */
 .bio-block{position:absolute;pointer-events:none;will-change:transform,opacity,filter;--tx0:0px;--ty0:-50%}
 .bio-lead{right:calc(50% + var(--bioD)*.2);top:50%;width:min(400px,30vw);direction:rtl;text-align:right;background:rgba(7,7,7,.82);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:24px 26px;backdrop-filter:blur(6px)}
 .bio-lead .chapter-title{font-size:clamp(26px,3vw,44px)}
@@ -286,79 +286,79 @@ body.site-ready .site-content{opacity:1}
 
   <div class="hud">
     <div class="enterwrap">
-      <img class="wingvid" id="wingVid" src="content/wings_alpha_v2.webp" alt="" aria-hidden="true" draggable="false">
+      <img class="wingvid" id="wingVid" src="content/wings_alpha_v2.webp?v=3" alt="" aria-hidden="true" draggable="false">
       <button class="enterbtn" id="enterbtn" type="button">
-        <span class="ring"><span class="word">ورود</span></span>
+        <span class="ring"><span class="word">ÙˆØ±ÙˆØ¯</span></span>
       </button>
     </div>
-    <!-- ✏️ متن‌های صفحه‌ی اول (تیتر، اسم، توضیح، دکمه‌ها) را همین پایین عوض کن -->
-    <div class="hero" id="hero" aria-label="معرفی">
-      <div class="hero-tag">BASS PLAYER / COMPOSER • PRODUCER</div>
-      <h1 class="hero-name">سینا گل‌نقره</h1>
-      <p class="hero-desc">موسیقی برای من فقط صدا نیست؛ روایتی است از احساس، تجربه و زندگی، که از پایین‌ترین نت آغاز می‌شود.</p>
+    <!-- âœï¸ Ù…ØªÙ†â€ŒÙ‡Ø§ÛŒ ØµÙØ­Ù‡â€ŒÛŒ Ø§ÙˆÙ„ (ØªÛŒØªØ±ØŒ Ø§Ø³Ù…ØŒ ØªÙˆØ¶ÛŒØ­ØŒ Ø¯Ú©Ù…Ù‡â€ŒÙ‡Ø§) Ø±Ø§ Ù‡Ù…ÛŒÙ† Ù¾Ø§ÛŒÛŒÙ† Ø¹ÙˆØ¶ Ú©Ù† -->
+    <div class="hero" id="hero" aria-label="Ù…Ø¹Ø±ÙÛŒ">
+      <div class="hero-tag">BASS PLAYER / COMPOSER â€¢ PRODUCER</div>
+      <h1 class="hero-name">Ø³ÛŒÙ†Ø§ Ú¯Ù„â€ŒÙ†Ù‚Ø±Ù‡</h1>
+      <p class="hero-desc">Ù…ÙˆØ³ÛŒÙ‚ÛŒ Ø¨Ø±Ø§ÛŒ Ù…Ù† ÙÙ‚Ø· ØµØ¯Ø§ Ù†ÛŒØ³ØªØ› Ø±ÙˆØ§ÛŒØªÛŒ Ø§Ø³Øª Ø§Ø² Ø§Ø­Ø³Ø§Ø³ØŒ ØªØ¬Ø±Ø¨Ù‡ Ùˆ Ø²Ù†Ø¯Ú¯ÛŒØŒ Ú©Ù‡ Ø§Ø² Ù¾Ø§ÛŒÛŒÙ†â€ŒØªØ±ÛŒÙ† Ù†Øª Ø¢ØºØ§Ø² Ù…ÛŒâ€ŒØ´ÙˆØ¯.</p>
       <div class="hero-actions">
-        <a class="hero-btn primary" href="https://carnivalesqueband.bandcamp.com" target="_blank" rel="noopener"><span class="ic">▶</span> شنیدن موسیقی</a>
+        <a class="hero-btn primary" href="https://carnivalesqueband.bandcamp.com" target="_blank" rel="noopener"><span class="ic">â–¶</span> Ø´Ù†ÛŒØ¯Ù† Ù…ÙˆØ³ÛŒÙ‚ÛŒ</a>
       </div>
     </div>
-    <div class="continuecue" id="continueCue"><b>↓</b>برای ادامه، اسکرول کن</div>
+    <div class="continuecue" id="continueCue"><b>â†“</b>Ø¨Ø±Ø§ÛŒ Ø§Ø¯Ø§Ù…Ù‡ØŒ Ø§Ø³Ú©Ø±ÙˆÙ„ Ú©Ù†</div>
   </div>
 </div>
 
-<!-- ✏️ منوی بالای سایت -->
-<nav class="site-nav" aria-label="ناوبری اصلی">
-  <span class="mark">سینا</span>
+<!-- âœï¸ Ù…Ù†ÙˆÛŒ Ø¨Ø§Ù„Ø§ÛŒ Ø³Ø§ÛŒØª -->
+<nav class="site-nav" aria-label="Ù†Ø§ÙˆØ¨Ø±ÛŒ Ø§ØµÙ„ÛŒ">
+  <span class="mark">Ø³ÛŒÙ†Ø§</span>
   <div class="links">
-    <a href="#instrument">ساز</a>
-    <a href="#sound">صدا</a>
-    <a href="#live">صحنه</a>
-    <a href="#bio">بیو</a>
-    <a href="#contact">تماس</a>
+    <a href="#instrument">Ø³Ø§Ø²</a>
+    <a href="#sound">ØµØ¯Ø§</a>
+    <a href="#live">ØµØ­Ù†Ù‡</a>
+    <a href="#bio">Ø¨ÛŒÙˆ</a>
+    <a href="#contact">ØªÙ…Ø§Ø³</a>
   </div>
 </nav>
 
 <main class="site-content" id="site-content">
-  <!-- ✏️ بخش ۰۱ ساز — عنوان و متن داخل تگ‌های پایین -->
+  <!-- âœï¸ Ø¨Ø®Ø´ Û°Û± Ø³Ø§Ø² â€” Ø¹Ù†ÙˆØ§Ù† Ùˆ Ù…ØªÙ† Ø¯Ø§Ø®Ù„ ØªÚ¯â€ŒÙ‡Ø§ÛŒ Ù¾Ø§ÛŒÛŒÙ† -->
   <section class="chapter instrument-chapter" id="instrument">
     <div class="instrument-sticky">
       <div class="instrument-copy">
         <div class="eyebrow">INSTRUMENT</div>
         <div class="seq-wrap">
-          <h2 class="chapter-title seq-a" id="seqA">موسیقی</h2>
-          <h2 class="chapter-title seq-b" id="seqB">از پایین‌ترین<br>نت‌ها</h2>
+          <h2 class="chapter-title seq-a" id="seqA">Ù…ÙˆØ³ÛŒÙ‚ÛŒ</h2>
+          <h2 class="chapter-title seq-b" id="seqB">Ø§Ø² Ù¾Ø§ÛŒÛŒÙ†â€ŒØªØ±ÛŒÙ†<br>Ù†Øªâ€ŒÙ‡Ø§</h2>
         </div>
       </div>
       <div class="instrument-visual">
-        <canvas id="pegCanvas" aria-label="انیمیشن سردسته‌ی گیتار بیس"></canvas>
+        <canvas id="pegCanvas" aria-label="Ø§Ù†ÛŒÙ…ÛŒØ´Ù† Ø³Ø±Ø¯Ø³ØªÙ‡â€ŒÛŒ Ú¯ÛŒØªØ§Ø± Ø¨ÛŒØ³"></canvas>
       </div>
     </div>
   </section>
 
-  <!-- ✏️ بخش ۰۲ صدا — عنوان، متن، کاور و متای آلبوم + لینک Bandcamp -->
+  <!-- âœï¸ Ø¨Ø®Ø´ Û°Û² ØµØ¯Ø§ â€” Ø¹Ù†ÙˆØ§Ù†ØŒ Ù…ØªÙ†ØŒ Ú©Ø§ÙˆØ± Ùˆ Ù…ØªØ§ÛŒ Ø¢Ù„Ø¨ÙˆÙ… + Ù„ÛŒÙ†Ú© Bandcamp -->
   <section class="chapter sound-chapter" id="sound">
     <div class="chapter-shell sound-layout">
       <div class="sound-copy">
         <div class="eyebrow">BAND</div>
-        <h2 class="chapter-title">درباره Carnivalesque</h2>
-        <p class="chapter-copy">Carnivalesque گروهی در سبک پست پراگرسیو راک است که در نروژ و ایران فعالیت دارد. موسیقی گروه با رویکردی معاصر به پراگرسیو راک شکل گرفته و بر ترکیب ساختارهای پویا، فضاپردازی و بیان موسیقایی متمرکز است.</p>
+        <h2 class="chapter-title">Ø¯Ø±Ø¨Ø§Ø±Ù‡ Carnivalesque</h2>
+        <p class="chapter-copy">Carnivalesque Ú¯Ø±ÙˆÙ‡ÛŒ Ø¯Ø± Ø³Ø¨Ú© Ù¾Ø³Øª Ù¾Ø±Ø§Ú¯Ø±Ø³ÛŒÙˆ Ø±Ø§Ú© Ø§Ø³Øª Ú©Ù‡ Ø¯Ø± Ù†Ø±ÙˆÚ˜ Ùˆ Ø§ÛŒØ±Ø§Ù† ÙØ¹Ø§Ù„ÛŒØª Ø¯Ø§Ø±Ø¯. Ù…ÙˆØ³ÛŒÙ‚ÛŒ Ú¯Ø±ÙˆÙ‡ Ø¨Ø§ Ø±ÙˆÛŒÚ©Ø±Ø¯ÛŒ Ù…Ø¹Ø§ØµØ± Ø¨Ù‡ Ù¾Ø±Ø§Ú¯Ø±Ø³ÛŒÙˆ Ø±Ø§Ú© Ø´Ú©Ù„ Ú¯Ø±ÙØªÙ‡ Ùˆ Ø¨Ø± ØªØ±Ú©ÛŒØ¨ Ø³Ø§Ø®ØªØ§Ø±Ù‡Ø§ÛŒ Ù¾ÙˆÛŒØ§ØŒ ÙØ¶Ø§Ù¾Ø±Ø¯Ø§Ø²ÛŒ Ùˆ Ø¨ÛŒØ§Ù† Ù…ÙˆØ³ÛŒÙ‚Ø§ÛŒÛŒ Ù…ØªÙ…Ø±Ú©Ø² Ø§Ø³Øª.</p>
         <div class="band-members">
-          <div class="band-members-title">اعضای گروه</div>
+          <div class="band-members-title">Ø§Ø¹Ø¶Ø§ÛŒ Ú¯Ø±ÙˆÙ‡</div>
           <ul>
-            <li><b>سپهر حقیقی</b><i>وکال و گیتار</i></li>
-            <li><b>روزبه اسماعیلی</b><i>درامز</i></li>
-            <li><b>سیاوش خوش‌روز</b><i>کیبورد</i></li>
-            <li><b class="me">سینا گل‌نقره</b><i>گیتار بیس</i></li>
+            <li><b>Ø³Ù¾Ù‡Ø± Ø­Ù‚ÛŒÙ‚ÛŒ</b><i>ÙˆÚ©Ø§Ù„ Ùˆ Ú¯ÛŒØªØ§Ø±</i></li>
+            <li><b>Ø±ÙˆØ²Ø¨Ù‡ Ø§Ø³Ù…Ø§Ø¹ÛŒÙ„ÛŒ</b><i>Ø¯Ø±Ø§Ù…Ø²</i></li>
+            <li><b>Ø³ÛŒØ§ÙˆØ´ Ø®ÙˆØ´â€ŒØ±ÙˆØ²</b><i>Ú©ÛŒØ¨ÙˆØ±Ø¯</i></li>
+            <li><b class="me">Ø³ÛŒÙ†Ø§ Ú¯Ù„â€ŒÙ†Ù‚Ø±Ù‡</b><i>Ú¯ÛŒØªØ§Ø± Ø¨ÛŒØ³</i></li>
           </ul>
         </div>
-        <a class="bandcamp-link" href="https://carnivalesqueband.bandcamp.com" target="_blank" rel="noopener"><span>↗</span> شنیدن در Bandcamp</a>
+        <a class="bandcamp-link" href="https://carnivalesqueband.bandcamp.com" target="_blank" rel="noopener"><span>â†—</span> Ø´Ù†ÛŒØ¯Ù† Ø¯Ø± Bandcamp</a>
       </div>
       <div class="sound-stage">
         <figure class="album-figure">
-          <img src="content/album%20art.jpg" alt="کاور آلبوم Down the River — Carnivalesque" draggable="false">
+          <img src="content/album%20art.jpg" alt="Ú©Ø§ÙˆØ± Ø¢Ù„Ø¨ÙˆÙ… Down the River â€” Carnivalesque" draggable="false">
         </figure>
         <div class="album-meta">
           <span class="album-band">Carnivalesque</span>
           <h3 class="album-title">Down the River</h3>
-          <span class="album-date">Released · October 29, 2023</span>
+          <span class="album-date">Released Â· October 29, 2023</span>
           <p class="album-desc">In two parts, it narrates two various possibilities concerning the climate crises we are facing. The first narration explores the situation in which denial is selected as the course of action. The second part narrates the possibility of change and a prominent future for the upcoming generations.</p>
           <ul class="album-credits">
             <li><i>Drums</i><b>Ruzbeh Smiley</b></li>
@@ -377,12 +377,12 @@ body.site-ready .site-content{opacity:1}
       <div class="live-heading">
         <div>
           <div class="eyebrow">03 / LIVE ARCHIVE</div>
-          <h2 class="chapter-title">روی صحنه</h2>
+          <h2 class="chapter-title">Ø±ÙˆÛŒ ØµØ­Ù†Ù‡</h2>
         </div>
-        <p class="chapter-copy">چند لحظه از نور، بدن و صدای زنده؛ نه یک گالری، یک نوارِ حافظه.</p>
+        <p class="chapter-copy">Ú†Ù†Ø¯ Ù„Ø­Ø¸Ù‡ Ø§Ø² Ù†ÙˆØ±ØŒ Ø¨Ø¯Ù† Ùˆ ØµØ¯Ø§ÛŒ Ø²Ù†Ø¯Ù‡Ø› Ù†Ù‡ ÛŒÚ© Ú¯Ø§Ù„Ø±ÛŒØŒ ÛŒÚ© Ù†ÙˆØ§Ø±Ù Ø­Ø§ÙØ¸Ù‡.</p>
       </div>
 
-      <div class="tunnel" aria-label="گالری اجرای زنده">
+      <div class="tunnel" aria-label="Ú¯Ø§Ù„Ø±ÛŒ Ø§Ø¬Ø±Ø§ÛŒ Ø²Ù†Ø¯Ù‡">
         <div class="tunnel-scene" id="tunnelScene"></div>
         <div class="tunnel-vignette" aria-hidden="true"></div>
         <div class="tunnel-hud" aria-hidden="true"><b id="tunnelCount">01 / 16</b><span>LIVE FRAME</span></div>
@@ -394,29 +394,29 @@ body.site-ready .site-content{opacity:1}
     <!-- orbit overlay: circle dead-center; lead + events emerge from its edge, driven by the shell scroll below -->
     <div class="bio-orbit">
       <div class="bio-center">
-        <div class="bio-stage" id="bioStage" aria-label="چرخش ۳۶۰ درجه‌ی سینا">
+        <div class="bio-stage" id="bioStage" aria-label="Ú†Ø±Ø®Ø´ Û³Û¶Û° Ø¯Ø±Ø¬Ù‡â€ŒÛŒ Ø³ÛŒÙ†Ø§">
           <canvas id="bio360Canvas"></canvas>
         </div>
       </div>
       <div class="bio-block bio-lead side-l">
         <div class="eyebrow">04 / THE PERSON</div>
-        <h2 class="chapter-title">سینا</h2>
-        <p>نوازنده‌ی گیتار بیس، آهنگساز و مهندس صدای زنده؛ مسیری که از سال ۱۳۸۳ بین ساز، گروه و اتاق صدا حرکت کرده است.</p>
-        <div class="bio-stats" aria-label="نگاه سریع به کارنامه">
-          <span><b>۲۰+</b> سال صحنه</span>
-          <span>مهندسی صدا</span>
-          <span><b>۵</b> گروه و پروژه</span>
-          <span>تورِ رشت · شیراز · تهران · دبی</span>
+        <h2 class="chapter-title">Ø³ÛŒÙ†Ø§</h2>
+        <p>Ù†ÙˆØ§Ø²Ù†Ø¯Ù‡â€ŒÛŒ Ú¯ÛŒØªØ§Ø± Ø¨ÛŒØ³ØŒ Ø¢Ù‡Ù†Ú¯Ø³Ø§Ø² Ùˆ Ù…Ù‡Ù†Ø¯Ø³ ØµØ¯Ø§ÛŒ Ø²Ù†Ø¯Ù‡Ø› Ù…Ø³ÛŒØ±ÛŒ Ú©Ù‡ Ø§Ø² Ø³Ø§Ù„ Û±Û³Û¸Û³ Ø¨ÛŒÙ† Ø³Ø§Ø²ØŒ Ú¯Ø±ÙˆÙ‡ Ùˆ Ø§ØªØ§Ù‚ ØµØ¯Ø§ Ø­Ø±Ú©Øª Ú©Ø±Ø¯Ù‡ Ø§Ø³Øª.</p>
+        <div class="bio-stats" aria-label="Ù†Ú¯Ø§Ù‡ Ø³Ø±ÛŒØ¹ Ø¨Ù‡ Ú©Ø§Ø±Ù†Ø§Ù…Ù‡">
+          <span><b>Û²Û°+</b> Ø³Ø§Ù„ ØµØ­Ù†Ù‡</span>
+          <span>Ù…Ù‡Ù†Ø¯Ø³ÛŒ ØµØ¯Ø§</span>
+          <span><b>Ûµ</b> Ú¯Ø±ÙˆÙ‡ Ùˆ Ù¾Ø±ÙˆÚ˜Ù‡</span>
+          <span>ØªÙˆØ±Ù Ø±Ø´Øª Â· Ø´ÛŒØ±Ø§Ø² Â· ØªÙ‡Ø±Ø§Ù† Â· Ø¯Ø¨ÛŒ</span>
         </div>
       </div>
-      <!-- ✏️ رویدادهای بیو — هر <article> یک رویداد است؛ کپی کن تا رویداد جدید بسازی (side-r/side-l یک‌درمیان) -->
-      <article class="bio-block bio-event side-r"><div class="year">۱۳۸۳</div><h3>شروع با گیتار بیس</h3><p>فعالیت موسیقایی سینا با نوازندگی گیتار بیس آغاز شد و با مسترکلاس‌های بابک ریاحی‌پور ادامه پیدا کرد.</p></article>
-      <article class="bio-block bio-event side-l"><div class="year">۲۰۱۵</div><h3>ساز و دانش صدا</h3><p>گذراندن دوره‌های مهندسی صدا زیر نظر روزبه اسماعیلی و سپهر حقیقی، مسیر نوازندگی را به کارِ استودیو و اجرای زنده پیوند زد.</p></article>
-      <article class="bio-block bio-event side-r t-low"><div class="year">۲۰۱۹ — امروز</div><h3>مهندس صدای زنده</h3><p>صدابرداری حرفه‌ای اجراهای زنده؛ مهندس صدای ثابت گروه «بالزن» و همکاری با ماخولا، پاپ «نیواگ» و مجتبی اخوان.</p></article>
-      <article class="bio-block bio-event side-l t-low"><div class="year">۲۰۱۳ — امروز</div><h3>گروه‌ها و پروژه‌ها</h3><p>از مونهد و ماخولا تا کارنیوالسک، مگو و جلیل؛ در سبک‌های راک فارسی، آلترنیتیو، تجربی، پراگرسیو و فیوژن.</p></article>
-      <article class="bio-block bio-event side-r"><div class="year">۲۰۲۳</div><h3>صحنه‌های دبی</h3><p>حضور روی صحنه به‌عنوان نوازنده‌ی بیس با سیاوش شمس، فتانه و کوروس؛ در کنار فعالیت حرفه‌ای به‌عنوان مهندس صدای زنده.</p></article>
+      <!-- âœï¸ Ø±ÙˆÛŒØ¯Ø§Ø¯Ù‡Ø§ÛŒ Ø¨ÛŒÙˆ â€” Ù‡Ø± <article> ÛŒÚ© Ø±ÙˆÛŒØ¯Ø§Ø¯ Ø§Ø³ØªØ› Ú©Ù¾ÛŒ Ú©Ù† ØªØ§ Ø±ÙˆÛŒØ¯Ø§Ø¯ Ø¬Ø¯ÛŒØ¯ Ø¨Ø³Ø§Ø²ÛŒ (side-r/side-l ÛŒÚ©â€ŒØ¯Ø±Ù…ÛŒØ§Ù†) -->
+      <article class="bio-block bio-event side-r"><div class="year">Û±Û³Û¸Û³</div><h3>Ø´Ø±ÙˆØ¹ Ø¨Ø§ Ú¯ÛŒØªØ§Ø± Ø¨ÛŒØ³</h3><p>ÙØ¹Ø§Ù„ÛŒØª Ù…ÙˆØ³ÛŒÙ‚Ø§ÛŒÛŒ Ø³ÛŒÙ†Ø§ Ø¨Ø§ Ù†ÙˆØ§Ø²Ù†Ø¯Ú¯ÛŒ Ú¯ÛŒØªØ§Ø± Ø¨ÛŒØ³ Ø¢ØºØ§Ø² Ø´Ø¯ Ùˆ Ø¨Ø§ Ù…Ø³ØªØ±Ú©Ù„Ø§Ø³â€ŒÙ‡Ø§ÛŒ Ø¨Ø§Ø¨Ú© Ø±ÛŒØ§Ø­ÛŒâ€ŒÙ¾ÙˆØ± Ø§Ø¯Ø§Ù…Ù‡ Ù¾ÛŒØ¯Ø§ Ú©Ø±Ø¯.</p></article>
+      <article class="bio-block bio-event side-l"><div class="year">Û²Û°Û±Ûµ</div><h3>Ø³Ø§Ø² Ùˆ Ø¯Ø§Ù†Ø´ ØµØ¯Ø§</h3><p>Ú¯Ø°Ø±Ø§Ù†Ø¯Ù† Ø¯ÙˆØ±Ù‡â€ŒÙ‡Ø§ÛŒ Ù…Ù‡Ù†Ø¯Ø³ÛŒ ØµØ¯Ø§ Ø²ÛŒØ± Ù†Ø¸Ø± Ø±ÙˆØ²Ø¨Ù‡ Ø§Ø³Ù…Ø§Ø¹ÛŒÙ„ÛŒ Ùˆ Ø³Ù¾Ù‡Ø± Ø­Ù‚ÛŒÙ‚ÛŒØŒ Ù…Ø³ÛŒØ± Ù†ÙˆØ§Ø²Ù†Ø¯Ú¯ÛŒ Ø±Ø§ Ø¨Ù‡ Ú©Ø§Ø±Ù Ø§Ø³ØªÙˆØ¯ÛŒÙˆ Ùˆ Ø§Ø¬Ø±Ø§ÛŒ Ø²Ù†Ø¯Ù‡ Ù¾ÛŒÙˆÙ†Ø¯ Ø²Ø¯.</p></article>
+      <article class="bio-block bio-event side-r t-low"><div class="year">Û²Û°Û±Û¹ â€” Ø§Ù…Ø±ÙˆØ²</div><h3>Ù…Ù‡Ù†Ø¯Ø³ ØµØ¯Ø§ÛŒ Ø²Ù†Ø¯Ù‡</h3><p>ØµØ¯Ø§Ø¨Ø±Ø¯Ø§Ø±ÛŒ Ø­Ø±ÙÙ‡â€ŒØ§ÛŒ Ø§Ø¬Ø±Ø§Ù‡Ø§ÛŒ Ø²Ù†Ø¯Ù‡Ø› Ù…Ù‡Ù†Ø¯Ø³ ØµØ¯Ø§ÛŒ Ø«Ø§Ø¨Øª Ú¯Ø±ÙˆÙ‡ Â«Ø¨Ø§Ù„Ø²Ù†Â» Ùˆ Ù‡Ù…Ú©Ø§Ø±ÛŒ Ø¨Ø§ Ù…Ø§Ø®ÙˆÙ„Ø§ØŒ Ù¾Ø§Ù¾ Â«Ù†ÛŒÙˆØ§Ú¯Â» Ùˆ Ù…Ø¬ØªØ¨ÛŒ Ø§Ø®ÙˆØ§Ù†.</p></article>
+      <article class="bio-block bio-event side-l t-low"><div class="year">Û²Û°Û±Û³ â€” Ø§Ù…Ø±ÙˆØ²</div><h3>Ú¯Ø±ÙˆÙ‡â€ŒÙ‡Ø§ Ùˆ Ù¾Ø±ÙˆÚ˜Ù‡â€ŒÙ‡Ø§</h3><p>Ø§Ø² Ù…ÙˆÙ†Ù‡Ø¯ Ùˆ Ù…Ø§Ø®ÙˆÙ„Ø§ ØªØ§ Ú©Ø§Ø±Ù†ÛŒÙˆØ§Ù„Ø³Ú©ØŒ Ù…Ú¯Ùˆ Ùˆ Ø¬Ù„ÛŒÙ„Ø› Ø¯Ø± Ø³Ø¨Ú©â€ŒÙ‡Ø§ÛŒ Ø±Ø§Ú© ÙØ§Ø±Ø³ÛŒØŒ Ø¢Ù„ØªØ±Ù†ÛŒØªÛŒÙˆØŒ ØªØ¬Ø±Ø¨ÛŒØŒ Ù¾Ø±Ø§Ú¯Ø±Ø³ÛŒÙˆ Ùˆ ÙÛŒÙˆÚ˜Ù†.</p></article>
+      <article class="bio-block bio-event side-r"><div class="year">Û²Û°Û²Û³</div><h3>ØµØ­Ù†Ù‡â€ŒÙ‡Ø§ÛŒ Ø¯Ø¨ÛŒ</h3><p>Ø­Ø¶ÙˆØ± Ø±ÙˆÛŒ ØµØ­Ù†Ù‡ Ø¨Ù‡â€ŒØ¹Ù†ÙˆØ§Ù† Ù†ÙˆØ§Ø²Ù†Ø¯Ù‡â€ŒÛŒ Ø¨ÛŒØ³ Ø¨Ø§ Ø³ÛŒØ§ÙˆØ´ Ø´Ù…Ø³ØŒ ÙØªØ§Ù†Ù‡ Ùˆ Ú©ÙˆØ±ÙˆØ³Ø› Ø¯Ø± Ú©Ù†Ø§Ø± ÙØ¹Ø§Ù„ÛŒØª Ø­Ø±ÙÙ‡â€ŒØ§ÛŒ Ø¨Ù‡â€ŒØ¹Ù†ÙˆØ§Ù† Ù…Ù‡Ù†Ø¯Ø³ ØµØ¯Ø§ÛŒ Ø²Ù†Ø¯Ù‡.</p></article>
     </div>
-    <!-- invisible scroll track: 6 × 100svh — one segment per block; the wheel lands here so shellAfford keeps native scroll -->
+    <!-- invisible scroll track: 6 Ã— 100svh â€” one segment per block; the wheel lands here so shellAfford keeps native scroll -->
     <div class="chapter-shell bio-flow" aria-hidden="true">
       <div class="bio-spacer"></div>
       <div class="bio-spacer"></div>
@@ -430,11 +430,11 @@ body.site-ready .site-content{opacity:1}
   <section class="chapter contact-chapter" id="contact">
     <div class="chapter-shell">
       <div class="contact-layout">
-        <h2 class="chapter-title">همکاری؟</h2>
+        <h2 class="chapter-title">Ù‡Ù…Ú©Ø§Ø±ÛŒØŸ</h2>
         <div class="contact-copy">
           <div class="eyebrow">05 / CONTACT</div>
-          <p class="chapter-copy">برای اجرا، تولید موسیقی یا همکاری در مهندسی صدای زنده.</p>
-          <!-- ✏️ لینک‌های تماس — آدرس را داخل href="..." و نام را بین > < عوض کن -->
+          <p class="chapter-copy">Ø¨Ø±Ø§ÛŒ Ø§Ø¬Ø±Ø§ØŒ ØªÙˆÙ„ÛŒØ¯ Ù…ÙˆØ³ÛŒÙ‚ÛŒ ÛŒØ§ Ù‡Ù…Ú©Ø§Ø±ÛŒ Ø¯Ø± Ù…Ù‡Ù†Ø¯Ø³ÛŒ ØµØ¯Ø§ÛŒ Ø²Ù†Ø¯Ù‡.</p>
+          <!-- âœï¸ Ù„ÛŒÙ†Ú©â€ŒÙ‡Ø§ÛŒ ØªÙ…Ø§Ø³ â€” Ø¢Ø¯Ø±Ø³ Ø±Ø§ Ø¯Ø§Ø®Ù„ href="..." Ùˆ Ù†Ø§Ù… Ø±Ø§ Ø¨ÛŒÙ† > < Ø¹ÙˆØ¶ Ú©Ù† -->
           <div class="contact-links">
             <a href="https://www.instagram.com/sina.golnoghreh" target="_blank" rel="noopener">Instagram / Sina</a>
             <a href="https://carnivalesqueband.bandcamp.com" target="_blank" rel="noopener">Bandcamp</a>
@@ -443,20 +443,20 @@ body.site-ready .site-content{opacity:1}
           </div>
         </div>
       </div>
-      <div class="contact-sign"><span>سینا گل‌نقره</span><span>BASS / SOUND / LIVE</span></div>
-      <div class="site-credit">© 2026 <a href="https://www.amenroad.com" target="_blank" rel="noopener">AmenRoad Co</a> — Design: <a href="xoshhal.html" target="_blank" rel="noopener">xoshhal</a></div>
+      <div class="contact-sign"><span>Ø³ÛŒÙ†Ø§ Ú¯Ù„â€ŒÙ†Ù‚Ø±Ù‡</span><span>BASS / SOUND / LIVE</span></div>
+      <div class="site-credit">Â© 2026 <a href="https://www.amenroad.com" target="_blank" rel="noopener">AmenRoad Co</a> â€” Design: <a href="xoshhal.html" target="_blank" rel="noopener">xoshhal</a></div>
     </div>
   </section>
 </main>
 
 <script>
 /* ================================================================
-   Color-Reveal — raw WebGL2, no libraries.
+   Color-Reveal â€” raw WebGL2, no libraries.
    Phases (scroll-driven):
-     1. blur 15→2, B&W, low contrast        (p 0 → .38)
-     2. blur 2→0, B&W, contrast .75→1.1     (p .38 → .62)
+     1. blur 15â†’2, B&W, low contrast        (p 0 â†’ .38)
+     2. blur 2â†’0, B&W, contrast .75â†’1.1     (p .38 â†’ .62)
      3. color sweeps from geometric logo,
-        soft-edged, not global               (p .62 → 1)
+        soft-edged, not global               (p .62 â†’ 1)
    Image occupies the RIGHT third, fades to black leftward,
    text appears on the black zone in phase 3.
 ================================================================ */
@@ -467,7 +467,7 @@ var canvas = document.getElementById('gl');
 var gl = canvas.getContext('webgl2', {alpha:false, antialias:true, powerPreference:'high-performance', preserveDrawingBuffer:true});
 if(!gl){
   document.body.insertAdjacentHTML('afterbegin',
-    '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#888;font-family:sans-serif;z-index:99">WebGL2 پشتیبانی نمی‌شود</div>');
+    '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#888;font-family:sans-serif;z-index:99">WebGL2 Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Ù†Ù…ÛŒâ€ŒØ´ÙˆØ¯</div>');
   return;
 }
 
@@ -492,7 +492,7 @@ uniform sampler2D uTexF;   // subject plate (alpha = cutout)
 uniform vec2  uMouse;      // smoothed pointer -1..1 (parallax)
 uniform float uDepth;      // parallax intensity 0..1
 uniform vec2  uRes;        // canvas px
-uniform float uPortrait;   // 1 = portrait screen → image occupies the TOP band
+uniform float uPortrait;   // 1 = portrait screen â†’ image occupies the TOP band
 uniform vec2  uImgRes;     // image px
 uniform float uBlur;       // 0..15
 uniform float uContrast;   // .75..1.1
@@ -510,7 +510,7 @@ vec4 sampF(vec2 uv){
   if(uv.x<0.||uv.x>1.||uv.y<0.||uv.y>1.) return vec4(0.);
   return texture(uTexF, uv);
 }
-/* blurred subject sampling (9-tap + wide pass) — fg softens with the bg */
+/* blurred subject sampling (9-tap + wide pass) â€” fg softens with the bg */
 vec4 blurF(vec2 uv){
   vec2 off = vec2(uBlur * .0014) * vec2(1., uRes.x/uRes.y);
   vec3 s = vec3(0.); float a = 0.; vec4 t;
@@ -543,14 +543,14 @@ vec3 grade(vec3 c){
   return pow(max(c, vec3(0.)), vec3(.93, 1.0, 1.10));
 }
 
-/* gentler grade for the subject — less crushing, less punch */
+/* gentler grade for the subject â€” less crushing, less punch */
 vec3 gradeF(vec3 c){
   c = max(mix(vec3(dot(c, vec3(.2126,.7152,.0722))), c, 1.35), vec3(0.));
   c *= vec3(1.08, .99, .90);
   return pow(max(c, vec3(0.)), vec3(.97, 1.0, 1.05));
 }
 
-/* soft-edged rounded hexagon SDF — the "geometric logo" origin */
+/* soft-edged rounded hexagon SDF â€” the "geometric logo" origin */
 float sdHex(vec2 p, float r){
   const vec3 k = vec3(-0.866025404, 0.5, 0.577350269);
   p = abs(p);
@@ -575,7 +575,7 @@ void main(){
     luv = vec2((vUv.x - (1. - slotW)) / slotW, vUv.y);
   }
 
-  /* parallax offsets: bg drifts against, subject with the pointer (deep → near) */
+  /* parallax offsets: bg drifts against, subject with the pointer (deep â†’ near) */
   vec2 oBg = uMouse * .014 * uDepth;
   vec2 oFg = uMouse * .045 * uDepth;
 
@@ -594,15 +594,15 @@ void main(){
      on portrait the cutout maps EXACTLY onto the background so subject & bg stay in sync (no double ghost) */
   vec2 cuvF = mix((base - .5) * 1.06 + .5 + oFg + vec2(0., -.055 * (1. - uPortrait * .5)), cuvB, uPortrait);
 
-  /* soft fade: desktop → black toward slot's left edge; portrait → black below the band */
+  /* soft fade: desktop â†’ black toward slot's left edge; portrait â†’ black below the band */
   float ramp, outside, vfade;
   if(uPortrait > .5){
     ramp    = 1. - smoothstep(.30, 1.0, luv.y);   // keep subject bright, melt to black at band bottom
     outside = 1. - smoothstep(.96, 1.03, luv.y);
     vfade   = smoothstep(.0, .06, luv.y);
   }else{
-    ramp    = 1.0;                              // فید سیاه کلاً حذف شد — فقط fg + bg
-    outside = 1.0;                              // بدون هیچ تیرگی در لبهی عکس
+    ramp    = 1.0;                              // ÙÛŒØ¯ Ø³ÛŒØ§Ù‡ Ú©Ù„Ø§Ù‹ Ø­Ø°Ù Ø´Ø¯ â€” ÙÙ‚Ø· fg + bg
+    outside = 1.0;                              // Ø¨Ø¯ÙˆÙ† Ù‡ÛŒÚ† ØªÛŒØ±Ú¯ÛŒ Ø¯Ø± Ù„Ø¨Ù‡ÛŒ Ø¹Ú©Ø³
     vfade   = 1.0;
   }
   float fadeIn  = ramp * outside * vfade;
@@ -648,21 +648,21 @@ void main(){
   vec2 pH = (luv - hexC) * vec2(slotW * aspect, 1.0);
   float dHex = sdHex(pH * 2.4, 1.05);
 
-  float front = uReveal * 4.2 - 1.55;           // starts below every pixel → no pop-in
+  float front = uReveal * 4.2 - 1.55;           // starts below every pixel â†’ no pop-in
   float mBg = uReveal > 0.001 ? smoothstep(dHex - .60, dHex + .80, front) : 0.;
   float mSub = uReveal > 0.001 ? smoothstep(dHex - .32, dHex + .45, front - .85) : 0.;
   float m = clamp(mix(mBg, mSub, maskF), 0., 1.);
 
-  /* color develops gradually behind the wave — like a print coming up */
+  /* color develops gradually behind the wave â€” like a print coming up */
   vec3 colB = mix(bwB, grade(bgc), mBg * (.30 + .70 * uReveal));
-  colB = pow(max(colB, vec3(0.)), vec3(.72)) * 1.08;   // سایههای پسزمینه روشنتر → عکس پشتی بیشتر معلوم
+  colB = pow(max(colB, vec3(0.)), vec3(.72)) * 1.08;   // Ø³Ø§ÛŒÙ‡Ù‡Ø§ÛŒ Ù¾Ø³Ø²Ù…ÛŒÙ†Ù‡ Ø±ÙˆØ´Ù†ØªØ± â†’ Ø¹Ú©Ø³ Ù¾Ø´ØªÛŒ Ø¨ÛŒØ´ØªØ± Ù…Ø¹Ù„ÙˆÙ…
   vec3 colF = mix(bwF, gradeF(fgc.rgb), mSub * (.30 + .70 * uReveal));
-  colF = pow(max(colF, vec3(0.)), vec3(.78)) * 1.06;   // سایههای سوژه هم روشنتر — نوار تاریک چپ
+  colF = pow(max(colF, vec3(0.)), vec3(.78)) * 1.06;   // Ø³Ø§ÛŒÙ‡Ù‡Ø§ÛŒ Ø³ÙˆÚ˜Ù‡ Ù‡Ù… Ø±ÙˆØ´Ù†ØªØ± â€” Ù†ÙˆØ§Ø± ØªØ§Ø±ÛŒÚ© Ú†Ù¾
 
   /* composite subject over background with soft edges */
   vec3 finalCol = mix(colB, colF, maskF);
 
-  /* soft traveling glow — two rings hugging the wavefronts, fade in slowly */
+  /* soft traveling glow â€” two rings hugging the wavefronts, fade in slowly */
   if(uReveal > 0.001){
     float fade = smoothstep(0., .14, uReveal);
     float ringB = 1. - smoothstep(0., .38, abs(front - dHex));
@@ -880,10 +880,10 @@ var t0 = performance.now(), last = t0, raf;
 function tick(now){
   raf = requestAnimationFrame(tick);
   if(document.hidden) return;
-  /* stage hidden (scenes active) → skip GL work until back on top */
+  /* stage hidden (scenes active) â†’ skip GL work until back on top */
   if(vScroll.v > sceneCenter.instrument * .55) return;
 
-  // button-driven journey: advance target along the 0→100 timeline
+  // button-driven journey: advance target along the 0â†’100 timeline
   if(journey.playing){
     var jp = Math.min(1, (now - journey.t0) / journey.dur);
     target.p = jp;
@@ -899,16 +899,16 @@ function tick(now){
 
   if(p < .38){                       // phase 1: blur + B&W
     var t1 = p / .38;
-    blur = 15 - 13 * t1;             // 15 → 2
+    blur = 15 - 13 * t1;             // 15 â†’ 2
     contrast = .75;
     reveal = 0; textIn = 0; phase = 1;
   }else if(p < .55){                 // phase 2: focus, still B&W
     var t2 = (p - .38) / .17;
     var e2 = t2*t2*(3-2*t2);
-    blur = 2 * (1 - e2);             // 2 → 0
-    contrast = .75 + .35 * e2;       // .75 → 1.10
+    blur = 2 * (1 - e2);             // 2 â†’ 0
+    contrast = .75 + .35 * e2;       // .75 â†’ 1.10
     reveal = 0; textIn = 0; phase = 2;
-  }else{                             // phase 3: color from hexagon — long, gentle
+  }else{                             // phase 3: color from hexagon â€” long, gentle
     var t3 = (p - .55) / .45;
     var e3 = t3*t3*t3*(t3*(t3*6-15)+10);   // smootherstep: gentle start & landing
     blur = 0;
@@ -996,7 +996,7 @@ window.__reveal.force = function(pv){
    the `#headline`/`#subline` lookups above are null-guarded and safely no-op */
 
 /* ================================================================
-   VIRTUAL SCROLL ENGINE — Luca-style: the page never moves.
+   VIRTUAL SCROLL ENGINE â€” Luca-style: the page never moves.
    Wheel/touch/keys feed a virtual value 0..1; every scene is placed
    continuously on that axis and rendered cinematically each frame
    (slide + focus + scale) instead of a hard opacity toggle.
@@ -1034,12 +1034,12 @@ var FX = {
   blur: 7,                         // px of focus blur at the edges
   scale: 0.016                     // depth scale at the edges
 };
-/* ---------- bio shell ⇄ v mirror (زمان‌بندی اول/آخر بیو) ----------
-   وقتی شل بیو صاحب اسکرول است v دیگر از wheel تغذیه نمیشود و میخکوب میماند؛
-   این آینه پیشرفت داخلی شل را روی محور مجازی مینویسد:
-   p=0 → نقطهی جاافتادن ورود (همان آستانهی sceneSettled) · p=1 → دقیقاً
-   آستانهی کراسفید خروج به تماس — پس پایان شل بدون ناحیهی مرده به تماس
-   میرسد و برگشت از تماس هم یکپارچه است. */
+/* ---------- bio shell â‡„ v mirror (Ø²Ù…Ø§Ù†â€ŒØ¨Ù†Ø¯ÛŒ Ø§ÙˆÙ„/Ø¢Ø®Ø± Ø¨ÛŒÙˆ) ----------
+   ÙˆÙ‚ØªÛŒ Ø´Ù„ Ø¨ÛŒÙˆ ØµØ§Ø­Ø¨ Ø§Ø³Ú©Ø±ÙˆÙ„ Ø§Ø³Øª v Ø¯ÛŒÚ¯Ø± Ø§Ø² wheel ØªØºØ°ÛŒÙ‡ Ù†Ù…ÛŒØ´ÙˆØ¯ Ùˆ Ù…ÛŒØ®Ú©ÙˆØ¨ Ù…ÛŒÙ…Ø§Ù†Ø¯Ø›
+   Ø§ÛŒÙ† Ø¢ÛŒÙ†Ù‡ Ù¾ÛŒØ´Ø±ÙØª Ø¯Ø§Ø®Ù„ÛŒ Ø´Ù„ Ø±Ø§ Ø±ÙˆÛŒ Ù…Ø­ÙˆØ± Ù…Ø¬Ø§Ø²ÛŒ Ù…ÛŒÙ†ÙˆÛŒØ³Ø¯:
+   p=0 â†’ Ù†Ù‚Ø·Ù‡ÛŒ Ø¬Ø§Ø§ÙØªØ§Ø¯Ù† ÙˆØ±ÙˆØ¯ (Ù‡Ù…Ø§Ù† Ø¢Ø³ØªØ§Ù†Ù‡ÛŒ sceneSettled) Â· p=1 â†’ Ø¯Ù‚ÛŒÙ‚Ø§Ù‹
+   Ø¢Ø³ØªØ§Ù†Ù‡ÛŒ Ú©Ø±Ø§Ø³ÙÛŒØ¯ Ø®Ø±ÙˆØ¬ Ø¨Ù‡ ØªÙ…Ø§Ø³ â€” Ù¾Ø³ Ù¾Ø§ÛŒØ§Ù† Ø´Ù„ Ø¨Ø¯ÙˆÙ† Ù†Ø§Ø­ÛŒÙ‡ÛŒ Ù…Ø±Ø¯Ù‡ Ø¨Ù‡ ØªÙ…Ø§Ø³
+   Ù…ÛŒØ±Ø³Ø¯ Ùˆ Ø¨Ø±Ú¯Ø´Øª Ø§Ø² ØªÙ…Ø§Ø³ Ù‡Ù… ÛŒÚ©Ù¾Ø§Ø±Ú†Ù‡ Ø§Ø³Øª. */
 var bioSettleV = sceneStart.bio + Math.max(
       Math.min(FX.tail, SCENE_RANGE.bio * .12),
       Math.min(FX.tail, SCENE_RANGE.live * .12));
@@ -1055,7 +1055,7 @@ function placeScene(id){
   var el = sceneEls[id];
   if(!el) return;
   var v = vScroll.v;
-  /* visibility window: [start - tail, end + tail] — strictly zero outside.
+  /* visibility window: [start - tail, end + tail] â€” strictly zero outside.
      first scene starts EARLY-capped so it stays invisible at v=0 (entry owns) */
   var s = sceneStart[id], r = SCENE_RANGE[id];
   var t = Math.min(FX.tail, r * .12);         /* short scenes: proportional fade so the scene owns its length */
@@ -1072,8 +1072,8 @@ function placeScene(id){
   }
   el.style.opacity = a.toFixed(3);
   el.style.visibility = 'visible';
-  el.style.transform = 'none';                  // ثابت — بدون لرزش
-  el.style.filter = 'none';                     // بدون بلر حین اسکرول
+  el.style.transform = 'none';                  // Ø«Ø§Ø¨Øª â€” Ø¨Ø¯ÙˆÙ† Ù„Ø±Ø²Ø´
+  el.style.filter = 'none';                     // Ø¨Ø¯ÙˆÙ† Ø¨Ù„Ø± Ø­ÛŒÙ† Ø§Ø³Ú©Ø±ÙˆÙ„
   el.classList.toggle('on', a > .5);
   if(id === 'live') tunnelUpdate(sceneP(id), a);
 }
@@ -1096,18 +1096,18 @@ function applyScroll(){
   var sa = Math.max(0, 1 - sv);
   sa = sa * sa * (3 - 2 * sa);
   stageEl.style.opacity = sa.toFixed(3);
-  stageEl.style.transform = 'none';             // ثابت — بدون لرزش
+  stageEl.style.transform = 'none';             // Ø«Ø§Ø¨Øª â€” Ø¨Ø¯ÙˆÙ† Ù„Ø±Ø²Ø´
   stageEl.style.filter = 'none';
   /* active scene = the one centered nearest v; instrument updates its frames.
-     before leaving the entry stage (v≈0) nothing is "active" — GL stage owns */
+     before leaving the entry stage (vâ‰ˆ0) nothing is "active" â€” GL stage owns */
   var cur = null, best = 1e9;
   SCENES.forEach(function(id){
     var dd = Math.abs(v - sceneCenter[id]);
     if(dd < best){ best = dd; cur = id; }
   });
   if(v < sceneCenter.instrument * .55) cur = null;
-  /* نزدیکترین مرکز وسط شل بیو زود به contact میچرخد؛ تا وقتی شل به bottom نرسیده
-     و کراسفید خروج شروع نشده، صحنهی فعال bio بماند */
+  /* Ù†Ø²Ø¯ÛŒÚ©ØªØ±ÛŒÙ† Ù…Ø±Ú©Ø² ÙˆØ³Ø· Ø´Ù„ Ø¨ÛŒÙˆ Ø²ÙˆØ¯ Ø¨Ù‡ contact Ù…ÛŒÚ†Ø±Ø®Ø¯Ø› ØªØ§ ÙˆÙ‚ØªÛŒ Ø´Ù„ Ø¨Ù‡ bottom Ù†Ø±Ø³ÛŒØ¯Ù‡
+     Ùˆ Ú©Ø±Ø§Ø³ÙÛŒØ¯ Ø®Ø±ÙˆØ¬ Ø´Ø±ÙˆØ¹ Ù†Ø´Ø¯Ù‡ØŒ ØµØ­Ù†Ù‡ÛŒ ÙØ¹Ø§Ù„ bio Ø¨Ù…Ø§Ù†Ø¯ */
   if(cur === 'contact' && v < bioExitV && bioShell
      && bioShell.scrollTop < bioShell.scrollHeight - bioShell.clientHeight - 4) cur = 'bio';
   setScene(cur);
@@ -1124,7 +1124,7 @@ function applyScroll(){
   applyScroll();
 })();
 /* wheel: hijack and feed virtual value.
-   Inner scrollable shells keep native scroll — but ONLY while they can
+   Inner scrollable shells keep native scroll â€” but ONLY while they can
    actually move in that direction; at their edge the wheel hands off
    to the virtual scroll again (so you can leave a long scene). */
 function shellAfford(t, dy){
@@ -1135,12 +1135,12 @@ function shellAfford(t, dy){
   if((dy > 0 && !atBottom) || (dy < 0 && !atTop)) return sh;
   return null;
 }
-/* شل فقط وقتی میتواند صاحب اسکرول شود که «شلِ خودش» کاملاً جا افتاده باشد —
-   کلید گارد باید صحنهی صاحبِ شل باشد نه نزدیکترین صحنه (vScroll.scene وسط
-   کراسفید ورود هنوز صحنهی قبلی است و settled هرگز false نمیشود) و آستانه
-   باید هم فول-این صحنهی خودش هم خروجِ کامل صحنهی قبلی را پوشش دهد؛ وگرنه
-   گرفتنِ وسط کراسفید v را همانجا میخکوب میکند و صحنهی قبلی شبحِ
-   نیمه‌محو روی صحنهی جدید میماند (باگ صحنه←بیو) */
+/* Ø´Ù„ ÙÙ‚Ø· ÙˆÙ‚ØªÛŒ Ù…ÛŒØªÙˆØ§Ù†Ø¯ ØµØ§Ø­Ø¨ Ø§Ø³Ú©Ø±ÙˆÙ„ Ø´ÙˆØ¯ Ú©Ù‡ Â«Ø´Ù„Ù Ø®ÙˆØ¯Ø´Â» Ú©Ø§Ù…Ù„Ø§Ù‹ Ø¬Ø§ Ø§ÙØªØ§Ø¯Ù‡ Ø¨Ø§Ø´Ø¯ â€”
+   Ú©Ù„ÛŒØ¯ Ú¯Ø§Ø±Ø¯ Ø¨Ø§ÛŒØ¯ ØµØ­Ù†Ù‡ÛŒ ØµØ§Ø­Ø¨Ù Ø´Ù„ Ø¨Ø§Ø´Ø¯ Ù†Ù‡ Ù†Ø²Ø¯ÛŒÚ©ØªØ±ÛŒÙ† ØµØ­Ù†Ù‡ (vScroll.scene ÙˆØ³Ø·
+   Ú©Ø±Ø§Ø³ÙÛŒØ¯ ÙˆØ±ÙˆØ¯ Ù‡Ù†ÙˆØ² ØµØ­Ù†Ù‡ÛŒ Ù‚Ø¨Ù„ÛŒ Ø§Ø³Øª Ùˆ settled Ù‡Ø±Ú¯Ø² false Ù†Ù…ÛŒØ´ÙˆØ¯) Ùˆ Ø¢Ø³ØªØ§Ù†Ù‡
+   Ø¨Ø§ÛŒØ¯ Ù‡Ù… ÙÙˆÙ„-Ø§ÛŒÙ† ØµØ­Ù†Ù‡ÛŒ Ø®ÙˆØ¯Ø´ Ù‡Ù… Ø®Ø±ÙˆØ¬Ù Ú©Ø§Ù…Ù„ ØµØ­Ù†Ù‡ÛŒ Ù‚Ø¨Ù„ÛŒ Ø±Ø§ Ù¾ÙˆØ´Ø´ Ø¯Ù‡Ø¯Ø› ÙˆÚ¯Ø±Ù†Ù‡
+   Ú¯Ø±ÙØªÙ†Ù ÙˆØ³Ø· Ú©Ø±Ø§Ø³ÙÛŒØ¯ v Ø±Ø§ Ù‡Ù…Ø§Ù†Ø¬Ø§ Ù…ÛŒØ®Ú©ÙˆØ¨ Ù…ÛŒÚ©Ù†Ø¯ Ùˆ ØµØ­Ù†Ù‡ÛŒ Ù‚Ø¨Ù„ÛŒ Ø´Ø¨Ø­Ù
+   Ù†ÛŒÙ…Ù‡â€ŒÙ…Ø­Ùˆ Ø±ÙˆÛŒ ØµØ­Ù†Ù‡ÛŒ Ø¬Ø¯ÛŒØ¯ Ù…ÛŒÙ…Ø§Ù†Ø¯ (Ø¨Ø§Ú¯ ØµØ­Ù†Ù‡â†Ø¨ÛŒÙˆ) */
 function shellScene(sh){
   var ch = sh && sh.closest ? sh.closest('.chapter') : null;
   return (ch && sceneStart[ch.id] !== undefined) ? ch.id : null;
@@ -1154,7 +1154,7 @@ function sceneSettled(id){
 /* keyboard parity: arrows/PageUp-Down feed the bio orbit track while it can still move */
 function bioKeyScroll(dy){
   if(vScroll.scene !== 'bio' || !bioShell) return false;
-  if(dy > 0 && !sceneSettled('bio')) return false;   /* وسط کراسفید ورود: محور مجازی */
+  if(dy > 0 && !sceneSettled('bio')) return false;   /* ÙˆØ³Ø· Ú©Ø±Ø§Ø³ÙÛŒØ¯ ÙˆØ±ÙˆØ¯: Ù…Ø­ÙˆØ± Ù…Ø¬Ø§Ø²ÛŒ */
   var max = bioShell.scrollHeight - bioShell.clientHeight;
   if(dy > 0){ if(bioShell.scrollTop >= max - 1) return false; }
   else if(bioShell.scrollTop <= 0){ return false; }
@@ -1164,16 +1164,16 @@ function bioKeyScroll(dy){
 }
 window.addEventListener('wheel', function(e){
   if(!journey.complete){
-    /* ورود فقط با دکمهی «ورود» — اسکرول هیچ کاری نمیکند */
+    /* ÙˆØ±ÙˆØ¯ ÙÙ‚Ø· Ø¨Ø§ Ø¯Ú©Ù…Ù‡ÛŒ Â«ÙˆØ±ÙˆØ¯Â» â€” Ø§Ø³Ú©Ø±ÙˆÙ„ Ù‡ÛŒÚ† Ú©Ø§Ø±ÛŒ Ù†Ù…ÛŒÚ©Ù†Ø¯ */
     return;
   }
   e.preventDefault();
   var sh = shellAfford(e.target, e.deltaY);
-  var shId = shellScene(sh);            /* صحنهی صاحب شل — نه نزدیکترین صحنه */
+  var shId = shellScene(sh);            /* ØµØ­Ù†Ù‡ÛŒ ØµØ§Ø­Ø¨ Ø´Ù„ â€” Ù†Ù‡ Ù†Ø²Ø¯ÛŒÚ©ØªØ±ÛŒÙ† ØµØ­Ù†Ù‡ */
   if(sh && !(e.deltaY > 0 && shId && !sceneSettled(shId))){
-    /* preventDefault above killed the browser's own scroll — drive the shell ourselves */
+    /* preventDefault above killed the browser's own scroll â€” drive the shell ourselves */
     sh.scrollTop += (e.deltaMode === 1) ? e.deltaY * 33 : e.deltaY;
-    if(sh === bioShell) bioMirror();   /* v همراه شل — پایان شل = آستانهی کراسفید تماس */
+    if(sh === bioShell) bioMirror();   /* v Ù‡Ù…Ø±Ø§Ù‡ Ø´Ù„ â€” Ù¾Ø§ÛŒØ§Ù† Ø´Ù„ = Ø¢Ø³ØªØ§Ù†Ù‡ÛŒ Ú©Ø±Ø§Ø³ÙÛŒØ¯ ØªÙ…Ø§Ø³ */
     return;
   }
   var wf = (vScroll.scene === 'live') ? .00005 : .00015;   /* gallery: one photo per notch */
@@ -1218,7 +1218,7 @@ window.addEventListener('touchmove', function(e){
 Object.keys(navLinks).forEach(function(id){
   navLinks[id].addEventListener('click', function(e){
     e.preventDefault();
-    if(!journey.complete) return;   // ورود فقط با دکمهی «ورود»
+    if(!journey.complete) return;   // ÙˆØ±ÙˆØ¯ ÙÙ‚Ø· Ø¨Ø§ Ø¯Ú©Ù…Ù‡ÛŒ Â«ÙˆØ±ÙˆØ¯Â»
     vScroll.target = sceneStart[id] + SCENE_RANGE[id] * .12;
   });
 });
@@ -1248,14 +1248,14 @@ function drawPeg(){
 function updatePeg(){
   if(!pegCanvas) return;
   /* frame timeline spans the scene's whole visible window:
-     frame 0 exactly when the scene starts fading in → frame 239 at scene end */
+     frame 0 exactly when the scene starts fading in â†’ frame 239 at scene end */
   var s = sceneStart.instrument, r = SCENE_RANGE.instrument;
   var winS = s + FX.tail * .6, winE = s + r;
   var p = (vScroll.v - winS) / (winE - winS);
   p = Math.max(0, Math.min(1, p));
   var idx = Math.round(p * (pegCount - 1));
   if(idx !== pegFrameIndex){ pegFrameIndex = idx; drawPeg(); }
-  /* scroll text sequence: موسیقی → از پایین‌ترین نت‌ها */
+  /* scroll text sequence: Ù…ÙˆØ³ÛŒÙ‚ÛŒ â†’ Ø§Ø² Ù¾Ø§ÛŒÛŒÙ†â€ŒØªØ±ÛŒÙ† Ù†Øªâ€ŒÙ‡Ø§ */
   var q = 1 - (p - .26) / .12; q = Math.max(0, Math.min(1, q));
   if(seqA){
     seqA.style.opacity = q;
@@ -1285,8 +1285,8 @@ if(tunScene){
     var side = (ti % 2 ? 1 : -1);
     var fig = document.createElement('figure');
     fig.className = 't-frame' + (ti === 1 || ti === 4 || ti === 7 || ti === 11 || ti === 14 ? ' t-tall' : '');   /* portrait shots 02/05/08/12/15 */
-    fig.innerHTML = '<img loading="lazy" src="assets/live/live-' + String(ti + 1).padStart(2, '0') + '.webp" alt="اجرای زنده ' + (ti + 1) + '">' +
-      '<figcaption><span>اجرای زنده</span><b>' + String(ti + 1).padStart(2, '0') + ' / LIVE</b></figcaption>';
+    fig.innerHTML = '<img loading="lazy" src="assets/live/live-' + String(ti + 1).padStart(2, '0') + '.webp" alt="Ø§Ø¬Ø±Ø§ÛŒ Ø²Ù†Ø¯Ù‡ ' + (ti + 1) + '">' +
+      '<figcaption><span>Ø§Ø¬Ø±Ø§ÛŒ Ø²Ù†Ø¯Ù‡</span><b>' + String(ti + 1).padStart(2, '0') + ' / LIVE</b></figcaption>';
     tunScene.appendChild(fig);
     tunFrames.push({el: fig, x: side * (150 + (ti % 3) * 70), y: (((ti * 37) % 3) - 1) * 44, ry: -side * 14});
   }
@@ -1323,19 +1323,19 @@ function tunnelUpdate(p, sectionOpacity){
   }
 }
 /* ---------- bio 360 spin (frame sequence driven by scene scroll, same pattern as headstock) ---------- */
-var BIO360_N = 120;                     /* 360 video = 240 frames @24fps, every 2nd → 120 (full revolution) */
+var BIO360_N = 120;                     /* 360 video = 240 frames @24fps, every 2nd â†’ 120 (full revolution) */
 var bioCanvas = document.getElementById('bio360Canvas');
 var bioStage = document.getElementById('bioStage');
 var bioCtx = bioCanvas ? bioCanvas.getContext('2d') : null;
 var bioFrames = [], bioFrameIndex = -1;
-var bioFrameF = 0;                       /* eased float frame — motion glides like the source video, never snaps */
+var bioFrameF = 0;                       /* eased float frame â€” motion glides like the source video, never snaps */
 var bioShell = document.querySelector('.bio-chapter .chapter-shell');
 function bioSrc(i){ return 'assets/bio-360/sina-' + String(i + 1).padStart(3, '0') + '.webp'; }
 if(bioCanvas && BIO360_N > 0){
   for(var bi = 0; bi < BIO360_N; bi++){
     var bim = new Image();
     bim.onload = (function(bidx){                       /* reload mid-bio: first draw may hit before the
-                                                           frame's image arrives → redraw on arrival */
+                                                           frame's image arrives â†’ redraw on arrival */
       return function(){ if(bidx === bioFrameIndex) drawBio360(); };
     })(bi);
     bim.src = bioSrc(bi); bioFrames.push(bim);
@@ -1375,7 +1375,7 @@ function updateBio360(){
   if(idx !== bioFrameIndex){ bioFrameIndex = idx; sizeBio360(); drawBio360(); }
 }
 /* bio orbit: lead + events emerge from the circle edge in sequence, driven by the bio shell scroll.
-   6 blocks × equal 100svh spacers → block i is centered at p = i/(n-1). */
+   6 blocks Ã— equal 100svh spacers â†’ block i is centered at p = i/(n-1). */
 var bioFlow = document.querySelector('.bio-chapter .chapter-shell');
 var bioBlocks = Array.prototype.slice.call(document.querySelectorAll('.bio-block'));
 function bioSstep(t){ return t * t * (3 - 2 * t); }
