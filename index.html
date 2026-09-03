@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>سینا گل‌نقره — Bass / Sound / Live</title>
 <style>
-@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
-@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Medium.ttf') format('truetype');font-weight:500;font-display:swap}
-@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap}
-@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
-@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
-@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Light.ttf') format('truetype');font-weight:300;font-display:swap}
-@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Medium.ttf') format('truetype');font-weight:500;font-display:swap}
-@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap}
-@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Light.woff2') format('woff2');font-weight:300;font-display:swap}
+@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
 *{margin:0;padding:0;box-sizing:border-box}
 body{
   background:#000;color:#fff;
@@ -1226,8 +1226,8 @@ Object.keys(navLinks).forEach(function(id){
 /* ---------- instrument frame sequence (driven by virtual scroll) ---------- */
 var pegCanvas = document.getElementById('pegCanvas');
 var pegCtx = pegCanvas ? pegCanvas.getContext('2d') : null;
-var pegFrames = [], pegFrameIndex = 0, pegCount = 240;
-function pegSrc(i){ return 'assets/headstock-frames/f' + String(i + 1).padStart(3, '0') + '.webp?v=8'; }
+var pegFrames = [], pegFrameIndex = 0, pegCount = 120;   /* every 2nd frame of the 240-seq (odd files kept) */
+function pegSrc(i){ return 'assets/headstock-frames/f' + String(i * 2 + 1).padStart(3, '0') + '.webp?v=8'; }
 function sizePegCanvas(){
   if(!pegCanvas || !pegCtx) return;
   var r = pegCanvas.getBoundingClientRect();
@@ -1324,14 +1324,14 @@ function tunnelUpdate(p, sectionOpacity){
   }
 }
 /* ---------- bio 360 spin (frame sequence driven by scene scroll, same pattern as headstock) ---------- */
-var BIO360_N = 120;                     /* 360 video = 240 frames @24fps, every 2nd → 120 (full revolution) */
+var BIO360_N = 60;                       /* 360 video = 240 frames @24fps, every 4th → 60 (full revolution) */
 var bioCanvas = document.getElementById('bio360Canvas');
 var bioStage = document.getElementById('bioStage');
 var bioCtx = bioCanvas ? bioCanvas.getContext('2d') : null;
 var bioFrames = [], bioFrameIndex = -1;
 var bioFrameF = 0;                       /* eased float frame — motion glides like the source video, never snaps */
 var bioShell = document.querySelector('.bio-chapter .chapter-shell');
-function bioSrc(i){ return 'assets/bio-360/sina-' + String(i + 1).padStart(3, '0') + '.webp'; }
+function bioSrc(i){ return 'assets/bio-360/sina-' + String(i * 2 + 1).padStart(3, '0') + '.webp'; }
 if(bioCanvas && BIO360_N > 0){
   for(var bi = 0; bi < BIO360_N; bi++){
     var bim = new Image();
