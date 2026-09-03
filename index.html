@@ -286,7 +286,7 @@ body.site-ready .site-content{opacity:1}
 
   <div class="hud">
     <div class="enterwrap">
-      <video class="wingvid" id="wingVid" src="content/wings_alpha.webm" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      <img class="wingvid" id="wingVid" src="content/wings_alpha_v2.webp" alt="" aria-hidden="true" draggable="false">
       <button class="enterbtn" id="enterbtn" type="button">
         <span class="ring"><span class="word">ورود</span></span>
       </button>
@@ -855,7 +855,6 @@ function startJourney(){
   enterBtn.classList.add('gone');
   if(wingVid){
     wingVid.classList.add('gone');
-    setTimeout(function(){ try{ wingVid.pause(); }catch(err){} }, 950);
   }
 }
 if(enterBtn) enterBtn.addEventListener('click', startJourney);
