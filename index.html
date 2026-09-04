@@ -73,27 +73,7 @@ body{
 }
 .wingvid.gone{opacity:0}
 
-/* تنظیمات ویژه آیفون */
-.wing-ios {
-  display: none;
-}
 
-html.ios .wing-webm {
-  display: none !important;
-}
-
-html.ios .wing-ios {
-  display: block !important;
-  mix-blend-mode: screen !important;
-  background: transparent !important;
-  filter: none !important;
-  -webkit-transform: translate(-50%, -50%) translateZ(0);
-  transform: translate(-50%, -50%) translateZ(0);
-}
-
-/* حذف فیلتر روی ویدیو در آیفون برای رفع باگ */
-html.ios .wingvid {
-  filter: none !important;
 }
 .frame{
   position:absolute;inset:16px;border:1px solid rgba(255,255,255,.06);
@@ -315,27 +295,17 @@ body.site-ready .site-content{opacity:1}
 
   <div class="hud">
     <div class="enterwrap">
-      <video
-        class="wingvid wing-webm"
+            <video
+        class="wingvid"
         id="wingVid"
-        src="content/wings_alpha.webm"
         autoplay
         muted
         loop
         playsinline
         preload="auto"
         aria-hidden="true">
-      </video>
-      <video
-        class="wingvid wing-ios"
-        id="wingIOS"
-        src="content/wings_ios.mp4?v=2"
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="auto"
-        aria-hidden="true">
+        <source src="content/wings_alpha_ios.mp4" type='video/mp4; codecs="hvc1"'>
+        <source src="content/wings_alpha.webm" type="video/webm">
       </video>
       <button class="enterbtn" id="enterbtn" type="button">
         <span class="ring"><span class="word">ورود</span></span>
