@@ -73,19 +73,28 @@ body{
 }
 .wingvid.gone{opacity:0}
 
-/* iPhone/iPad fallback:
-   Safari/WebKit does not reliably composite VP9/WebM alpha.
-   Desktop/Android keep the original transparent WebM.
-   iOS uses an H.264 MP4 rendered over black and blends it with SCREEN,
-   making black disappear visually while preserving the animated wings. */
-.wing-ios{display:none}
-html.ios .wing-webm{display:none}
-html.ios .wing-ios{
-  display:block;
-  mix-blend-mode:screen;
-  background:#000;
+/* تنظیمات ویژه آیفون */
+.wing-ios {
+  display: none;
 }
 
+html.ios .wing-webm {
+  display: none !important;
+}
+
+html.ios .wing-ios {
+  display: block !important;
+  mix-blend-mode: screen !important;
+  background: transparent !important;
+  filter: none !important;
+  -webkit-transform: translate(-50%, -50%) translateZ(0);
+  transform: translate(-50%, -50%) translateZ(0);
+}
+
+/* حذف فیلتر روی ویدیو در آیفون برای رفع باگ */
+html.ios .wingvid {
+  filter: none !important;
+}
 .frame{
   position:absolute;inset:16px;border:1px solid rgba(255,255,255,.06);
   border-radius:22px;pointer-events:none;z-index:4;
