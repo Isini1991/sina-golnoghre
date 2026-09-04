@@ -73,11 +73,18 @@ body{
 }
 .wingvid.gone{opacity:0}
 
-/* iPhone/iPad: Safari/WebKit does not reliably composite VP9 WebM alpha.
-   Use the original animated WebM everywhere else, and a transparent PNG fallback on iOS. */
+/* iPhone/iPad fallback:
+   Safari/WebKit does not reliably composite VP9/WebM alpha.
+   Desktop/Android keep the original transparent WebM.
+   iOS uses an H.264 MP4 rendered over black and blends it with SCREEN,
+   making black disappear visually while preserving the animated wings. */
 .wing-ios{display:none}
 html.ios .wing-webm{display:none}
-html.ios .wing-ios{display:block}
+html.ios .wing-ios{
+  display:block;
+  mix-blend-mode:screen;
+  background:#000;
+}
 
 .frame{
   position:absolute;inset:16px;border:1px solid rgba(255,255,255,.06);
@@ -310,13 +317,17 @@ body.site-ready .site-content{opacity:1}
         preload="auto"
         aria-hidden="true">
       </video>
-      <img
+      <video
         class="wingvid wing-ios"
         id="wingIOS"
-        src="content/wings_ios.png?v=1"
-        alt=""
-        aria-hidden="true"
-        draggable="false">
+        src="content/wings_ios.mp4?v=2"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        aria-hidden="true">
+      </video>
       <button class="enterbtn" id="enterbtn" type="button">
         <span class="ring"><span class="word">ورود</span></span>
       </button>
@@ -890,6 +901,7 @@ function startJourney(){
   }
   if(wingIOS){
     wingIOS.classList.add('gone');
+    setTimeout(function(){ try{ wingIOS.pause(); }catch(err){} }, 950);
   }
 }
 if(enterBtn) enterBtn.addEventListener('click', startJourney);
