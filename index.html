@@ -226,26 +226,33 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
 .band-members b.me{color:#ffb17f}
 .band-members i{font-style:normal;font-size:10.5px;color:rgba(255,255,255,.38)}
 .band-members i::before{content:'—';margin-left:10px;color:rgba(255,106,42,.5)}
-.sound-stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;border-left:1px solid rgba(255,255,255,.08);direction:ltr;padding:14px 0 14px 3vw}
+.sound-stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;border-left:1px solid rgba(255,255,255,.08);direction:ltr;padding:14px 0 14px 3vw}
+/* --- jewel case: front lid hinged on the left spine, opens with scroll --- */
 .album-figure{position:relative;margin:0;line-height:0}
-.album-figure::before,.album-figure::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(255,106,42,.26);border-radius:50%;width:124%;aspect-ratio:1;animation:orbitpulse 4.8s ease-in-out infinite;pointer-events:none}
+.album-figure::before,.album-figure::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(255,106,42,.26);border-radius:50%;width:124%;aspect-ratio:1;animation:orbitpulse 4.8s ease-in-out infinite;pointer-events:none;z-index:0}
 .album-figure::after{width:88%;border-color:rgba(255,255,255,.16);animation-delay:-1.3s}
-.album-figure img{position:relative;z-index:1;width:clamp(220px,22vw,300px);aspect-ratio:1;display:block;object-fit:cover;border:1px solid rgba(255,255,255,.12);box-shadow:0 34px 80px rgba(0,0,0,.65),0 0 90px rgba(126,164,192,.14);transform:rotate(-2.5deg);transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s ease}
-.album-figure:hover img,.album-figure:focus-within img{transform:rotate(0deg) scale(1.02);box-shadow:0 40px 90px rgba(0,0,0,.7),0 0 110px rgba(126,164,192,.22)}
+.jewel{position:relative;z-index:1;width:clamp(280px,25vw,380px);aspect-ratio:1;perspective:1500px;transform-style:preserve-3d}
+.jewel-inside{position:absolute;inset:0;z-index:1;border-radius:5px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(160deg,#17110c,#0a0908 68%,#080706);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -34px 60px rgba(0,0,0,.55);display:flex;flex-direction:column;justify-content:center;gap:10px;padding:24px;overflow:hidden;direction:ltr;text-align:left}
+.jewel-inside::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.028) 0 1px,transparent 1px 4px);opacity:.7;pointer-events:none}
+.jewel-specs{position:relative;z-index:1;display:flex;flex-direction:column;gap:4px}
+.jewel .album-band{display:block;font-size:12px;line-height:1.5;letter-spacing:.3em;color:#8fb0c4;text-transform:uppercase}
+.jewel .album-title{font-family:'Darvish',Vazirmatn,sans-serif;font-weight:700;font-size:clamp(24px,2.1vw,31px);line-height:1.15;color:#fff;margin:4px 0 6px}
+.jewel .album-date{display:block;font-size:11px;line-height:1.5;letter-spacing:.24em;color:rgba(255,255,255,.45);text-transform:uppercase}
+.jewel .credits-label{position:relative;z-index:1;font-size:10px;line-height:1.6;letter-spacing:.26em;color:rgba(255,177,127,.8);text-transform:uppercase}
+.jewel .album-credits{position:relative;z-index:1;list-style:none;margin:0;padding:14px 0 0;border-top:1px solid rgba(255,106,42,.45);display:grid;grid-template-columns:1fr 1fr;gap:10px 20px}
+.jewel .album-credits li{display:flex;flex-direction:column;gap:4px}
+.jewel .album-credits i{font-style:normal;font-size:12px;line-height:1.4;letter-spacing:.18em;color:rgba(255,255,255,.42);text-transform:uppercase}
+.jewel .album-credits b{font-weight:500;font-size:16px;line-height:1.7;color:#e8e8e8}
+.jewel .album-credits b.me{color:#ffb17f}
+.album-caption{position:relative;z-index:1;max-width:430px;margin:0;font-size:15px;line-height:1.8;color:rgba(255,255,255,.55);direction:ltr;text-align:left;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.jewel-lid{position:absolute;inset:0;z-index:2;border-radius:5px;overflow:hidden;transform-origin:left center;transform:rotateY(0deg);backface-visibility:hidden;will-change:transform;border:1px solid rgba(255,255,255,.14);box-shadow:0 26px 60px rgba(0,0,0,.6),0 0 70px rgba(126,164,192,.12)}
+.jewel-lid img{width:100%;height:100%;object-fit:cover;display:block}
+.jewel-lid::after{content:'';position:absolute;left:0;top:0;bottom:0;width:11px;background:linear-gradient(90deg,rgba(0,0,0,.6),transparent);pointer-events:none}
+.jewel-spine{position:absolute;left:0;top:0;bottom:0;width:7px;z-index:3;border-radius:5px 0 0 5px;background:linear-gradient(90deg,rgba(0,0,0,.75),rgba(255,255,255,.05));pointer-events:none}
+.sound-label{color:rgba(255,255,255,.26);font-size:9px;letter-spacing:.22em}
 @keyframes orbitpulse{0%,100%{transform:translate(-50%,-50%) scale(.94);opacity:.35}50%{transform:translate(-50%,-50%) scale(1.06);opacity:.8}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.album-meta{direction:ltr;text-align:left;max-width:430px}
-.album-band{display:block;font-size:10px;letter-spacing:.3em;color:#8fb0c4;text-transform:uppercase}
-.album-title{font-family:'Darvish',Vazirmatn,sans-serif;font-weight:700;font-size:clamp(24px,2.4vw,34px);line-height:1.1;color:#fff;margin:8px 0 6px}
-.album-date{display:block;font-size:9px;letter-spacing:.24em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:16px}
-.album-desc{font-size:11px;line-height:1.95;color:rgba(255,255,255,.5)}
-.album-credits{list-style:none;margin:20px 0 0;padding:18px 0 0;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:1fr 1fr;gap:12px 26px}
-.album-credits li{display:flex;flex-direction:column;gap:3px}
-.album-credits i{font-style:normal;font-size:8.5px;letter-spacing:.2em;color:rgba(255,255,255,.35);text-transform:uppercase}
-.album-credits b{font-weight:500;font-size:12px;color:#e8e8e8}
-.album-credits b.me{color:#ffb17f}
-.sound-label{color:rgba(255,255,255,.26);font-size:9px;letter-spacing:.22em}
-@media (max-height:720px){.album-figure img{width:clamp(180px,20vw,240px)}.album-meta{max-width:400px}}
+@media (max-height:720px){.jewel{width:clamp(220px,52vw,270px)}.jewel-inside{padding:14px;gap:6px}.jewel .album-title{font-size:24px}.jewel .album-credits{display:flex;flex-direction:column;padding-top:10px;gap:8px}.jewel .album-credits li{flex-direction:row;align-items:baseline;gap:6px}.jewel .album-credits b{font-size:14px}.jewel .album-credits i{letter-spacing:.1em}.album-caption{-webkit-line-clamp:2;font-size:13px}}
 
 /* ====== 03 / live — projection theater ====== */
 .live-chapter{background:#050505;display:flex;align-items:center}
@@ -341,12 +348,19 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
   .hero-btn{padding:11px 15px;font-size:10.5px}
   .chapter-shell{width:88vw}
   .instrument-chapter .instrument-sticky{flex-direction:column;justify-content:center;gap:0;padding:70px 6vw 20px}.instrument-copy{order:1;flex:0 0 auto;width:100%;text-align:center}.instrument-copy .big-index{font-size:54px;margin-bottom:4px}.instrument-copy .chapter-title{font-size:36px;margin-bottom:10px}.instrument-copy .seq-wrap{min-height:98px}.instrument-copy .chapter-copy{margin:0 auto;font-size:12px;line-height:1.8}.instrument-visual{order:2;width:100%;height:54vh;min-height:280px;flex:0 0 auto;justify-content:center}#pegCanvas{width:100%;height:auto}.instrument-note{right:0;bottom:0}
-  .sound-chapter{padding:6svh 0}.sound-layout{display:flex;flex-direction:column;gap:20px}.sound-copy{width:100%;text-align:center}.sound-copy .chapter-title{font-size:27px}.sound-copy p{font-size:11px;line-height:1.9;max-width:340px;margin:0 auto;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.band-members{margin-top:12px}.band-members ul{gap:7px}.band-members b{font-size:12px}.band-members li{justify-content:center}.bandcamp-link{margin-top:14px}.sound-stage{width:100%;border-left:0;border-top:1px solid rgba(255,255,255,.08);padding:20px 0 0;gap:15px}.album-figure img{width:clamp(138px,38vw,176px)}.album-meta{max-width:100%;text-align:center}.album-title{font-size:21px;margin:3px 0 2px}.album-date{margin-bottom:6px}.album-desc{font-size:10px;line-height:1.8;max-width:330px;margin-left:auto;margin-right:auto;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.album-credits{margin-top:12px;padding-top:12px;gap:8px 20px;justify-items:center}.album-credits b{font-size:11px}.album-credits li{align-items:center;text-align:center}.sound-label{display:none}
+  .sound-chapter{padding:6svh 0}.sound-layout{display:flex;flex-direction:column;gap:20px}.sound-copy{width:100%;text-align:center}.sound-copy .chapter-title{font-size:27px}.sound-copy p{font-size:11px;line-height:1.9;max-width:340px;margin:0 auto;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.band-members{margin-top:12px}.band-members ul{gap:7px}.band-members b{font-size:12px}.band-members li{justify-content:center}.bandcamp-link{margin-top:14px}.band-members{display:none}.sound-stage{width:100%;border-left:0;border-top:1px solid rgba(255,255,255,.08);padding:14px 0 0;gap:12px}.jewel{width:clamp(230px,72vw,280px)}.jewel-inside{padding:14px;gap:7px}.jewel .album-band{font-size:11px}.jewel .album-title{font-size:20px}.jewel .album-date{font-size:11px}.jewel .credits-label{font-size:9px}.jewel .album-credits{display:flex;flex-direction:column;margin-top:0;padding-top:9px;gap:7px}.jewel .album-credits li{flex-direction:row;align-items:baseline;gap:8px}.jewel .album-credits b{font-size:14px;line-height:1.65}.jewel .album-credits i{font-size:11px;line-height:1.6;letter-spacing:.1em}.album-caption{font-size:12px;line-height:1.7;-webkit-line-clamp:3;max-width:330px;text-align:center;margin-left:auto;margin-right:auto}.sound-label{display:none}
   .live-chapter .chapter-shell{padding:7vh 0 4vh}.live-heading{display:block;text-align:center}.live-heading .chapter-title{margin-bottom:14px}.live-heading .chapter-copy{margin:0 auto}.tunnel{height:56vh;border-radius:12px}.t-frame img{height:28vh}.t-frame.t-tall img{height:24vh}
   .bio-orbit{--bioD:min(76vw,38svh);place-items:center;padding-top:0}.bio-center{gap:10px}.bio-lead{right:auto;left:50%;top:auto;bottom:5svh;--tx0:-50%;--ty0:0%;width:min(360px,86vw);padding:13px 15px;background:linear-gradient(165deg,rgba(16,13,10,.9),rgba(7,7,7,.82));border-color:rgba(255,255,255,.14);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.55);backdrop-filter:blur(10px) saturate(1.15)}.bio-lead .chapter-title{font-size:19px}.bio-lead p{font-size:10px;line-height:1.9}.bio-lead .bio-stats{justify-content:center;gap:6px;margin-top:10px}.bio-lead .bio-stats span{letter-spacing:.08em;font-size:9px;padding:5px 11px}.bio-chapter .bio-event{left:50%;right:auto;top:auto;bottom:5svh;--tx0:-50%;--ty0:0%;width:min(360px,86vw);padding:13px 15px;background:linear-gradient(165deg,rgba(16,13,10,.88),rgba(7,7,7,.8));border-color:rgba(255,255,255,.14);border-radius:15px;box-shadow:0 14px 40px rgba(0,0,0,.55);backdrop-filter:blur(10px) saturate(1.15)}.bio-event.t-low{top:auto}.bio-event h3{font-size:16px;margin-bottom:6px}.bio-event p{font-size:10px;line-height:1.9;color:rgba(255,255,255,.6)}.bio-event .year{font-size:9px;padding:3px 8px;margin-bottom:8px;border:1px solid rgba(255,106,42,.35);border-radius:999px;display:inline-block;background:rgba(255,106,42,.08)}
   .contact-chapter .contact-layout{display:block;text-align:center}.contact-layout .chapter-title{font-size:46px}.contact-copy{margin:24px auto 0;text-align:center}.contact-links{justify-content:center}.contact-sign{margin-top:8vh}
   /* موبایل: عبور کوتاه‌تر از بیو — ۶×۷۵svh یعنی ~۳۰٪ اسکرول کمتر تا خروج */
   .bio-spacer{height:75svh}
+}
+/* موبایلِ کوتاه‌قد: فشرده‌سازی بیشتر جعبه تا بدون بریدگی جا شود */
+@media (max-width:820px) and (max-height:700px){
+  .jewel-inside{padding:13px;gap:6px}
+  .jewel .album-credits{padding-top:8px;gap:6px}
+  .jewel .album-credits li{gap:6px}
+  .album-caption{-webkit-line-clamp:2}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -519,20 +533,28 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
       </div>
       <div class="sound-stage">
         <figure class="album-figure">
-          <img src="content/album%20art.jpg" alt="کاور آلبوم Down the River — Carnivalesque" draggable="false">
+          <div class="jewel" id="jewel">
+            <div class="jewel-inside">
+              <div class="jewel-specs">
+                <span class="album-band">Carnivalesque</span>
+                <h3 class="album-title">Down the River</h3>
+                <span class="album-date">Released · October 29, 2023</span>
+              </div>
+              <div class="credits-label" data-i18n="band.title">اعضای گروه</div>
+              <ul class="album-credits">
+                <li><i>Drums</i><b>Ruzbeh Smiley</b></li>
+                <li><i>Keys</i><b>Siavash Khoshrouz</b></li>
+                <li><i>Bass Guitar</i><b class="me">Sina Golnoghreh</b></li>
+                <li><i>Vocals &amp; Guitars</i><b>Sepehr Haghighi</b></li>
+              </ul>
+            </div>
+            <div class="jewel-lid" id="jewelLid">
+              <img src="content/album%20art.jpg" alt="کاور آلبوم Down the River — Carnivalesque" draggable="false">
+            </div>
+            <span class="jewel-spine" aria-hidden="true"></span>
+          </div>
         </figure>
-        <div class="album-meta">
-          <span class="album-band">Carnivalesque</span>
-          <h3 class="album-title">Down the River</h3>
-          <span class="album-date">Released · October 29, 2023</span>
-          <p class="album-desc">In two parts, it narrates two various possibilities concerning the climate crises we are facing. The first narration explores the situation in which denial is selected as the course of action. The second part narrates the possibility of change and a prominent future for the upcoming generations.</p>
-          <ul class="album-credits">
-            <li><i>Drums</i><b>Ruzbeh Smiley</b></li>
-            <li><i>Keys</i><b>Siavash Khoshrouz</b></li>
-            <li><i>Bass Guitar</i><b class="me">Sina Golnoghreh</b></li>
-            <li><i>Vocals &amp; Guitars</i><b>Sepehr Haghighi</b></li>
-          </ul>
-        </div>
+        <p class="album-caption">In two parts, it narrates two various possibilities concerning the climate crises we are facing. The first narration explores the situation in which denial is selected as the course of action. The second part narrates the possibility of change and a prominent future for the upcoming generations.</p>
         <div class="sound-label">SIGNAL / LOW FREQUENCY</div>
       </div>
     </div>
@@ -1169,9 +1191,11 @@ SCENES.forEach(function(id){
   var a = document.querySelector('.site-nav a[href="#' + id + '"]');
   if(a) navLinks[id] = a;
 });
-/* scene ranges on the 0..1 axis — ساز با رنج متراکم (.34) هم‌سایر صحنه‌ها؛
-   قبلاً .60 بود = ۱۵۰ ناچِ چرخ موس فقط برای یک صحنه (کند و ناهماهنگ) */
-var SCENE_RANGE = {instrument:.34, sound:.20, live:.32, bio:.40, contact:.09};
+/* scene ranges on the 0..1 axis — ساز (.22) و صدا (.13) فشرده شدند تا عبور
+   ~۳۵٪ سریع‌تر شود؛ همهی مصرف‌کننده‌ها (peg، تیترها، کراسفید، لندینگ، ریل)
+   از sceneStart/RANGE مشتق‌اند پس انیمیشن‌ها متناسب فشرده می‌شوند، نه حذف.
+   تاریخچه: ساز قبلاً .60 بود، بعد .34 شد. */
+var SCENE_RANGE = {instrument:.22, sound:.13, live:.32, bio:.40, contact:.09};
 var RANGE_TOTAL = SCENE_RANGE.instrument + SCENE_RANGE.sound + SCENE_RANGE.live + SCENE_RANGE.bio + SCENE_RANGE.contact;
 /* cumulative start + center of each scene */
 var sceneStart = (function(){
@@ -1241,6 +1265,7 @@ function placeScene(id){
   el.style.filter = 'none';                     // بدون بلر حین اسکرول
   el.classList.toggle('on', a > .5);
   if(id === 'live') tunnelUpdate(sceneP(id), a);
+  if(id === 'sound') soundJewelUpdate(sceneP(id));
 }
 function setScene(id){
   if(vScroll.scene === id) return;
@@ -1483,6 +1508,19 @@ function updatePeg(){
   }
 }
 var seqA = document.getElementById('seqA'), seqB = document.getElementById('seqB');
+/* ---------- sound jewel case — scroll-scrubbed lid opening ----------
+   p=0..1 across the sound scene. Lid stays closed until .22, opens (rotateY
+   around the left spine) through .70, then holds fully open so the inside
+   specs + credits stay legible before exit. Reversible: transform is a pure
+   function of p, so scrolling up closes it again. */
+var jewelLid = document.getElementById('jewelLid');
+function soundJewelUpdate(p){
+  if(!jewelLid) return;
+  var o = (p - .22) / .48;
+  o = Math.max(0, Math.min(1, o));
+  o = o * o * (3 - 2 * o);                     /* smoothstep */
+  jewelLid.style.transform = 'rotateY(' + (-86 * o).toFixed(2) + 'deg)';
+}
 for(var pi = 0; pi < pegCount; pi++){
   (function(idx){
     var im = new Image(); im.decoding = 'async';
