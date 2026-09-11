@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preload" href="assets/fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Vazirmatn-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <script>
 (function(){
   var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -15,11 +18,7 @@
 @font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
 @font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
-@font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
 @font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
-@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Light.woff2') format('woff2');font-weight:300;font-display:swap}
-@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
-@font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
 @font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -251,7 +250,6 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
 .jewel-spine{position:absolute;left:0;top:0;bottom:0;width:7px;z-index:3;border-radius:5px 0 0 5px;background:linear-gradient(90deg,rgba(0,0,0,.75),rgba(255,255,255,.05));pointer-events:none}
 .sound-label{color:rgba(255,255,255,.26);font-size:9px;letter-spacing:.22em}
 @keyframes orbitpulse{0%,100%{transform:translate(-50%,-50%) scale(.94);opacity:.35}50%{transform:translate(-50%,-50%) scale(1.06);opacity:.8}}
-@keyframes spin{to{transform:rotate(360deg)}}
 @media (max-height:720px){.jewel{width:clamp(220px,52vw,270px)}.jewel-inside{padding:14px;gap:6px}.jewel .album-title{font-size:24px}.jewel .album-credits{display:flex;flex-direction:column;padding-top:10px;gap:8px}.jewel .album-credits li{flex-direction:row;align-items:baseline;gap:6px}.jewel .album-credits b{font-size:14px}.jewel .album-credits i{letter-spacing:.1em}.album-caption{-webkit-line-clamp:2;font-size:13px}}
 
 /* ====== 03 / live — projection theater ====== */
@@ -368,6 +366,15 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
   .scroll-rail.hint .sr-pulse{animation:none;opacity:.8}
   html{scroll-behavior:auto}
 }
+/* CPU-only fallback: disable expensive CSS when body.cpu is set (detected software renderer) */
+body.cpu .bio-lead,body.cpu .bio-event,body.cpu .site-nav{backdrop-filter:none;-webkit-backdrop-filter:none}
+body.cpu .album-figure::before,body.cpu .album-figure::after{animation:none}
+body.cpu .bio-stage::before{animation:none}
+body.cpu .tunnel{perspective:none}
+body.cpu .t-frame{transform:none!important;filter:none!important}
+body.cpu .peg-canvas{display:none}
+body.cpu .bio360-canvas{display:none}
+body.cpu .scroll-rail{display:none}
 </style>
 </head>
 <body>
@@ -385,7 +392,7 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
       <video
         class="wingvid wing-webm"
         id="wingVid"
-        src="content/wings_alpha.webm"
+        data-src="content/wings_alpha.webm?v=2"
         autoplay
         muted
         loop
@@ -397,7 +404,7 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
       <img
         class="wingvid wing-ios"
         id="wingIOS"
-        src="content/wings_ios.webp?v=10"
+        data-src="content/wings_ios.webp?v=11"
         alt=""
         aria-hidden="true"
         draggable="false">
@@ -549,7 +556,7 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
               </ul>
             </div>
             <div class="jewel-lid" id="jewelLid">
-              <img src="content/album%20art.jpg" alt="کاور آلبوم Down the River — Carnivalesque" draggable="false">
+              <img src="content/album-art.webp?v=1" alt="کاور آلبوم Down the River — Carnivalesque" draggable="false">
             </div>
             <span class="jewel-spine" aria-hidden="true"></span>
           </div>
@@ -616,10 +623,16 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
 
 var canvas = document.getElementById('gl');
 var gl = canvas.getContext('webgl2', {alpha:false, antialias:false, powerPreference:'high-performance'});
-if(!gl){
-  document.body.insertAdjacentHTML('afterbegin',
-    '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#888;font-family:sans-serif;z-index:99">WebGL2 پشتیبانی نمی‌شود</div>');
-  return;
+var noGL = !gl;
+/* CPU-only detection: SwiftShader / software renderers → disable expensive CSS */
+var isCPU = noGL || (gl && /SwiftShader|Software|llvmpipe|Google SwiftShader/i.test(gl.getParameter(gl.RENDERER) || ''));
+if(isCPU) document.body.classList.add('cpu');
+if(noGL){
+  /* graceful fallback: show static foreground instead of blocking entire site */
+  canvas.style.display = 'none';
+  var fg = document.getElementById('wingIOS');
+  if(fg) fg.style.display = 'block';
+  if(enterBtn) enterBtn.classList.add('ready');
 }
 
 /* ---------- shaders ---------- */
@@ -1001,7 +1014,7 @@ function resize(){
   portrait = H > W ? 1 : 0;
   canvas.width  = Math.round(W * dpr);
   canvas.height = Math.round(H * dpr);
-  gl.viewport(0, 0, canvas.width, canvas.height);
+  if(!noGL) gl.viewport(0, 0, canvas.width, canvas.height);
 }
 window.addEventListener('resize', resize);
 resize();
@@ -1014,9 +1027,19 @@ var enterBtn = document.getElementById('enterbtn');
 var wingVid = document.getElementById('wingVid');
 var wingIOS = document.getElementById('wingIOS');
 
-/* On iOS the animated WebP is used; do not keep the hidden VP9 video decoding. */
-if(document.documentElement.classList.contains('ios') && wingVid){
-  try{ wingVid.pause(); }catch(err){}
+/* Platform-gated wings media: each platform downloads ONLY its own asset
+   (iOS → animated WebP, others → VP9 video). Saves ~3–7MB of dead bytes. */
+var isIOSWing = document.documentElement.classList.contains('ios');
+if(isIOSWing){
+  if(wingIOS && !wingIOS.getAttribute('src') && wingIOS.getAttribute('data-src')) wingIOS.src = wingIOS.getAttribute('data-src');
+  if(wingVid){ try{ wingVid.pause(); }catch(err){} }
+}else if(wingVid && !wingVid.getAttribute('src') && !wingVid.querySelector('source') && wingVid.getAttribute('data-src')){
+  try{
+    var wvs = document.createElement('source');
+    wvs.src = wingVid.getAttribute('data-src'); wvs.type = 'video/webm';
+    wingVid.appendChild(wvs); wingVid.load();
+    var wvp = wingVid.play(); if(wvp && wvp.catch) wvp.catch(function(){});
+  }catch(err){}
 }
 function finishJourney(){
   if(journey.complete) return;
@@ -1059,12 +1082,17 @@ window.__reveal = { getState: function(){ return {
 window.__reveal.start = startJourney;
 
 /* ---------- render loop ---------- */
-var t0 = performance.now(), last = t0, raf;
+var t0 = performance.now(), last = t0, raf, idleSkips = 0;
 function tick(now){
   raf = requestAnimationFrame(tick);
-  if(document.hidden) return;
+  if(document.hidden){ idleSkips = 0; return; }
   /* stage hidden (scenes active) → skip GL work until back on top */
   if(vScroll.v > sceneCenter.bio * .55) return;
+  /* idle-skip: when fully converged, skip DOM writes (saves ~15% GPU on mobile) */
+  if(!journey.playing && Math.abs(target.p - state.p) < .0004 && Math.abs(vScroll.target - vScroll.v) < .00005){
+    idleSkips++;
+    if(idleSkips > 120) return;        /* skip after ~2s idle */
+  }else{ idleSkips = 0; }
 
   // button-driven journey: advance target along the 0→100 timeline
   if(journey.playing){
@@ -1108,25 +1136,27 @@ function tick(now){
   mouse.y += (mouse.ty - mouse.y) * .06;
   mouse.depth += (mouse.tdepth - mouse.depth) * .04;
 
-  // draw
-  gl.useProgram(prog);
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, texB);
-  gl.uniform1i(U.uTexB, 0);
-  gl.activeTexture(gl.TEXTURE1);
-  gl.bindTexture(gl.TEXTURE_2D, texF);
-  gl.uniform1i(U.uTexF, 1);
-  gl.uniform2f(U.uMouse, mouse.x, mouse.y);
-  gl.uniform1f(U.uDepth, mouse.depth);
-  gl.uniform2f(U.uRes, canvas.width, canvas.height);
-  gl.uniform1f(U.uPortrait, portrait);
-  gl.uniform2f(U.uImgRes, imgW, imgH);
-  gl.uniform1f(U.uBlur, blur);
-  gl.uniform1f(U.uContrast, contrast);
-  gl.uniform1f(U.uReveal, reveal);
-  gl.uniform1f(U.uTextIn, textIn);
-  gl.uniform1f(U.uTime, (now - t0) * .001);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  // draw — skip GL calls when noGL (static fallback active)
+  if(!noGL){
+    gl.useProgram(prog);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texB);
+    gl.uniform1i(U.uTexB, 0);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, texF);
+    gl.uniform1i(U.uTexF, 1);
+    gl.uniform2f(U.uMouse, mouse.x, mouse.y);
+    gl.uniform1f(U.uDepth, mouse.depth);
+    gl.uniform2f(U.uRes, canvas.width, canvas.height);
+    gl.uniform1f(U.uPortrait, portrait);
+    gl.uniform2f(U.uImgRes, imgW, imgH);
+    gl.uniform1f(U.uBlur, blur);
+    gl.uniform1f(U.uContrast, contrast);
+    gl.uniform1f(U.uReveal, reveal);
+    gl.uniform1f(U.uTextIn, textIn);
+    gl.uniform1f(U.uTime, (now - t0) * .001);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
 
   // DOM text overlay opacity (phase 3)
   var txt = document.getElementById('headline');
@@ -1316,10 +1346,16 @@ function updateRail(v){
   railEl.classList.toggle('hint', v < .012);
 }
 /* smoothed virtual scroll loop (rAF independent of the GL tick) */
+var vIdle = 0;
 (function vLoop(){
   requestAnimationFrame(vLoop);
+  if(document.hidden){ vIdle = 0; return; }
   var d = vScroll.target - vScroll.v;
-  if(Math.abs(d) < .00002){ vScroll.v = vScroll.target; applyScroll(); return; }
+  if(Math.abs(d) < .00002){ vScroll.v = vScroll.target; applyScroll();
+    vIdle++; if(vIdle > 120) return;   /* idle-skip: stop rAF when converged */
+    return;
+  }
+  vIdle = 0;
   vScroll.v += d * .07;
   applyScroll();
 })();
@@ -1525,7 +1561,10 @@ for(var pi = 0; pi < pegCount; pi++){
   (function(idx){
     var im = new Image(); im.decoding = 'async';
     im.onload = function(){ if(idx === pegFrameIndex) drawPeg(); };
-    im.src = pegSrc(idx); pegFrames[idx] = im;
+    /* idle-defer: spread 120 headstock frames over idle callbacks to avoid parse-time jank */
+    function loadPeg(){ im.src = pegSrc(idx); pegFrames[idx] = im; }
+    if(window.requestIdleCallback) window.requestIdleCallback(loadPeg, {timeout:5000+idx*40});
+    else setTimeout(loadPeg, 50+idx*8);
   })(pi);
 }
 window.addEventListener('resize', function(){ sizePegCanvas(); drawPeg(); });
@@ -1597,7 +1636,10 @@ if(bioCanvas && BIO360_N > 0){
                                                            frame's image arrives → redraw on arrival */
       return function(){ if(bidx === bioFrameIndex) drawBio360(); };
     })(bi);
-    bim.src = bioSrc(bi); bioFrames.push(bim);
+    /* idle-defer: spread bio360 frames over idle callbacks */
+    function loadBio(idx, img){ img.src = bioSrc(idx); bioFrames.push(img); }
+    if(window.requestIdleCallback) window.requestIdleCallback((function(ii,im){ return function(){ loadBio(ii,im); }; })(bi,bim), {timeout:5000+bi*80});
+    else setTimeout((function(ii,im){ return function(){ loadBio(ii,im); }; })(bi,bim), 100+bi*12);
   }
   if(bioStage) bioStage.classList.add('has-frames');
 }
