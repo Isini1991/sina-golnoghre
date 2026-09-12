@@ -366,15 +366,22 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
   .scroll-rail.hint .sr-pulse{animation:none;opacity:.8}
   html{scroll-behavior:auto}
 }
-/* CPU-only fallback: disable expensive CSS when body.cpu is set (detected software renderer) */
+/* CPU-only fallback: drop expensive effects when body.cpu is set
+   (software renderer / hardware acceleration OFF). Visuals are preserved as
+   transform+opacity only — no blur filters, no 3D rasterisation, no big shadows. */
 body.cpu .bio-lead,body.cpu .bio-event,body.cpu .site-nav{backdrop-filter:none;-webkit-backdrop-filter:none}
 body.cpu .album-figure::before,body.cpu .album-figure::after{animation:none}
 body.cpu .bio-stage::before{animation:none}
-body.cpu .tunnel{perspective:none}
-body.cpu .t-frame{transform:none!important;filter:none!important}
+body.cpu .bio-stage,body.cpu .bio-lead,body.cpu .bio-event{box-shadow:none}
+body.cpu .tunnel{perspective:none;box-shadow:none}
+body.cpu .tunnel-scene{transform-style:flat}
+body.cpu .t-frame{will-change:transform,opacity}
+body.cpu .t-frame img{box-shadow:none}
 body.cpu .peg-canvas{display:none}
 body.cpu .bio360-canvas{display:none}
 body.cpu .scroll-rail{display:none}
+/* keep the fallback static image from being an oversized shadow layer */
+body.cpu .stage{box-shadow:none}
 </style>
 </head>
 <body>
@@ -392,7 +399,7 @@ body.cpu .scroll-rail{display:none}
       <video
         class="wingvid wing-webm"
         id="wingVid"
-        data-src="content/wings_alpha.webm?v=2"
+        src="content/wings_alpha.webm"
         autoplay
         muted
         loop
@@ -404,7 +411,7 @@ body.cpu .scroll-rail{display:none}
       <img
         class="wingvid wing-ios"
         id="wingIOS"
-        data-src="content/wings_ios.webp?v=11"
+        src="content/wings_ios.webp?v=10"
         alt=""
         aria-hidden="true"
         draggable="false">
@@ -624,15 +631,27 @@ body.cpu .scroll-rail{display:none}
 var canvas = document.getElementById('gl');
 var gl = canvas.getContext('webgl2', {alpha:false, antialias:false, powerPreference:'high-performance'});
 var noGL = !gl;
-/* CPU-only detection: SwiftShader / software renderers → disable expensive CSS */
-var isCPU = noGL || (gl && /SwiftShader|Software|llvmpipe|Google SwiftShader/i.test(gl.getParameter(gl.RENDERER) || ''));
-if(isCPU) document.body.classList.add('cpu');
+/* Software / CPU-only rendering detection. Covers SwiftShader, WARP
+   ("Microsoft Basic Render Driver"), llvmpipe, Mesa and generic fallbacks —
+   i.e. the case where hardware acceleration is OFF. When true we drop the
+   expensive per-frame effects (blur filters, 3D, big shadows). */
+function detectSoftwareGL(ctx){
+  if(!ctx) return true;
+  try{
+    var dbg = ctx.getExtension('WEBGL_debug_renderer_info');
+    var r = String((dbg ? ctx.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : ctx.getParameter(ctx.RENDERER)) || '');
+    return /swiftshader|software|llvmpipe|basic render|warp|mesa|generic renderer|angle.*basic|apple software/i.test(r);
+  }catch(e){ return false; }
+}
+var cpuMode = detectSoftwareGL(gl);
+if(cpuMode) document.body.classList.add('cpu');
 if(noGL){
   /* graceful fallback: show static foreground instead of blocking entire site */
   canvas.style.display = 'none';
-  var fg = document.getElementById('wingIOS');
-  if(fg) fg.style.display = 'block';
-  if(enterBtn) enterBtn.classList.add('ready');
+  var fgFall = document.getElementById('wingIOS');
+  if(fgFall) fgFall.style.display = 'block';
+  var ebFall = document.getElementById('enterbtn');
+  if(ebFall) ebFall.classList.add('ready');
 }
 
 /* ---------- shaders ---------- */
@@ -1027,19 +1046,9 @@ var enterBtn = document.getElementById('enterbtn');
 var wingVid = document.getElementById('wingVid');
 var wingIOS = document.getElementById('wingIOS');
 
-/* Platform-gated wings media: each platform downloads ONLY its own asset
-   (iOS → animated WebP, others → VP9 video). Saves ~3–7MB of dead bytes. */
-var isIOSWing = document.documentElement.classList.contains('ios');
-if(isIOSWing){
-  if(wingIOS && !wingIOS.getAttribute('src') && wingIOS.getAttribute('data-src')) wingIOS.src = wingIOS.getAttribute('data-src');
-  if(wingVid){ try{ wingVid.pause(); }catch(err){} }
-}else if(wingVid && !wingVid.getAttribute('src') && !wingVid.querySelector('source') && wingVid.getAttribute('data-src')){
-  try{
-    var wvs = document.createElement('source');
-    wvs.src = wingVid.getAttribute('data-src'); wvs.type = 'video/webm';
-    wingVid.appendChild(wvs); wingVid.load();
-    var wvp = wingVid.play(); if(wvp && wvp.catch) wvp.catch(function(){});
-  }catch(err){}
+/* On iOS the animated WebP is used; do not keep the hidden VP9 video decoding. */
+if(document.documentElement.classList.contains('ios') && wingVid){
+  try{ wingVid.pause(); }catch(err){}
 }
 function finishJourney(){
   if(journey.complete) return;
@@ -1215,7 +1224,7 @@ window.__reveal.force = function(pv){
    (slide + focus + scale) instead of a hard opacity toggle.
    ================================================================ */
 var SCENES = ['bio','instrument','sound','live','contact'];
-var sceneEls = {}, navLinks = {};
+var sceneEls = {}, navLinks = {}, sceneAlpha = {};
 SCENES.forEach(function(id){
   sceneEls[id] = document.getElementById(id);
   var a = document.querySelector('.site-nav a[href="#' + id + '"]');
@@ -1284,7 +1293,9 @@ function placeScene(id){
   var a = Math.min(aIn, aOut);
   a = a * a * (3 - 2 * a);                    // smoothstep both edges
   var d = (v - sceneCenter[id]) / (r * .5 + t * 2);
+  sceneAlpha[id] = a;
   if(a < .003){
+    if(id === 'live') tunSettling = false;   /* gallery offscreen → let the loop idle out */
     el.style.opacity = '0'; el.style.visibility = 'hidden';
     el.style.transform = 'none'; el.style.filter = 'none';
     return;
@@ -1307,8 +1318,14 @@ function setScene(id){
     if(a) a.classList.toggle('cur', s === id);
   });
 }
+var _lastApplyV = -1, _lastApplyScene = null;
 function applyScroll(){
   var v = vScroll.v;
+  /* rAF-throttle: if neither the virtual position nor the active scene moved,
+     there is literally nothing to recompute — skip all DOM/layout work.
+     (tunSettling keeps the loop alive while the gallery camera is still easing
+     into place, so a settled v never freezes it mid-move.) */
+  if(v === _lastApplyV && vScroll.scene === _lastApplyScene && !tunSettling) return;
   SCENES.forEach(placeScene);
   /* stage (color-reveal) exits up-front with its own cinematic fade.
      exit fully by the time the first scene is fully in (tail*1.8) */
@@ -1331,10 +1348,12 @@ function applyScroll(){
   if(cur === 'instrument' && v < bioExit() && bioShell
      && bioShell.scrollTop < bioShell.scrollHeight - bioShell.clientHeight - 4) cur = 'bio';
   setScene(cur);
-  updatePeg();
-  updateBio360();
-  bioOrbitUpdate();
+  /* only run a scene's heavy per-frame work while that scene is actually on
+     screen — while scrolling the gallery, bio/instrument must stay idle */
+  if((sceneAlpha.instrument || 0) > .003) updatePeg();
+  if((sceneAlpha.bio || 0) > .003){ updateBio360(); bioOrbitUpdate(); }
   updateRail(v);
+  _lastApplyV = v; _lastApplyScene = vScroll.scene;
 }
 /* ریل کناری: اول راهنما (پالس متحرک)، بعد از شروع اسکرول نشانگر پیشرفت */
 var railEl = document.getElementById('scrollRail');
@@ -1581,22 +1600,36 @@ if(tunScene){
   for(var ti = 0; ti < TUN_N; ti++){
     var side = (ti % 2 ? 1 : -1);
     var fn = tunOrder[ti];
+    var num = String(fn).padStart(2, '0');
+    /* CPU mode: decode smaller lite variants and defer offscreen slides (lazy-load).
+       GPU mode: original full-size eager markup — behaviour unchanged. */
+    var fullSrc = 'assets/live/live-' + num + '.webp';
+    var liteSrc = 'assets/live/lite/live-' + num + '.webp';
     var fig = document.createElement('figure');
     fig.className = 't-frame' + (ti === 1 || ti === 4 || ti === 7 || ti === 11 || ti === 14 ? ' t-tall' : '');
-    fig.innerHTML = '<img loading="lazy" src="assets/live/live-' + String(fn).padStart(2, '0') + '.webp" alt="اجرای زنده ' + fn + '">' +
-      '<figcaption><span>اجرای زنده</span><b>' + String(fn).padStart(2, '0') + ' / LIVE</b></figcaption>';
+    var imgAttr = cpuMode ? ('data-src="' + liteSrc + '" decoding="async"') : ('src="' + fullSrc + '" loading="lazy" decoding="async"');
+    fig.innerHTML = '<img ' + imgAttr + ' alt="اجرای زنده ' + fn + '">' +
+      '<figcaption><span>اجرای زنده</span><b>' + num + ' / LIVE</b></figcaption>';
     tunScene.appendChild(fig);
-    tunFrames.push({el: fig, x: side * (150 + (ti % 3) * 70), y: (((ti * 37) % 3) - 1) * 44, ry: -side * 14});
+    tunFrames.push({el: fig, img: fig.firstChild, src: liteSrc, x: side * (150 + (ti % 3) * 70), y: (((ti * 37) % 3) - 1) * 44, ry: -side * 14, _vis: -1});
+  }
+  if(cpuMode){   /* eager-load the first pair so the gallery entry is never blank */
+    for(var e = 0; e < 2 && e < tunFrames.length; e++){
+      var ei = tunFrames[e].img;
+      if(ei && ei.getAttribute('data-src')) ei.src = ei.getAttribute('data-src');
+    }
   }
 }
-var tunCam = 0;
+var tunCam = 0, tunSettling = false;
 function tunnelUpdate(p, sectionOpacity){
+  if(cpuMode) return tunnelUpdateLite(p, sectionOpacity);
   if(!tunScene || !tunFrames || !tunFrames.length) return;
   /* hold camera while neighbor scenes fade, then rest each frame exactly on focus */
   var pc = Math.min(1, Math.max(0, (p - .12) / .72));
   var target = Math.round(pc * (TUN_N - 1)) * TUN_GAP;
   if(Math.abs(target - tunCam) > TUN_GAP * 6) tunCam = target;   /* hard snap on scene jumps */
   tunCam += (target - tunCam) * .12;
+  tunSettling = Math.abs(target - tunCam) > .5;   /* keep applying until rest position reached */
   var cam = tunCam;
   var best = -1, bd = 1e9;
   for(var i = 0; i < TUN_N; i++){
@@ -1620,6 +1653,47 @@ function tunnelUpdate(p, sectionOpacity){
     if(tunCount) tunCount.textContent = String(tunOrder[best]).padStart(2, '0') + ' / ' + TUN_N;
   }
 }
+/* CPU-only gallery path: flat 2D carousel — transform + opacity ONLY
+   (no blur filter, no rotateY, no z-depth, no shadow), offscreen slides are
+   hidden and lazy-decoded, and redundant updates are skipped. */
+var tunLitCam = -1, tunLitOp = -1;
+function tunnelUpdateLite(p, sectionOpacity){
+  if(!tunScene || !tunFrames || !tunFrames.length) return;
+  tunSettling = false;
+  var so = sectionOpacity || 1;
+  var pc = Math.min(1, Math.max(0, (p - .12) / .72));
+  var iF = pc * (TUN_N - 1);
+  /* rAF-throttle: skip the whole pass when camera & fade moved imperceptibly */
+  if(Math.abs(iF - tunLitCam) < .0035 && Math.abs(so - tunLitOp) < .006) return;
+  tunLitCam = iF; tunLitOp = so;
+  var WIN = 3.0, best = -1, bd = 1e9;
+  for(var i = 0; i < TUN_N; i++){
+    var f = tunFrames[i];
+    var d = i - iF, ad = d < 0 ? -d : d;
+    if(ad > WIN){                                  /* offscreen → hide once, no repaint */
+      if(f._vis !== 0){ f.el.style.opacity = '0'; f.el.style.visibility = 'hidden'; f._vis = 0; }
+      continue;
+    }
+    if(f._vis !== 1){
+      f.el.style.visibility = 'visible';
+      f.el.style.filter = 'none';
+      f._vis = 1;
+    }
+    /* lazy-load the reduced-size slide the moment it enters the window */
+    var im = f.img;
+    if(im && !im.getAttribute('src') && im.getAttribute('data-src')) im.src = im.getAttribute('data-src');
+    var op = Math.max(0, 1 - ad / WIN);
+    var sc = 1 - Math.min(.28, ad * .1);
+    var tx = d * 165;
+    f.el.style.opacity = (op * so).toFixed(3);
+    f.el.style.transform = 'translate(-50%,-50%) translate(' + tx.toFixed(1) + 'px,0) scale(' + sc.toFixed(3) + ')';
+    if(ad < bd){ bd = ad; best = i; }
+  }
+  if(best !== tunCur && best >= 0){
+    tunCur = best;
+    if(tunCount) tunCount.textContent = String(tunOrder[best]).padStart(2, '0') + ' / ' + TUN_N;
+  }
+}
 /* ---------- bio 360 spin (frame sequence driven by scene scroll, same pattern as headstock) ---------- */
 var BIO360_N = 60;                       /* 360 video = 240 frames @24fps, every 4th → 60 (full revolution) */
 var bioCanvas = document.getElementById('bio360Canvas');
@@ -1628,6 +1702,19 @@ var bioCtx = bioCanvas ? bioCanvas.getContext('2d') : null;
 var bioFrames = [], bioFrameIndex = -1;
 var bioFrameF = 0;                       /* eased float frame — motion glides like the source video, never snaps */
 var bioShell = document.querySelector('.bio-chapter .chapter-shell');
+/* keep the bio orbit/360 in step with the shell's own scrolling — including
+   native touch momentum, which fires no wheel/touch events of its own */
+var bioScrollRaf = 0;
+function bioOnScroll(){
+  if(bioScrollRaf) return;
+  bioScrollRaf = requestAnimationFrame(function(){
+    bioScrollRaf = 0;
+    bioMirror();
+    updateBio360();
+    bioOrbitUpdate();
+  });
+}
+if(bioShell) bioShell.addEventListener('scroll', bioOnScroll, {passive:true});
 function bioSrc(i){ return 'assets/bio-360/sina-' + String(i * 2 + 1).padStart(3, '0') + '.webp'; }
 if(bioCanvas && BIO360_N > 0){
   for(var bi = 0; bi < BIO360_N; bi++){
@@ -1707,7 +1794,7 @@ window.__sina = { getState: function(){ return {
   journey: journey.complete ? 'complete' : (journey.playing ? 'playing' : 'idle'),
   scene: vScroll.scene, v: +vScroll.v.toFixed(3), vTarget: +vScroll.target.toFixed(3),
   pegIndex: pegFrameIndex, pegCount: pegCount, liveIndex: tunCur + 1,
-  liveFrames: tunFrames.length
+  liveFrames: tunFrames.length, cpu: cpuMode
 }; } };
 /* expose virtual-scroll driver for verification & nav testing */
 window.__sina.goto = function(v){ vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, v)); };
