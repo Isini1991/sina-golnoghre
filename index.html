@@ -1342,14 +1342,20 @@ function applyScroll(){
   stageEl.style.opacity = sa.toFixed(3);
   stageEl.style.transform = 'none';             // ثابت — بدون لرزش
   stageEl.style.filter = 'none';
-  /* active scene = the one centered nearest v; instrument updates its frames.
-     before leaving the entry stage (v≈0) nothing is "active" — GL stage owns */
-  var cur = null, best = 1e9;
-  SCENES.forEach(function(id){
-    var dd = Math.abs(v - sceneCenter[id]);
-    if(dd < best){ best = dd; cur = id; }
-  });
-  if(v < sceneCenter.bio * .55) cur = null;
+  /* active scene = determined by scene boundaries so long scenes (like visual archive/gallery)
+     own their full scroll range without premature switching */
+  var cur = null;
+  if(v >= sceneStart.contact - 0.015){
+    cur = 'contact';
+  } else if(v >= sceneStart.live - 0.015){
+    cur = 'live';
+  } else if(v >= sceneStart.sound - 0.015){
+    cur = 'sound';
+  } else if(v >= sceneStart.instrument - 0.015){
+    cur = 'instrument';
+  } else if(v >= sceneCenter.bio * .4){
+    cur = 'bio';
+  }
   /* نزدیکترین مرکز وسط شل بیو زود به ساز میچرخد؛ تا وقتی شل به bottom نرسیده
      و کراسفید خروج شروع نشده، صحنهی فعال bio بماند */
   if(cur === 'instrument' && v < bioExit() && bioShell
