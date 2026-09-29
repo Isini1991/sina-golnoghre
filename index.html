@@ -256,19 +256,20 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
 .live-chapter{background:#050505;display:flex;align-items:center}
 .live-chapter .chapter-shell{max-height:100svh;overflow:visible;overscroll-behavior:contain;padding:5vh 0 4vh;scrollbar-width:none;width:min(1100px,92vw)}
 .live-chapter .chapter-shell::-webkit-scrollbar{display:none}
-.live-heading{display:flex;align-items:end;justify-content:space-between;direction:rtl;margin-bottom:20px}
+.live-heading{display:flex;align-items:end;justify-content:space-between;direction:rtl;margin-bottom:18px}
 .live-heading .chapter-title{margin:0}
-.live-heading .chapter-copy{max-width:300px;margin-bottom:8px}
+.live-heading .chapter-copy{max-width:320px;margin-bottom:6px}
 
 /* live photo tunnel — 3D corridor with depth of field */
-.tunnel{position:relative;height:min(62vh,600px);perspective:1150px;overflow:hidden;border-radius:18px;background:#020202;border:1px solid rgba(255,255,255,.06);box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.tunnel{position:relative;height:min(64vh,580px);perspective:1150px;overflow:hidden;border-radius:18px;background:#020202;border:1px solid rgba(255,255,255,.07);box-shadow:0 30px 80px rgba(0,0,0,.55)}
 .tunnel-scene{position:absolute;inset:0;transform-style:preserve-3d}
-.t-frame{position:absolute;top:50%;left:50%;margin:0;will-change:transform,opacity,filter;transform-style:preserve-3d}
-.t-frame img{display:block;height:clamp(280px,30vh,360px);width:auto;object-fit:cover;background:#0c0c0c;box-shadow:0 34px 90px rgba(0,0,0,.7)}
-.t-frame.t-tall img{height:clamp(240px,26vh,300px)}
-.t-frame figcaption{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.5)}
-.t-frame figcaption b{color:#ff8a3c;direction:ltr;font-weight:500}
-.tunnel-vignette{position:absolute;inset:-1px;pointer-events:none;background:radial-gradient(72% 85% at 50% 46%,transparent 44%,rgba(0,0,0,.74) 90%),linear-gradient(0deg,rgba(0,0,0,.42),transparent 24%)}
+.t-frame{position:absolute;top:50%;left:50%;margin:0;display:flex;flex-direction:column;align-items:center;will-change:transform,opacity,filter;transform-style:preserve-3d}
+.t-frame img{display:block;max-height:clamp(170px,23vh,230px);max-width:clamp(260px,46vw,440px);width:auto;height:auto;object-fit:contain;background:#0c0c0c;border-radius:6px;box-shadow:0 24px 60px rgba(0,0,0,.65)}
+.t-frame.t-tall img{max-height:clamp(185px,25vh,250px);max-width:clamp(190px,36vw,310px)}
+.t-frame figcaption{display:flex;justify-content:space-between;align-items:center;width:100%;box-sizing:border-box;gap:12px;margin-top:8px;padding:5px 10px;background:rgba(12,12,14,.82);border:1px solid rgba(255,255,255,.08);border-radius:7px;backdrop-filter:blur(6px);font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.75)}
+.t-frame figcaption span{font-family:Vazirmatn,sans-serif;font-size:11px;color:rgba(255,255,255,.88)}
+.t-frame figcaption b{color:#ff8a3c;direction:ltr;font-weight:600;font-size:9.5px;letter-spacing:.14em}
+.tunnel-vignette{position:absolute;inset:-1px;pointer-events:none;background:radial-gradient(82% 88% at 50% 50%,transparent 62%,rgba(0,0,0,.68) 96%),linear-gradient(0deg,rgba(0,0,0,.45) 0%,transparent 12%)}
 .tunnel-hud{position:absolute;bottom:16px;left:20px;display:flex;gap:14px;align-items:baseline;direction:ltr;font-size:11px;letter-spacing:.24em;color:rgba(255,255,255,.4)}
 .tunnel-hud b{color:#ff8a3c;font-weight:500}
 
@@ -347,7 +348,7 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
   .chapter-shell{width:88vw}
   .instrument-chapter .instrument-sticky{flex-direction:column;justify-content:center;gap:0;padding:70px 6vw 20px}.instrument-copy{order:1;flex:0 0 auto;width:100%;text-align:center}.instrument-copy .big-index{font-size:54px;margin-bottom:4px}.instrument-copy .chapter-title{font-size:36px;margin-bottom:10px}.instrument-copy .seq-wrap{min-height:98px}.instrument-copy .chapter-copy{margin:0 auto;font-size:12px;line-height:1.8}.instrument-visual{order:2;width:100%;height:54vh;min-height:280px;flex:0 0 auto;justify-content:center}#pegCanvas{width:100%;height:auto}.instrument-note{right:0;bottom:0}
   .sound-chapter{padding:6svh 0}.sound-layout{display:flex;flex-direction:column;gap:20px}.sound-copy{width:100%;text-align:center}.sound-copy .chapter-title{font-size:27px}.sound-copy p{font-size:11px;line-height:1.9;max-width:340px;margin:0 auto;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.band-members{margin-top:12px}.band-members ul{gap:7px}.band-members b{font-size:12px}.band-members li{justify-content:center}.bandcamp-link{margin-top:14px}.band-members{display:none}.sound-stage{width:100%;border-left:0;border-top:1px solid rgba(255,255,255,.08);padding:14px 0 0;gap:12px}.jewel{width:clamp(230px,72vw,280px)}.jewel-inside{padding:14px;gap:7px}.jewel .album-band{font-size:11px}.jewel .album-title{font-size:20px}.jewel .album-date{font-size:11px}.jewel .credits-label{font-size:9px}.jewel .album-credits{display:flex;flex-direction:column;margin-top:0;padding-top:9px;gap:7px}.jewel .album-credits li{flex-direction:row;align-items:baseline;gap:8px}.jewel .album-credits b{font-size:14px;line-height:1.65}.jewel .album-credits i{font-size:11px;line-height:1.6;letter-spacing:.1em}.album-caption{font-size:12px;line-height:1.7;-webkit-line-clamp:3;max-width:330px;text-align:center;margin-left:auto;margin-right:auto}.sound-label{display:none}
-  .live-chapter .chapter-shell{padding:7vh 0 4vh}.live-heading{display:block;text-align:center}.live-heading .chapter-title{margin-bottom:14px}.live-heading .chapter-copy{margin:0 auto}.tunnel{height:56vh;border-radius:12px}.t-frame img{height:28vh}.t-frame.t-tall img{height:24vh}
+  .live-chapter .chapter-shell{padding:7vh 0 4vh}.live-heading{display:block;text-align:center}.live-heading .chapter-title{margin-bottom:14px}.live-heading .chapter-copy{margin:0 auto}.tunnel{height:min(58vh,440px);border-radius:14px}.t-frame img{max-height:clamp(140px,20vh,180px);max-width:clamp(220px,64vw,300px)}.t-frame.t-tall img{max-height:clamp(150px,21vh,190px);max-width:clamp(170px,50vw,240px)}.t-frame figcaption{margin-top:6px;padding:4px 8px}.t-frame figcaption span{font-size:9.5px}.t-frame figcaption b{font-size:8.5px}
   .bio-orbit{--bioD:min(76vw,38svh);place-items:center;padding-top:0}.bio-center{gap:10px}.bio-lead{right:auto;left:50%;top:auto;bottom:5svh;--tx0:-50%;--ty0:0%;width:min(360px,86vw);padding:13px 15px;background:linear-gradient(165deg,rgba(16,13,10,.9),rgba(7,7,7,.82));border-color:rgba(255,255,255,.14);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.55);backdrop-filter:blur(10px) saturate(1.15)}.bio-lead .chapter-title{font-size:19px}.bio-lead p{font-size:10px;line-height:1.9}.bio-lead .bio-stats{justify-content:center;gap:6px;margin-top:10px}.bio-lead .bio-stats span{letter-spacing:.08em;font-size:9px;padding:5px 11px}.bio-chapter .bio-event{left:50%;right:auto;top:auto;bottom:5svh;--tx0:-50%;--ty0:0%;width:min(360px,86vw);padding:13px 15px;background:linear-gradient(165deg,rgba(16,13,10,.88),rgba(7,7,7,.8));border-color:rgba(255,255,255,.14);border-radius:15px;box-shadow:0 14px 40px rgba(0,0,0,.55);backdrop-filter:blur(10px) saturate(1.15)}.bio-event.t-low{top:auto}.bio-event h3{font-size:16px;margin-bottom:6px}.bio-event p{font-size:10px;line-height:1.9;color:rgba(255,255,255,.6)}.bio-event .year{font-size:9px;padding:3px 8px;margin-bottom:8px;border:1px solid rgba(255,106,42,.35);border-radius:999px;display:inline-block;background:rgba(255,106,42,.08)}
   .contact-chapter .contact-layout{display:block;text-align:center}.contact-layout .chapter-title{font-size:46px}.contact-copy{margin:24px auto 0;text-align:center}.contact-links{justify-content:center}.contact-sign{margin-top:8vh}
   /* موبایل: عبور کوتاه‌تر از بیو — ۶×۷۵svh یعنی ~۳۰٪ اسکرول کمتر تا خروج */
@@ -584,16 +585,16 @@ body.cpu .stage{box-shadow:none}
     <div class="chapter-shell">
       <div class="live-heading">
         <div>
-          <div class="eyebrow">04 / LIVE ARCHIVE</div>
-          <h2 class="chapter-title" data-i18n="live.h2">روی صحنه</h2>
+          <div class="eyebrow">04 / VISUAL ARCHIVE</div>
+          <h2 class="chapter-title" data-i18n="live.h2">صحنه و تصویر</h2>
         </div>
-        <p class="chapter-copy" data-i18n="live.copy">چند لحظه از نور، بدن و صدای زنده؛ نه یک گالری، یک نوارِ حافظه.</p>
+        <p class="chapter-copy" data-i18n="live.copy">لحظاتی از نور، صحنه، اجرای زنده و ثبتِ تصویری گروه «کارنیوالسک».</p>
       </div>
 
-      <div class="tunnel" aria-label="گالری اجرای زنده">
+      <div class="tunnel" aria-label="گالری اجرا و گروه‌ها">
         <div class="tunnel-scene" id="tunnelScene"></div>
         <div class="tunnel-vignette" aria-hidden="true"></div>
-        <div class="tunnel-hud" aria-hidden="true"><b id="tunnelCount">01 / 16</b><span>LIVE FRAME</span></div>
+        <div class="tunnel-hud" aria-hidden="true"><b id="tunnelCount">01 / 20</b><span id="tunnelType">CARNIVALESQUE</span></div>
       </div>
     </div>
   </section>
@@ -1240,7 +1241,7 @@ SCENES.forEach(function(id){
    ~۳۵٪ سریع‌تر شود؛ همهی مصرف‌کننده‌ها (peg، تیترها، کراسفید، لندینگ، ریل)
    از sceneStart/RANGE مشتق‌اند پس انیمیشن‌ها متناسب فشرده می‌شوند، نه حذف.
    تاریخچه: ساز قبلاً .60 بود، بعد .34 شد. */
-var SCENE_RANGE = {instrument:.22, sound:.13, live:.32, bio:.40, contact:.09};
+var SCENE_RANGE = {instrument:.22, sound:.13, live:.36, bio:.40, contact:.09};
 var RANGE_TOTAL = SCENE_RANGE.instrument + SCENE_RANGE.sound + SCENE_RANGE.live + SCENE_RANGE.bio + SCENE_RANGE.contact;
 /* cumulative start + center of each scene */
 var sceneStart = (function(){
@@ -1595,31 +1596,49 @@ for(var pi = 0; pi < pegCount; pi++){
 window.addEventListener('resize', function(){ sizePegCanvas(); drawPeg(); });
 setTimeout(function(){ sizePegCanvas(); }, 80);
 
-/* ---------- live photo tunnel (scroll = flying through a corridor) ---------- */
-var TUN_N = 16, TUN_GAP = 560, TUN_FOCUS = 430, TUN_PERSP = 1150;
+/* ---------- visual archive & live tunnel (scroll = flying through a corridor) ---------- */
+var tunItems = [
+  { file: 'carnivalesque-01', label: 'کارنیوالسک', badge: 'CARNIVALESQUE', alt: 'گروه کارنیوالسک در استودیو', type: 'band' },
+  { file: 'carnivalesque-02', label: 'کارنیوالسک', badge: 'CARNIVALESQUE', alt: 'گروه کارنیوالسک در طبیعت', type: 'band' },
+  { file: 'carnivalesque-03', label: 'کارنیوالسک', badge: 'CARNIVALESQUE', alt: 'گروه کارنیوالسک در برابر طاق‌ها', type: 'band' },
+  { file: 'carnivalesque-04', label: 'کارنیوالسک', badge: 'CARNIVALESQUE', alt: 'گروه کارنیوالسک در پاییز', type: 'band' },
+  { file: 'live-14', label: 'اجرای زنده', badge: '01 / LIVE', alt: 'اجرای زنده ۱۴', type: 'live' },
+  { file: 'live-01', label: 'اجرای زنده', badge: '02 / LIVE', alt: 'اجرای زنده ۱', type: 'live' },
+  { file: 'live-02', label: 'اجرای زنده', badge: '03 / LIVE', alt: 'اجرای زنده ۲', type: 'live', tall: true },
+  { file: 'live-03', label: 'اجرای زنده', badge: '04 / LIVE', alt: 'اجرای زنده ۳', type: 'live' },
+  { file: 'live-04', label: 'اجرای زنده', badge: '05 / LIVE', alt: 'اجرای زنده ۴', type: 'live' },
+  { file: 'live-05', label: 'اجرای زنده', badge: '06 / LIVE', alt: 'اجرای زنده ۵', type: 'live', tall: true },
+  { file: 'live-06', label: 'اجرای زنده', badge: '07 / LIVE', alt: 'اجرای زنده ۶', type: 'live' },
+  { file: 'live-07', label: 'اجرای زنده', badge: '08 / LIVE', alt: 'اجرای زنده ۷', type: 'live' },
+  { file: 'live-08', label: 'اجرای زنده', badge: '09 / LIVE', alt: 'اجرای زنده ۸', type: 'live', tall: true },
+  { file: 'live-09', label: 'اجرای زنده', badge: '10 / LIVE', alt: 'اجرای زنده ۹', type: 'live' },
+  { file: 'live-10', label: 'اجرای زنده', badge: '11 / LIVE', alt: 'اجرای زنده ۱۰', type: 'live' },
+  { file: 'live-11', label: 'اجرای زنده', badge: '12 / LIVE', alt: 'اجرای زنده ۱۱', type: 'live' },
+  { file: 'live-12', label: 'اجرای زنده', badge: '13 / LIVE', alt: 'اجرای زنده ۱۲', type: 'live', tall: true },
+  { file: 'live-13', label: 'اجرای زنده', badge: '14 / LIVE', alt: 'اجرای زنده ۱۳', type: 'live' },
+  { file: 'live-15', label: 'اجرای زنده', badge: '15 / LIVE', alt: 'اجرای زنده ۱۵', type: 'live', tall: true },
+  { file: 'live-16', label: 'اجرای زنده', badge: '16 / LIVE', alt: 'اجرای زنده ۱۶', type: 'live' }
+];
+var TUN_N = tunItems.length, TUN_GAP = 540, TUN_FOCUS = 430, TUN_PERSP = 1150;
 var tunFrames = [], tunCur = -1;
 var tunScene = document.getElementById('tunnelScene');
 var tunCount = document.getElementById('tunnelCount');
-/* ترتیب نمایش: 14 اول، بعد 1..13، بعد 15، 16 */
-var tunOrder = [14,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16];
+var tunType = document.getElementById('tunnelType');
 if(tunScene){
   for(var ti = 0; ti < TUN_N; ti++){
+    var item = tunItems[ti];
     var side = (ti % 2 ? 1 : -1);
-    var fn = tunOrder[ti];
-    var num = String(fn).padStart(2, '0');
-    /* CPU mode: decode smaller lite variants and defer offscreen slides (lazy-load).
-       GPU mode: original full-size eager markup — behaviour unchanged. */
-    var fullSrc = 'assets/live/live-' + num + '.webp';
-    var liteSrc = 'assets/live/lite/live-' + num + '.webp';
+    var fullSrc = 'assets/live/' + item.file + '.webp';
+    var liteSrc = 'assets/live/lite/' + item.file + '.webp';
     var fig = document.createElement('figure');
-    fig.className = 't-frame' + (ti === 1 || ti === 4 || ti === 7 || ti === 11 || ti === 14 ? ' t-tall' : '');
+    fig.className = 't-frame' + (item.tall ? ' t-tall' : '');
     var imgAttr = cpuMode ? ('data-src="' + liteSrc + '" decoding="async"') : ('src="' + fullSrc + '" loading="lazy" decoding="async"');
-    fig.innerHTML = '<img ' + imgAttr + ' alt="اجرای زنده ' + fn + '">' +
-      '<figcaption><span>اجرای زنده</span><b>' + num + ' / LIVE</b></figcaption>';
+    fig.innerHTML = '<img ' + imgAttr + ' alt="' + item.alt + '">' +
+      '<figcaption><span>' + item.label + '</span><b>' + item.badge + '</b></figcaption>';
     tunScene.appendChild(fig);
-    tunFrames.push({el: fig, img: fig.firstChild, src: liteSrc, x: side * (150 + (ti % 3) * 70), y: (((ti * 37) % 3) - 1) * 44, ry: -side * 14, _vis: -1});
+    tunFrames.push({el: fig, img: fig.firstChild, src: liteSrc, x: side * (140 + (ti % 3) * 60), y: (((ti * 37) % 3) - 1) * 32, ry: -side * 12, _vis: -1});
   }
-  if(cpuMode){   /* eager-load the first pair so the gallery entry is never blank */
+  if(cpuMode){
     for(var e = 0; e < 2 && e < tunFrames.length; e++){
       var ei = tunFrames[e].img;
       if(ei && ei.getAttribute('data-src')) ei.src = ei.getAttribute('data-src');
@@ -1630,18 +1649,17 @@ var tunCam = 0, tunSettling = false;
 function tunnelUpdate(p, sectionOpacity){
   if(cpuMode) return tunnelUpdateLite(p, sectionOpacity);
   if(!tunScene || !tunFrames || !tunFrames.length) return;
-  /* hold camera while neighbor scenes fade, then rest each frame exactly on focus */
   var pc = Math.min(1, Math.max(0, (p - .12) / .72));
   var target = Math.round(pc * (TUN_N - 1)) * TUN_GAP;
-  if(Math.abs(target - tunCam) > TUN_GAP * 6) tunCam = target;   /* hard snap on scene jumps */
+  if(Math.abs(target - tunCam) > TUN_GAP * 6) tunCam = target;
   tunCam += (target - tunCam) * .12;
-  tunSettling = Math.abs(target - tunCam) > .5;   /* keep applying until rest position reached */
+  tunSettling = Math.abs(target - tunCam) > .5;
   var cam = tunCam;
   var best = -1, bd = 1e9;
   for(var i = 0; i < TUN_N; i++){
     var f = tunFrames[i];
-    var rel = TUN_FOCUS + cam - i * TUN_GAP;      /* +toward viewer */
-    if(rel < -2300 || rel > TUN_PERSP * .96){      /* too deep / through camera */
+    var rel = TUN_FOCUS + cam - i * TUN_GAP;
+    if(rel < -2300 || rel > TUN_PERSP * .96){
       f.el.style.opacity = '0'; continue;
     }
     var dd = Math.abs(rel - TUN_FOCUS);
@@ -1649,19 +1667,18 @@ function tunnelUpdate(p, sectionOpacity){
     if(rel > TUN_PERSP * .55) op *= Math.max(0, (TUN_PERSP * .96 - rel) / (TUN_PERSP * .41));
     if(rel < -1500) op *= Math.max(0, (rel + 2300) / 800);
     f.el.style.opacity = (op * (sectionOpacity || 1)).toFixed(3);
-    var settle = Math.min(1, dd / 640);            /* rest dead-center & straight on focus */
+    var settle = Math.min(1, dd / 640);
     f.el.style.transform = 'translate3d(calc(-50% + ' + (f.x * settle).toFixed(1) + 'px),calc(-50% + ' + (f.y * settle).toFixed(1) + 'px),' + rel.toFixed(1) + 'px) rotateY(' + (f.ry * settle).toFixed(2) + 'deg)';
     f.el.style.filter = dd < 40 ? 'none' : 'blur(' + Math.min(13, dd / 110).toFixed(1) + 'px) brightness(' + Math.max(.22, 1 - dd / 2400).toFixed(2) + ')';
     if(dd < bd){ bd = dd; best = i; }
   }
-  if(best !== tunCur){
+  if(best !== tunCur && best >= 0){
     tunCur = best;
-    if(tunCount) tunCount.textContent = String(tunOrder[best]).padStart(2, '0') + ' / ' + TUN_N;
+    var curItem = tunItems[best];
+    if(tunCount) tunCount.textContent = String(best + 1).padStart(2, '0') + ' / ' + String(TUN_N).padStart(2, '0');
+    if(tunType && curItem) tunType.textContent = curItem.type === 'band' ? 'CARNIVALESQUE' : 'LIVE FRAME';
   }
 }
-/* CPU-only gallery path: flat 2D carousel — transform + opacity ONLY
-   (no blur filter, no rotateY, no z-depth, no shadow), offscreen slides are
-   hidden and lazy-decoded, and redundant updates are skipped. */
 var tunLitCam = -1, tunLitOp = -1;
 function tunnelUpdateLite(p, sectionOpacity){
   if(!tunScene || !tunFrames || !tunFrames.length) return;
@@ -1669,14 +1686,13 @@ function tunnelUpdateLite(p, sectionOpacity){
   var so = sectionOpacity || 1;
   var pc = Math.min(1, Math.max(0, (p - .12) / .72));
   var iF = pc * (TUN_N - 1);
-  /* rAF-throttle: skip the whole pass when camera & fade moved imperceptibly */
   if(Math.abs(iF - tunLitCam) < .0035 && Math.abs(so - tunLitOp) < .006) return;
   tunLitCam = iF; tunLitOp = so;
   var WIN = 3.0, best = -1, bd = 1e9;
   for(var i = 0; i < TUN_N; i++){
     var f = tunFrames[i];
     var d = i - iF, ad = d < 0 ? -d : d;
-    if(ad > WIN){                                  /* offscreen → hide once, no repaint */
+    if(ad > WIN){
       if(f._vis !== 0){ f.el.style.opacity = '0'; f.el.style.visibility = 'hidden'; f._vis = 0; }
       continue;
     }
@@ -1685,7 +1701,6 @@ function tunnelUpdateLite(p, sectionOpacity){
       f.el.style.filter = 'none';
       f._vis = 1;
     }
-    /* lazy-load the reduced-size slide the moment it enters the window */
     var im = f.img;
     if(im && !im.getAttribute('src') && im.getAttribute('data-src')) im.src = im.getAttribute('data-src');
     var op = Math.max(0, 1 - ad / WIN);
@@ -1697,7 +1712,9 @@ function tunnelUpdateLite(p, sectionOpacity){
   }
   if(best !== tunCur && best >= 0){
     tunCur = best;
-    if(tunCount) tunCount.textContent = String(tunOrder[best]).padStart(2, '0') + ' / ' + TUN_N;
+    var curItem = tunItems[best];
+    if(tunCount) tunCount.textContent = String(best + 1).padStart(2, '0') + ' / ' + String(TUN_N).padStart(2, '0');
+    if(tunType && curItem) tunType.textContent = curItem.type === 'band' ? 'CARNIVALESQUE' : 'LIVE FRAME';
   }
 }
 /* ---------- bio 360 spin (frame sequence driven by scene scroll, same pattern as headstock) ---------- */
@@ -1864,8 +1881,8 @@ var EN = {
   'band.m3': '<b>Siavash Khoshrouz</b><i>keys</i>',
   'band.m4': '<b class="me">Sina Golnoghreh</b><i>bass guitar</i>',
   'band.listen': '<span>\u2197</span> Listen on Bandcamp',
-  'live.h2': 'On Stage',
-  'live.copy': 'A few moments of light, body and live sound; not a gallery \u2014 a strip of memory.',
+  'live.h2': 'On Stage & Archive',
+  'live.copy': 'Moments of light, stage, live sound and visual archives of Carnivalesque.',
   'contact.h2': "Let\u2019s collaborate",
   'contact.copy': 'For performances, music production or live sound engineering collaboration.',
   'sign.name': 'Sina Golnoghreh'
@@ -1884,6 +1901,10 @@ function setLang(v){
   for(var i = 0; i < els.length; i++){
     var el = els[i], k = el.getAttribute('data-i18n');
     el.innerHTML = (en && EN[k] !== undefined) ? EN[k] : el._fa;
+  }
+  var caps = document.querySelectorAll('.t-frame figcaption span');
+  for(var c = 0; c < caps.length && c < tunItems.length; c++){
+    caps[c].textContent = en ? (tunItems[c].type === 'band' ? 'Carnivalesque' : 'Live Stage') : tunItems[c].label;
   }
   if(albumImg) albumImg.alt = en ? 'Down the River album cover \u2014 Carnivalesque' : altFa;
   btn.textContent = en ? '\u0641\u0627' : 'EN';
