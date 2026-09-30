@@ -300,8 +300,8 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
 .artlb{position:fixed;inset:0;z-index:3000;pointer-events:auto;background:rgba(4,4,5,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:5svh 4vw}
 .artlb.is-open{display:flex}
 .artlb *{pointer-events:auto}
-.artlb-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;flex:1}
-.artlb-stage img{max-width:min(94vw,1180px);max-height:74svh;object-fit:contain;border-radius:2px;box-shadow:0 30px 90px rgba(0,0,0,.75)}
+.artlb-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;flex:1;pointer-events:none}
+.artlb-stage img{max-width:min(94vw,1180px);max-height:74svh;object-fit:contain;border-radius:2px;box-shadow:0 30px 90px rgba(0,0,0,.75);pointer-events:none}
 .artlb-cap{display:flex;align-items:baseline;gap:12px;font-size:11px;letter-spacing:.1em;color:rgba(255,255,255,.5)}
 .artlb-cap{direction:ltr}
 .artlb-cap span{direction:rtl}
@@ -319,7 +319,7 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
 .artlb-nav.prev{right:-2px}.artlb-nav.next{left:-2px}
 .artlb[data-dir="ltr"] .artlb-nav.prev{right:auto;left:-2px}
 .artlb[data-dir="ltr"] .artlb-nav.next{left:auto;right:-2px}
-.artlb-x{position:absolute;top:18px;right:20px;width:38px;height:38px;border-radius:50%;background:transparent;border:1px solid rgba(255,255,255,.16);color:#fff;font-size:15px;cursor:pointer;display:grid;place-items:center}
+.artlb-x{position:absolute;top:18px;right:20px;width:38px;height:38px;border-radius:50%;background:transparent;border:1px solid rgba(255,255,255,.16);color:#fff;font-size:15px;cursor:pointer;display:grid;place-items:center;z-index:5;touch-action:manipulation}
 .artlb-x:hover{background:rgba(255,106,42,.2);border-color:rgba(255,106,42,.6)}
 @media (max-width:760px){.artlb{padding:4svh 3vw}.artlb-nav{width:36px;height:36px}
   .artlb-nav.prev{right:0;left:auto}
@@ -2107,7 +2107,11 @@ var artNext = document.getElementById('artLbNext');
 if(artNext) artNext.addEventListener('click', function(){ artShow(artIdx + 1); preloadArt(1); });
 var artPrev = document.getElementById('artLbPrev');
 if(artPrev) artPrev.addEventListener('click', function(){ artShow(artIdx - 1); preloadArt(-1); });
-if(artLb) artLb.addEventListener('click', function(e){ if(e.target === artLb) artSetOpen(false); });
+if(artLb) artLb.addEventListener('click', function(e){
+  /* کلیک روی پس‌زمینه = بستن. stage و خودِ عکس pointer-events:none دارند تا
+     جلوی دکمهٔ ضربدر (که مطلق است) نیفتند، پس هر نقطهٔ آزاد به این می‌رسد. */
+  if(e.target === artLb || e.target.classList.contains('artlb-stage')) artSetOpen(false);
+});
 window.addEventListener('keydown', function(e){
   if(!artOpen) return;
   if(e.key === 'Escape'){ artSetOpen(false); }
