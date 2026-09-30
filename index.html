@@ -160,6 +160,11 @@ html[dir="ltr"] .site-nav .links{gap:11px}
 html[dir="rtl"] .site-nav .links a{letter-spacing:.04em;font-size:12.5px}
 html[dir="ltr"] .site-nav .links a{letter-spacing:.02em}
 .site-nav a:hover,.site-nav a:focus-visible{color:#ff6a2a}
+/* موبایل/کروم: انگشت که برداشته می‌شود :hover را روی لینک نگه می‌دارد، پس لینکی که
+   تازه لمس شده نارنجی می‌ماند در حالی که صحنهٔ دیگری فعال است. لمس یعنی قصد ناوبری،
+   نه hover — پس رنگ‌دادن به :hover در دستگاه‌های لمسی غلط است. */
+@media (hover:none),(pointer:coarse){ .site-nav a:hover{color:rgba(255,255,255,.5)}
+  html[dir="rtl"] .site-nav a.cur:hover{color:#ff6a2a} .site-nav .mark:hover{color:#fff} }
 /* ====== fixed scenes (page never moves — scroll is only input) ====== */
 .site-content{position:fixed;inset:0;z-index:7;pointer-events:none;opacity:0;transition:opacity .9s ease}
 body.site-ready .site-content{opacity:1}
@@ -428,7 +433,12 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
 /* CPU-only fallback: drop expensive effects when body.cpu is set
    (software renderer / hardware acceleration OFF). Visuals are preserved as
    transform+opacity only — no blur filters, no 3D rasterisation, no big shadows. */
-body.cpu .bio-lead,body.cpu .bio-event,body.cpu .site-nav{backdrop-filter:none;-webkit-backdrop-filter:none}
+body.cpu .bio-lead,body.cpu .bio-event{backdrop-filter:none;-webkit-backdrop-filter:none}
+/* نوار بالا در حالت cpu بلور ندارد، پس پس‌زمینهٔ ۴۵٪ تنها باعث می‌شد متنِ زیرِ نوار
+   از روی آن خوانده شود (روی موبایل که cpuMode فعال است). بدون بلور باید کدری خودِ
+   نوار بیشتر شود تا محتوا پشتش گم شود. */
+body.cpu .site-nav{backdrop-filter:none;-webkit-backdrop-filter:none;
+  background:rgba(0,0,0,.86)!important}
 body.cpu .album-figure::before,body.cpu .album-figure::after{animation:none}
 body.cpu .bio-stage::before{animation:none}
 body.cpu .bio-stage,body.cpu .bio-lead,body.cpu .bio-event{box-shadow:none}
@@ -1402,6 +1412,7 @@ function setScene(id){
   /* ورود به گالری (هر راهی: اسکرول، لینک ناوبری، زبان) → بارگذاری کل مجموعه */
   if(id === 'live' && typeof tunPrimeAll === 'function') tunPrimeAll();
   if(!id && pegFrameIndex !== 0){ pegFrameIndex = 0; drawPeg(); }
+  if(id !== 'live') gridEscape = 0;   /* خروج/ورود دوباره به گالری = حالت مرور تازه */
   stageEl.classList.toggle('gone', !!id);
   SCENES.forEach(function(s){
     var a = navLinks[s];
@@ -1557,12 +1568,15 @@ window.addEventListener('keydown', function(e){
 /* touch swipe */
 var touchY0 = null;
 var touchAnchor = null;   /* v-target اول ژست — سقفِ «یک سوایپ = یک عکس» گالری موبایل */
+var gestTravel = 0;       /* مسافت انگشت تا این لحظه از ژست (px) — برای تشخیص سوایپِ عبور */
+var gridEscape = 0;       /* -1 در حال ترک به عقب، +1 به جلو، 0 داخل شبکه (فقط موبایل/گالری) */
+var browseMode = false;   /* ژست جاری «مرور عکس» است یا «عبور از گالری» */
 /* شبکه‌ی فریم‌های گالری: از .12 تا .84 ابتدای صحنه (باید پیش از touchmove تعریف شود) */
 var LIVE_GRID_LO = function(){ return sceneStart.live + .12 * SCENE_RANGE.live; },
     LIVE_GRID_HI = function(){ return sceneStart.live + .84 * SCENE_RANGE.live; };
 window.addEventListener('touchstart', function(e){
   touchY0 = shellAfford(e.target, 0) ? null : e.touches[0].clientY;
-  if(touchY0 !== null) touchAnchor = vScroll.target;
+  if(touchY0 !== null){ touchAnchor = vScroll.target; gestTravel = 0; gridEscape = 0; }  /* هر ژست از نو */
 }, {passive:true});
 window.addEventListener('touchmove', function(e){
   if(!journey.complete || touchY0 === null) return;
@@ -1577,19 +1591,25 @@ window.addEventListener('touchmove', function(e){
     e.preventDefault();
     /* touch pace mirrors the wheel ratio (live = 1/3) and caps flick jumps */
     var liveMob = mqMobileBio.matches && vScroll.scene === 'live';
-    /* گالری موبایل: دو رژیم. داخل شبکه‌ی عکس‌ها = یک عکس در هر سوایپ (آرام).
-       بیرون شبکه = در حال ترک گالری، پس با سرعت عادی تا سکشن قبلی/بعدی برسد
-       (با کلمپ .003 هرگز نمی‌رسید). */
+    /* آستانهٔ «عبور» بر پایهٔ مسافتِ انگشت در همین ژست است: سوایپِ کوتاه (~۱۰۰px یا
+           کمتر) یعنی مرورِ عکس‌ها، سوایپِ بلند یعنی کاربر دنبال سکشن قبلی/بعدی است.
+           تصمیم‌گیری با «بیرون رفتن از شبکه» غلط بود: هر سوایپ دوباره کلمپ و اسنپ می‌شد
+           و کاربر عملاً در گالری گیر می‌کرد (۲۲ سوایپ در آزمون واقعی پیش از اصلاح). */
     var gLo = LIVE_GRID_LO(), gHi = LIVE_GRID_HI();
-    var escaping = liveMob && (vScroll.target < gLo || vScroll.target > gHi);
-    var tf = (vScroll.scene === 'live') ? (liveMob && !escaping ? .00008 : .0005) : .0005;
-    var tcap = liveMob && !escaping ? .003 : .006;   /* موبایل/گالری: حساسیت کمتر */
+    if(touchY0 !== null) gestTravel += Math.abs(dy);
+    var passThru = liveMob && gestTravel > 130;
+    var escaping = liveMob && (passThru || gridEscape !== 0);
+    var tf = (vScroll.scene === 'live') ? (escaping ? .0005 : .00008) : .0005;
+    /* سقفِ گامِ عبور باید به‌اندازهٔ کل عرضِ گالری باشد نه یک تکهٔ کوچک: کل شبکهٔ
+       عکس‌ها ≈ .۲۶ از محور است، پس یک سوایپِ قاطعِ انگشت (~۵۰۰px) با ضریب .0005
+       حدود .۲۵ می‌دهد. با سقف .006 هر ژست فقط ~.۰۱ می‌رفت و کاربر ناچار بود ده‌ها
+       سوایپِ کوتاه بزند (۲۲ سوایپ در آزمون واقعی پیش از اصلاح). */
+    var tcap = (liveMob && !escaping) ? .003 : (escaping ? .03 : .006);
     var tstep = Math.max(-tcap, Math.min(tcap, dy * tf));
     var nt = vScroll.target + tstep;
-    /* موبایل/گالری: یک ژست حداکثر یک عکس (≈.015 = زیر یک فریم) — هرگز دو عکس نه.
-       ولی وقتی هدف از شبکه‌ی عکس‌ها بیرون رفته (بازگشت به عکس اول یا عبور به
-       عکس آخر) کلمپِ لنگر باید حذف شود، وگرنه هیچ سوایپی نمی‌تواند از آخرین
-       عکس رد شود و گالری به تله‌ی یک‌طرفه تبدیل می‌شود. */
+    if(passThru) gridEscape = nt < gLo ? -1 : (nt > gHi ? 1 : 0);
+    /* مرورِ عکس: یک ژست حداکثر یک عکس (≈.015) — هرگز دو عکس. در ژستِ «عبور» این
+       کلمپ حذف می‌شود، وگرنه هرگز از گالری رد نمی‌شویم. */
     if(liveMob && !escaping && touchAnchor !== null)
       nt = Math.max(touchAnchor - .015, Math.min(touchAnchor + .015, nt));
     vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, nt));
@@ -1608,12 +1628,15 @@ function liveSnap(){
   if(!(mqMobileBio.matches && vScroll.scene === 'live')) return;
   var s = sceneStart.live, r = SCENE_RANGE.live;
   var gLo = LIVE_GRID_LO(), gHi = LIVE_GRID_HI(), t = vScroll.target;
+  /* اگر این ژست از لبهٔ شبکه بیرون رفته، دیگر هیچ کلمپی نباید اعمال شود: هر
+     بازگشت به نزدیک‌ترین فریم دقیقاً همان چیزی بود که کاربر را در گالری گیر می‌کرد. */
+  if(gridEscape !== 0) return;
   if(t >= gLo && t <= gHi){
     var f = ((t - s) / r - .12) / .72 * (TUN_N - 1);
     var i = Math.max(0, Math.min(TUN_N - 1, Math.round(f)));
     vScroll.target = s + (.12 + .72 * i / (TUN_N - 1)) * r;
   } else if(t < gLo){
-    /* در حال ترک به عقب — کف باید زیر آستانه‌ی خروج (sceneStart.live - .015) باشد */
+    /* در حال ترک به عقب — کف باید زیر آستانهٔ خروج (sceneStart.live - .015) باشد */
     vScroll.target = (gLo - t < .004) ? gLo : t;
   } else {
     vScroll.target = (t - gHi < .004) ? gHi : t;
