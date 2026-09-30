@@ -1399,6 +1399,8 @@ function placeScene(id){
 function setScene(id){
   if(vScroll.scene === id) return;
   vScroll.scene = id;
+  /* ورود به گالری (هر راهی: اسکرول، لینک ناوبری، زبان) → بارگذاری کل مجموعه */
+  if(id === 'live' && typeof tunPrimeAll === 'function') tunPrimeAll();
   if(!id && pegFrameIndex !== 0){ pegFrameIndex = 0; drawPeg(); }
   stageEl.classList.toggle('gone', !!id);
   SCENES.forEach(function(s){
@@ -1999,12 +2001,24 @@ function buildTunnel(){
   if(tunType) tunType.textContent = TUN_SET_LABEL[tunSetKey] || 'LIVE FRAME';
   window.__tunItems = items;
 }
+/* هر فریم وقتی دوربین به آن نزدیک می‌شود src می‌گیرد (CPU-مود: data-src→src).
+   ولی اگر کاربر مستقیم با لینک ناوبری وارد گالری شود، دوربین وسط تونل است و
+   فریم‌های دور هرگز از راه updateTunnel نمی‌رسند → کادر خالی. برای همین به‌محض
+   ورود به صحنه‌ی گالری کل مجموعه یک‌بار بارگذاری می‌شود (lite است، ~۱۵KB). */
+function tunPrimeAll(){
+  if(!tunFrames.length) return;
+  for(var i = 0; i < tunFrames.length; i++){
+    var im = tunFrames[i].img;
+    if(im && !im.getAttribute('src') && im.getAttribute('data-src')) im.src = im.getAttribute('data-src');
+  }
+}
 buildTunnel();
 function tunSwitch(key){
   if(!tunSets[key] || key === tunSetKey) return;
   tunSetKey = key;
   tunItems = tunSets[key];
   buildTunnel();
+  tunPrimeAll();      /* تب جدید = مجموعه‌ی تازه، باید همه بارگذاری شوند */
   _lastApplyV = -1;   /* force re-render with the new frame set */
   applyScroll();
 }
