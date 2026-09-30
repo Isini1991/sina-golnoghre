@@ -10,3 +10,6 @@ versions/
 _diagA.html
 color-reveal-sample.html
 gallery-demo-*.html
+
+# unreferenced demo video (not used by index.html)
+sinawings_story_demo.mp4
