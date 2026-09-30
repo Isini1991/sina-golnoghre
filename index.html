@@ -1555,6 +1555,9 @@ window.addEventListener('keydown', function(e){
 /* touch swipe */
 var touchY0 = null;
 var touchAnchor = null;   /* v-target اول ژست — سقفِ «یک سوایپ = یک عکس» گالری موبایل */
+/* شبکه‌ی فریم‌های گالری: از .12 تا .84 ابتدای صحنه (باید پیش از touchmove تعریف شود) */
+var LIVE_GRID_LO = function(){ return sceneStart.live + .12 * SCENE_RANGE.live; },
+    LIVE_GRID_HI = function(){ return sceneStart.live + .84 * SCENE_RANGE.live; };
 window.addEventListener('touchstart', function(e){
   touchY0 = shellAfford(e.target, 0) ? null : e.touches[0].clientY;
   if(touchY0 !== null) touchAnchor = vScroll.target;
@@ -1572,23 +1575,47 @@ window.addEventListener('touchmove', function(e){
     e.preventDefault();
     /* touch pace mirrors the wheel ratio (live = 1/3) and caps flick jumps */
     var liveMob = mqMobileBio.matches && vScroll.scene === 'live';
-    var tf = (vScroll.scene === 'live') ? (liveMob ? .00008 : .00016) : .0005;
-    var tcap = liveMob ? .003 : .006;   /* موبایل/گالری: حساسیت کمتر */
+    /* گالری موبایل: دو رژیم. داخل شبکه‌ی عکس‌ها = یک عکس در هر سوایپ (آرام).
+       بیرون شبکه = در حال ترک گالری، پس با سرعت عادی تا سکشن قبلی/بعدی برسد
+       (با کلمپ .003 هرگز نمی‌رسید). */
+    var gLo = LIVE_GRID_LO(), gHi = LIVE_GRID_HI();
+    var escaping = liveMob && (vScroll.target < gLo || vScroll.target > gHi);
+    var tf = (vScroll.scene === 'live') ? (liveMob && !escaping ? .00008 : .0005) : .0005;
+    var tcap = liveMob && !escaping ? .003 : .006;   /* موبایل/گالری: حساسیت کمتر */
     var tstep = Math.max(-tcap, Math.min(tcap, dy * tf));
     var nt = vScroll.target + tstep;
-    /* موبایل/گالری: یک ژست حداکثر یک عکس (≈.015 = زیر یک فریم) — هرگز دو عکس نه */
-    if(liveMob && touchAnchor !== null) nt = Math.max(touchAnchor - .015, Math.min(touchAnchor + .015, nt));
+    /* موبایل/گالری: یک ژست حداکثر یک عکس (≈.015 = زیر یک فریم) — هرگز دو عکس نه.
+       ولی وقتی هدف از شبکه‌ی عکس‌ها بیرون رفته (بازگشت به عکس اول یا عبور به
+       عکس آخر) کلمپِ لنگر باید حذف شود، وگرنه هیچ سوایپی نمی‌تواند از آخرین
+       عکس رد شود و گالری به تله‌ی یک‌طرفه تبدیل می‌شود. */
+    if(liveMob && !escaping && touchAnchor !== null)
+      nt = Math.max(touchAnchor - .015, Math.min(touchAnchor + .015, nt));
     vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, nt));
     touchY0 = e.touches[0].clientY;
   }
 }, {passive:false});
-/* موبایل/گالری: اسنپ پایان ژست به نزدیک‌ترین فریم — هر سوایپ دقیقاً روی یک عکس می‌نشیند */
+/* موبایل/گالری: اسنپ پایان ژست به نزدیک‌ترین فریم — هر سوایپ دقیقاً روی یک عکس می‌نشیند.
+   شبکه‌ی فریم‌ها از .12 تا .84 از ابتدای صحنه کشیده شده (i=0 → .12، i=N-1 → .84).
+
+   فقط وقتی هدف *داخل* شبکه است باید کار کند. اگر کاربر از
+   عکس اول به عقب سوایپ کند، هدف بیرون شبکه می‌افتد و اسنپِ کور آن را به عکس اول
+   برمی‌گرداند — یعنی گالری تله می‌شود و هرگز به سکشن قبلی نمی‌رسی. بیرون شبکه
+   فقط لبه‌ی نزدیک گرفته می‌شود (و آن هم با کفی که پایین‌تر از آستانه‌ی خروجِ
+   صحنه است، وگرنه باز هم سقف می‌سازد). */
 function liveSnap(){
   if(!(mqMobileBio.matches && vScroll.scene === 'live')) return;
   var s = sceneStart.live, r = SCENE_RANGE.live;
-  var f = ((vScroll.target - s) / r - .12) / .72 * (TUN_N - 1);
-  var i = Math.max(0, Math.min(TUN_N - 1, Math.round(f)));
-  vScroll.target = s + (.12 + .72 * i / (TUN_N - 1)) * r;
+  var gLo = LIVE_GRID_LO(), gHi = LIVE_GRID_HI(), t = vScroll.target;
+  if(t >= gLo && t <= gHi){
+    var f = ((t - s) / r - .12) / .72 * (TUN_N - 1);
+    var i = Math.max(0, Math.min(TUN_N - 1, Math.round(f)));
+    vScroll.target = s + (.12 + .72 * i / (TUN_N - 1)) * r;
+  } else if(t < gLo){
+    /* در حال ترک به عقب — کف باید زیر آستانه‌ی خروج (sceneStart.live - .015) باشد */
+    vScroll.target = (gLo - t < .004) ? gLo : t;
+  } else {
+    vScroll.target = (t - gHi < .004) ? gHi : t;
+  }
 }
 window.addEventListener('touchend', function(){ liveSnap(); }, {passive:true});
 window.addEventListener('touchcancel', function(){ liveSnap(); }, {passive:true});
