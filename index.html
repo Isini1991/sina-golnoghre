@@ -2354,12 +2354,18 @@ function tunnelUpdate(p, sectionOpacity){
   for(var i = 0; i < TUN_N; i++){
     var f = tunFrames[i];
     var rel = TUN_FOCUS + cam - i * TUN_GAP;
-    if(rel < -2300 || rel > TUN_PERSP * .96){
-      f.el.style.opacity = '0'; continue;
+    var passed = (rel - TUN_FOCUS) / TUN_GAP;
+    /* A passed photo must disappear before its perspective projection can
+       enlarge across the next focused photo. Reversible with the camera. */
+    if(rel < -2300 || rel > TUN_PERSP * .96 || passed >= .8){
+      f.el.style.opacity = '0'; f.el.style.visibility = 'hidden';
+      f.el.style.filter = 'none'; continue;
     }
     var dd = Math.abs(rel - TUN_FOCUS);
     f.el.style.visibility = 'visible';
     var op = Math.max(0, 1 - dd / 2500);
+    var frontFade = Math.max(0, Math.min(1, passed / .8));
+    op *= 1 - frontFade * frontFade * (3 - 2 * frontFade);
     if(rel > TUN_PERSP * .55) op *= Math.max(0, (TUN_PERSP * .96 - rel) / (TUN_PERSP * .41));
     if(rel < -1500) op *= Math.max(0, (rel + 2300) / 800);
     f.el.style.opacity = (op * (sectionOpacity || 1)).toFixed(3);
