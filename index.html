@@ -395,7 +395,7 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
 .site-credit a:hover,.site-credit a:focus-visible{color:#ff6a2a;border-color:#ff6a2a}
 
 @media(max-width:820px){
-  #live{touch-action:none}.tunnel{perspective:none}.tunnel-scene{transform-style:flat}
+  #live{touch-action:none}
   .frame{inset:10px;border-radius:16px}.enterbtn{top:26svh}.enterbtn .ring{padding:7px 24px}
   .site-nav{top:14px;left:14px;gap:16px;padding:11px 17px;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.10);border-radius:16px}.site-nav .links{gap:13px;flex-wrap:wrap}.site-nav .mark{font-size:17px}.site-nav a{font-size:12px;letter-spacing:.06em}
   html[dir="ltr"] .site-nav{gap:12px;padding:10px 15px}
@@ -453,6 +453,10 @@ body.cpu .tunnel{perspective:none;box-shadow:none}
 body.cpu .tunnel-scene{transform-style:flat}
 body.cpu .t-frame{will-change:transform,opacity}
 body.cpu .t-frame img{box-shadow:none}
+@media(max-width:820px){
+  body.cpu .tunnel{perspective:1150px}
+  body.cpu .tunnel-scene{transform-style:preserve-3d}
+}
 body.cpu .peg-canvas{display:none}
 body.cpu .bio360-canvas{display:none}
 body.cpu .scroll-rail{display:none}
@@ -2335,13 +2339,16 @@ window.__artLb = { open: function(i){ if(typeof i === 'number') artShow(i); artS
   }
 })();
 function tunnelUpdate(p, sectionOpacity){
-  if(cpuMode || mqMobileBio.matches) return tunnelUpdateLite(p, sectionOpacity);
+  var mobile = mqMobileBio.matches;
+  if(cpuMode && !mobile) return tunnelUpdateLite(p, sectionOpacity);
   if(!tunScene || !tunFrames || !tunFrames.length) return;
   var pc = Math.min(1, Math.max(0, (p - .12) / .72));
-  var target = Math.round(pc * (TUN_N - 1)) * TUN_GAP;
-  if(Math.abs(target - tunCam) > TUN_GAP * 6) tunCam = target;
-  tunCam += (target - tunCam) * .12;
-  tunSettling = Math.abs(target - tunCam) > .5;
+  var target = (mobile ? pc * (TUN_N - 1) : Math.round(pc * (TUN_N - 1))) * TUN_GAP;
+  /* Mobile position already follows the finger through vScroll smoothing.
+     Avoid rounding and a second camera lag, while keeping the original depth. */
+  if(mobile || Math.abs(target - tunCam) > TUN_GAP * 6) tunCam = target;
+  else tunCam += (target - tunCam) * .12;
+  tunSettling = !mobile && Math.abs(target - tunCam) > .5;
   var cam = tunCam;
   var best = -1, bd = 1e9;
   for(var i = 0; i < TUN_N; i++){
@@ -2351,13 +2358,14 @@ function tunnelUpdate(p, sectionOpacity){
       f.el.style.opacity = '0'; continue;
     }
     var dd = Math.abs(rel - TUN_FOCUS);
+    f.el.style.visibility = 'visible';
     var op = Math.max(0, 1 - dd / 2500);
     if(rel > TUN_PERSP * .55) op *= Math.max(0, (TUN_PERSP * .96 - rel) / (TUN_PERSP * .41));
     if(rel < -1500) op *= Math.max(0, (rel + 2300) / 800);
     f.el.style.opacity = (op * (sectionOpacity || 1)).toFixed(3);
     var settle = Math.min(1, dd / 640);
     f.el.style.transform = 'translate3d(calc(-50% + ' + (f.x * settle).toFixed(1) + 'px),calc(-50% + ' + (f.y * settle).toFixed(1) + 'px),' + rel.toFixed(1) + 'px) rotateY(' + (f.ry * settle).toFixed(2) + 'deg)';
-    f.el.style.filter = dd < 40 ? 'none' : 'blur(' + Math.min(13, dd / 110).toFixed(1) + 'px) brightness(' + Math.max(.22, 1 - dd / 2400).toFixed(2) + ')';
+    f.el.style.filter = mobile || dd < 40 ? 'none' : 'blur(' + Math.min(13, dd / 110).toFixed(1) + 'px) brightness(' + Math.max(.22, 1 - dd / 2400).toFixed(2) + ')';
     if(dd < bd){ bd = dd; best = i; }
   }
   if(best !== tunCur && best >= 0){
@@ -2376,9 +2384,7 @@ function tunnelUpdateLite(p, sectionOpacity){
   var iF = pc * (TUN_N - 1);
   if(Math.abs(iF - tunLitCam) < .0035 && Math.abs(so - tunLitOp) < .006) return;
   tunLitCam = iF; tunLitOp = so;
-  var mobile = mqMobileBio.matches;
-  var WIN = mobile ? 1 : 3.0, best = -1, bd = 1e9;
-  var spacing = mobile ? Math.max(280, tunScene.clientWidth) : 165;
+  var WIN = 3.0, best = -1, bd = 1e9;
   for(var i = 0; i < TUN_N; i++){
     var f = tunFrames[i];
     var d = i - iF, ad = d < 0 ? -d : d;
@@ -2394,8 +2400,8 @@ function tunnelUpdateLite(p, sectionOpacity){
     var im = f.img;
     if(im && !im.getAttribute('src') && im.getAttribute('data-src')) im.src = im.getAttribute('data-src');
     var op = Math.max(0, 1 - ad / WIN);
-    var sc = mobile ? 1 : 1 - Math.min(.28, ad * .1);
-    var tx = d * spacing;
+    var sc = 1 - Math.min(.28, ad * .1);
+    var tx = d * 165;
     f.el.style.opacity = (op * so).toFixed(3);
     f.el.style.transform = 'translate(-50%,-50%) translate(' + tx.toFixed(1) + 'px,0) scale(' + sc.toFixed(3) + ')';
     if(ad < bd){ bd = ad; best = i; }
