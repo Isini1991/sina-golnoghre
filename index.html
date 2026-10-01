@@ -395,6 +395,7 @@ html[dir=ltr] .chapter-title,html[dir=ltr] .hero-name,html[dir=ltr] .site-nav .m
 .site-credit a:hover,.site-credit a:focus-visible{color:#ff6a2a;border-color:#ff6a2a}
 
 @media(max-width:820px){
+  #live{touch-action:none}.tunnel{perspective:none}.tunnel-scene{transform-style:flat}
   .frame{inset:10px;border-radius:16px}.enterbtn{top:26svh}.enterbtn .ring{padding:7px 24px}
   .site-nav{top:14px;left:14px;gap:16px;padding:11px 17px;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.10);border-radius:16px}.site-nav .links{gap:13px;flex-wrap:wrap}.site-nav .mark{font-size:17px}.site-nav a{font-size:12px;letter-spacing:.06em}
   html[dir="ltr"] .site-nav{gap:12px;padding:10px 15px}
@@ -668,7 +669,7 @@ body.cpu .stage{box-shadow:none}
         <div>
           <h2 class="chapter-title" data-i18n="live.h2">گالری</h2>
         </div>
-        <p class="chapter-copy" data-i18n="live.copy">لحظاتی از نور، صحنه، اجرای زنده و پوسترهای گروه «کارنیوالسک».</p>
+        <p class="chapter-copy" data-i18n="live.copy">لحظاتی از نور، صحنه، اجرای زنده و پوسترها</p>
       </div>
 
       <!-- ✏️ تب آرشیو — عکس‌ها / پوسترها -->
@@ -1362,6 +1363,76 @@ var FX = {
   blur: 7,                         // px of focus blur at the edges
   scale: 0.016                     // depth scale at the edges
 };
+/* Section handoffs finish on a fully visible scene; internal scrubbing stays continuous. */
+var sceneHop = null, sceneWheelBlocked = false, sceneWheelTime = -Infinity;
+var sceneTouchBlocked = false, sceneKeyBlocked = false;
+function sceneTail(id){ return Math.min(FX.tail, SCENE_RANGE[id] * .12); }
+/* Gallery entry starts just after the lid finishes opening at sound p=.70. */
+function sceneEntryTail(id){
+  return id === 'live' ? Math.min(sceneTail(id), SCENE_RANGE.sound * .26) : sceneTail(id);
+}
+function cancelSceneHop(){
+  sceneHop = null; sceneWheelBlocked = false; sceneKeyBlocked = false;
+  sceneWheelTime = -Infinity;
+}
+function hopToScenePosition(position){
+  bioCancelSnap();
+  var to = Math.max(0, Math.min(RANGE_TOTAL, position));
+  var destination = null, opacity = {};
+  SCENES.forEach(function(id){
+    opacity[id] = sceneAlpha[id] || 0;
+    if(to >= sceneStart[id]) destination = id;
+  });
+  if(to < Math.max(bioSettleV, FX.tail * 1.8)) destination = null;
+  sceneHop = {from:vScroll.v, to:to, lastTime:performance.now(), elapsed:0,
+    duration:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0
+      : (vScroll.scene === 'sound' && destination === 'live' ? 900 : 1300),
+    origin:vScroll.scene, destination:destination, opacity:opacity,
+    stageOpacity:parseFloat(stageEl.style.opacity) || 0, fade:0};
+  if(destination === 'live') tunPrimeAll();
+  vScroll.target = to;
+}
+function sceneRenderPosition(id){
+  return sceneHop ? (sceneHop.destination === id ? sceneHop.to : sceneHop.from) : vScroll.v;
+}
+function sceneRenderProgress(id){
+  return Math.max(0, Math.min(1, (sceneRenderPosition(id) - sceneStart[id]) / SCENE_RANGE[id]));
+}
+function advanceVirtual(step){
+  if(sceneHop) return true;
+  var from = vScroll.target, next = Math.max(0, Math.min(RANGE_TOTAL, from + step));
+  for(var j = 1; j < SCENES.length; j++){
+    var i = step > 0 ? j : SCENES.length - j;
+    var prev = SCENES[i - 1], following = SCENES[i];
+    var boundary = sceneStart[following];
+    var lo = boundary - sceneEntryTail(following), hi = boundary + sceneTail(prev);
+    if(step > 0 && from < hi - .000001 && next > lo + .000001){
+      /* Finish the visible album scrub before freezing it for the handoff.
+         Fast input can put target at the exit while the lid is still closed. */
+      if(prev === 'sound' && vScroll.v < sceneStart.sound + SCENE_RANGE.sound * .70){
+        vScroll.target = lo - .000001;
+        return false;
+      }
+      hopToScenePosition(SCENE_LAND[following]);
+      return true;
+    }
+    if(step < 0 && from > lo + .000001 && next < hi - .000001){
+      if(prev === 'bio' && bioShell){
+        bioCancelSnap(); bioSnapIndex = bioBlocks.length - 1;
+        bioShell.scrollTop = bioShell.scrollHeight - bioShell.clientHeight;
+      }
+      hopToScenePosition(lo);
+      return true;
+    }
+  }
+  vScroll.target = next;
+  return false;
+}
+function guardSceneWheel(e){
+  if(e.timeStamp - sceneWheelTime >= 400) sceneWheelBlocked = false;
+  sceneWheelTime = e.timeStamp;
+  return !!sceneHop || sceneWheelBlocked;
+}
 /* ---------- bio shell ⇄ v mirror (زمان‌بندی اول/آخر بیو) ----------
    وقتی شل بیو صاحب اسکرول است v دیگر از wheel تغذیه نمیشود و میخکوب میماند؛
    این آینه پیشرفت داخلی شل را روی محور مجازی مینویسد:
@@ -1380,7 +1451,72 @@ function bioMirror(){
   var max = bioShell.scrollHeight - bioShell.clientHeight;
   if(max <= 10) return;
   var p = Math.max(0, Math.min(1, bioShell.scrollTop / max));
-  vScroll.target = bioSettleV + p * (bioExit() - bioSettleV);
+  var first = Math.max(bioSettleV, FX.tail * 1.8);
+  var last = Math.min(bioExit(), bioExitV);
+  vScroll.target = first + p * (last - first);
+}
+/* One bio gesture owns one card; only the transition may sit between cards. */
+var bioSnapRaf = 0, bioSnapActive = false, bioSnapIndex = 0;
+var bioWheelTime = -Infinity, bioWheelOwned = false, bioWheelTravel = 0;
+function bioOwnsInput(){
+  return bioShell && bioBlocks && bioBlocks.length > 1
+    && vScroll.target < sceneStart.instrument;
+}
+function bioCancelSnap(){
+  cancelAnimationFrame(bioSnapRaf);
+  bioSnapRaf = 0; bioSnapActive = false;
+}
+function bioSnapTo(index){
+  bioCancelSnap();
+  var max = Math.max(0, bioShell.scrollHeight - bioShell.clientHeight);
+  bioSnapIndex = Math.max(0, Math.min(bioBlocks.length - 1, index));
+  var from = bioShell.scrollTop, to = max * bioSnapIndex / (bioBlocks.length - 1);
+  var started = performance.now();
+  var duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 420;
+  bioSnapActive = true;
+  function tick(now){
+    var p = duration ? Math.min(1, (now - started) / duration) : 1;
+    bioShell.scrollTop = from + (to - from) * bioSstep(p);
+    bioMirror(); updateBio360(); bioOrbitUpdate();
+    if(p < 1){ bioSnapRaf = requestAnimationFrame(tick); }
+    else { bioSnapRaf = 0; bioSnapActive = false; }
+  }
+  bioSnapRaf = requestAnimationFrame(tick);
+}
+function bioAdvance(direction){
+  if(!bioOwnsInput()) return false;
+  if(bioSnapActive) return true;
+  var first = Math.max(bioSettleV, FX.tail * 1.8);
+  if(vScroll.target < first - .0001){
+    if(direction > 0) bioSnapTo(0);
+    else hopToScenePosition(0);
+    return true;
+  }
+  if(vScroll.target > Math.min(bioExit(), bioExitV) + .0001){
+    bioSnapTo(bioBlocks.length - 1);
+    return true;
+  }
+  var max = bioShell.scrollHeight - bioShell.clientHeight;
+  var index = max > 0 ? Math.round(bioShell.scrollTop / max * (bioBlocks.length - 1)) : 0;
+  var next = index + direction;
+  if(next < 0){ hopToScenePosition(0); }
+  else if(next >= bioBlocks.length){
+    hopToScenePosition(SCENE_LAND.instrument);
+  } else { bioSnapTo(next); }
+  return true;
+}
+function bioWheel(e){
+  var now = e.timeStamp, continuing = now - bioWheelTime < 400;
+  bioWheelTime = now;
+  if(continuing && bioWheelOwned) return true;
+  if(!continuing){ bioWheelOwned = false; bioWheelTravel = 0; }
+  if(!bioOwnsInput()) return false;
+  var dy = e.deltaY * (e.deltaMode === 1 ? 33 : (e.deltaMode === 2 ? innerHeight : 1));
+  bioWheelTravel += dy;
+  if(Math.abs(bioWheelTravel) < 12) return true;
+  bioWheelOwned = bioAdvance(bioWheelTravel > 0 ? 1 : -1);
+  bioWheelTravel = 0;
+  return bioWheelOwned;
 }
 function placeScene(id){
   var el = sceneEls[id];
@@ -1390,11 +1526,16 @@ function placeScene(id){
      first scene starts EARLY-capped so it stays invisible at v=0 (entry owns) */
   var s = sceneStart[id], r = SCENE_RANGE[id];
   var t = Math.min(FX.tail, r * .12);         /* short scenes: proportional fade so the scene owns its length */
-  var winS = (id === SCENES[0]) ? s + FX.tail * .6 : s - t;
-  var aIn  = Math.min(1, Math.max(0, (v - winS) / t));
+  var entryTail = sceneEntryTail(id);
+  var winS = (id === SCENES[0]) ? s + FX.tail * .6 : s - entryTail;
+  var aIn  = Math.min(1, Math.max(0, (v - winS) / entryTail));
   var aOut = 1 - Math.min(1, Math.max(0, (v - (s + r)) / t));
   var a = Math.min(aIn, aOut);
   a = a * a * (3 - 2 * a);                    // smoothstep both edges
+  if(sceneHop){
+    a = (sceneHop.opacity[id] || 0) * (1 - sceneHop.fade)
+      + (sceneHop.destination === id ? sceneHop.fade : 0);
+  }
   var d = (v - sceneCenter[id]) / (r * .5 + t * 2);
   sceneAlpha[id] = a;
   if(a < .003){
@@ -1408,8 +1549,8 @@ function placeScene(id){
   el.style.transform = 'none';                  // ثابت — بدون لرزش
   el.style.filter = 'none';                     // بدون بلر حین اسکرول
   el.classList.toggle('on', a > .5);
-  if(id === 'live') tunnelUpdate(sceneP(id), a);
-  if(id === 'sound') soundJewelUpdate(sceneP(id));
+  if(id === 'live') tunnelUpdate(sceneRenderProgress(id), sceneHop ? 1 : a);
+  if(id === 'sound') soundJewelUpdate(sceneRenderProgress(id));
 }
 function setScene(id){
   if(vScroll.scene === id) return;
@@ -1417,7 +1558,7 @@ function setScene(id){
   /* ورود به گالری (هر راهی: اسکرول، لینک ناوبری، زبان) → بارگذاری کل مجموعه */
   if(id === 'live' && typeof tunPrimeAll === 'function') tunPrimeAll();
   if(!id && pegFrameIndex !== 0){ pegFrameIndex = 0; drawPeg(); }
-  if(id !== 'live') gridEscape = 0;   /* خروج/ورود دوباره به گالری = حالت مرور تازه */
+  if(id !== 'live') liveTouch = null;
   stageEl.classList.toggle('gone', !!id);
   SCENES.forEach(function(s){
     var a = navLinks[s];
@@ -1431,26 +1572,30 @@ function applyScroll(){
      there is literally nothing to recompute — skip all DOM/layout work.
      (tunSettling keeps the loop alive while the gallery camera is still easing
      into place, so a settled v never freezes it mid-move.) */
-  if(v === _lastApplyV && vScroll.scene === _lastApplyScene && !tunSettling) return;
+  if(v === _lastApplyV && vScroll.scene === _lastApplyScene && !tunSettling && !sceneHop) return;
   SCENES.forEach(placeScene);
   /* stage (color-reveal) exits up-front with its own cinematic fade.
      exit fully by the time the first scene is fully in (tail*1.8) */
   var sv = v / (FX.tail * 1.8);
   var sa = Math.max(0, 1 - sv);
   sa = sa * sa * (3 - 2 * sa);
+  if(sceneHop){
+    sa = sceneHop.stageOpacity * (1 - sceneHop.fade)
+      + (sceneHop.destination === null ? sceneHop.fade : 0);
+  }
   stageEl.style.opacity = sa.toFixed(3);
   stageEl.style.transform = 'none';             // ثابت — بدون لرزش
   stageEl.style.filter = 'none';
   /* active scene = determined by scene boundaries so long scenes (like visual archive/gallery)
      own their full scroll range without premature switching */
   var cur = null;
-  if(v >= sceneStart.contact - 0.015){
+  if(v >= sceneStart.contact){
     cur = 'contact';
-  } else if(v >= sceneStart.live - 0.015){
+  } else if(v >= sceneStart.live){
     cur = 'live';
-  } else if(v >= sceneStart.sound - 0.015){
+  } else if(v >= sceneStart.sound){
     cur = 'sound';
-  } else if(v >= sceneStart.instrument - 0.015){
+  } else if(v >= sceneStart.instrument){
     cur = 'instrument';
   } else if(v >= sceneCenter.bio * .4){
     cur = 'bio';
@@ -1459,6 +1604,7 @@ function applyScroll(){
      و کراسفید خروج شروع نشده، صحنهی فعال bio بماند */
   if(cur === 'instrument' && v < bioExit() && bioShell
      && bioShell.scrollTop < bioShell.scrollHeight - bioShell.clientHeight - 4) cur = 'bio';
+  if(sceneHop) cur = sceneHop.fade < .5 ? sceneHop.origin : sceneHop.destination;
   setScene(cur);
   /* only run a scene's heavy per-frame work while that scene is actually on
      screen — while scrolling the gallery, bio/instrument must stay idle */
@@ -1477,17 +1623,39 @@ function updateRail(v){
   railEl.classList.toggle('hint', v < .012);
 }
 /* smoothed virtual scroll loop (rAF independent of the GL tick) */
-var vIdle = 0;
+var vIdle = 0, vFrameTime = performance.now();
 (function vLoop(){
   requestAnimationFrame(vLoop);
+  var frameNow = performance.now();
+  var frameMs = Math.min(50, Math.max(0, frameNow - vFrameTime));
+  vFrameTime = frameNow;
   if(document.hidden){ vIdle = 0; return; }
+  if(sceneHop){
+    var hop = sceneHop;
+    var now = performance.now();
+    /* A late frame must not skip a visible chunk of the crossfade. */
+    hop.elapsed += Math.min(50, Math.max(0, now - hop.lastTime));
+    hop.lastTime = now;
+    var p = hop.duration ? Math.min(1, hop.elapsed / hop.duration) : 1;
+    hop.fade = bioSstep(p);
+    vScroll.v = hop.from + (hop.to - hop.from) * hop.fade;
+    if(p === 1){ vScroll.v = vScroll.target = hop.to; sceneHop = null; }
+    vIdle = 0; applyScroll(); return;
+  }
   var d = vScroll.target - vScroll.v;
   if(Math.abs(d) < .00002){ vScroll.v = vScroll.target; applyScroll();
     vIdle++; if(vIdle > 120) return;   /* idle-skip: stop rAF when converged */
     return;
   }
   vIdle = 0;
-  vScroll.v += d * .07;
+  var mobileGallery = mqMobileBio.matches && vScroll.scene === 'live';
+  var movement = d * (mobileGallery ? 1 - Math.exp(-frameMs / 70) : .07);
+  /* Give the album opening a visible duration even during a wheel burst.
+     Reverse scrubbing keeps its existing response. */
+  if(movement > 0 && vScroll.v >= sceneStart.sound && vScroll.v < sceneStart.live){
+    movement = Math.min(movement, SCENE_RANGE.sound * frameMs / 1000);
+  }
+  vScroll.v += movement;
   applyScroll();
 })();
 /* wheel: hijack and feed virtual value.
@@ -1524,14 +1692,7 @@ function sceneSettled(id){
 }
 /* keyboard parity: arrows/PageUp-Down feed the bio orbit track while it can still move */
 function bioKeyScroll(dy){
-  if(vScroll.scene !== 'bio' || !bioShell) return false;
-  if(dy > 0 && !sceneSettled('bio')) return false;   /* وسط کراسفید ورود: محور مجازی */
-  var max = bioShell.scrollHeight - bioShell.clientHeight;
-  if(dy > 0){ if(bioShell.scrollTop >= max - 1) return false; }
-  else if(bioShell.scrollTop <= 0){ return false; }
-  bioShell.scrollTop = Math.max(0, Math.min(max, bioShell.scrollTop + dy * 1.2));
-  bioMirror();
-  return true;
+  return bioAdvance(dy > 0 ? 1 : -1);
 }
 window.addEventListener('wheel', function(e){
   if(!journey.complete){
@@ -1540,6 +1701,8 @@ window.addEventListener('wheel', function(e){
   }
   e.preventDefault();
   if(window.__sinaLock) return;          /* lightbox open — the page must not move */
+  if(guardSceneWheel(e)) return;
+  if(bioWheel(e)){ if(sceneHop) sceneWheelBlocked = true; return; }
   var sh = shellAfford(e.target, e.deltaY);
   var shId = shellScene(sh);            /* صحنهی صاحب شل — نه نزدیکترین صحنه */
   if(sh && !(e.deltaY > 0 && shId && !sceneSettled(shId))){
@@ -1551,41 +1714,98 @@ window.addEventListener('wheel', function(e){
   }
   var wf = (vScroll.scene === 'live') ? .00005 : .00015;   /* gallery: one photo per notch */
   var wstep = Math.max(-.004, Math.min(.004, e.deltaY * wf));
-  vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, vScroll.target + wstep));
+  if(advanceVirtual(wstep)) sceneWheelBlocked = true;
 }, {passive:false});
 /* keyboard */
 window.addEventListener('keydown', function(e){
   if(!journey.complete) return;
   if(window.__sinaLock) return;          /* lightbox handles its own arrows/escape */
+  if(/^(ArrowDown|ArrowUp|PageDown|PageUp)$/.test(e.key)
+    && (sceneHop || (e.repeat && sceneKeyBlocked))){ e.preventDefault(); return; }
+  if(e.repeat && bioOwnsInput() && /^(ArrowDown|ArrowUp|PageDown|PageUp)$/.test(e.key)){
+    e.preventDefault(); return;
+  }
   var step = .008, handled = false;
   switch(e.key){
     case 'ArrowDown': case 'PageDown':
       if(bioKeyScroll(260)){ handled = true; break; }
-      vScroll.target = Math.min(RANGE_TOTAL, vScroll.target + step * 3); handled = true; break;
+      advanceVirtual(step * 3); handled = true; break;
     case 'ArrowUp': case 'PageUp':
       if(bioKeyScroll(-260)){ handled = true; break; }
-      vScroll.target = Math.max(0, vScroll.target - step * 3); handled = true; break;
-    case 'Home': vScroll.target = 0; handled = true; break;
-    case 'End': vScroll.target = RANGE_TOTAL; handled = true; break;
+      advanceVirtual(-step * 3); handled = true; break;
+    case 'Home': cancelSceneHop(); hopToScenePosition(0); handled = true; break;
+    case 'End': cancelSceneHop(); hopToScenePosition(RANGE_TOTAL); handled = true; break;
   }
-  if(handled) e.preventDefault();
+  if(handled){ if(sceneHop) sceneKeyBlocked = true; e.preventDefault(); }
 }, {passive:false});
+window.addEventListener('keyup', function(e){
+  if(/^(ArrowDown|ArrowUp|PageDown|PageUp)$/.test(e.key)) sceneKeyBlocked = false;
+});
 /* touch swipe */
 var touchY0 = null;
-var touchAnchor = null;   /* v-target اول ژست — سقفِ «یک سوایپ = یک عکس» گالری موبایل */
-var gestTravel = 0;       /* مسافت انگشت تا این لحظه از ژست (px) — برای تشخیص سوایپِ عبور */
-var gridEscape = 0;       /* -1 در حال ترک به عقب، +1 به جلو، 0 داخل شبکه (فقط موبایل/گالری) */
-var browseMode = false;   /* ژست جاری «مرور عکس» است یا «عبور از گالری» */
-/* شبکه‌ی فریم‌های گالری: از .12 تا .84 ابتدای صحنه (باید پیش از touchmove تعریف شود) */
+var liveTouch = null;
+var bioTouchStart = null, bioTouchOwned = false, bioTouchDone = false;
 var LIVE_GRID_LO = function(){ return sceneStart.live + .12 * SCENE_RANGE.live; },
     LIVE_GRID_HI = function(){ return sceneStart.live + .84 * SCENE_RANGE.live; };
+function liveFramePosition(i){
+  return LIVE_GRID_LO() + (LIVE_GRID_HI() - LIVE_GRID_LO()) * i / Math.max(1, TUN_N - 1);
+}
+/* One gesture previews at most one adjacent photo, independent of event rate. */
+function startLiveTouch(y){
+  var span = (LIVE_GRID_HI() - LIVE_GRID_LO()) / Math.max(1, TUN_N - 1);
+  var i = Math.max(0, Math.min(TUN_N - 1, Math.round((vScroll.target - LIVE_GRID_LO()) / span)));
+  liveTouch = {y:y, travel:0, index:i, span:span,
+    distance:Math.max(120, Math.min(200, innerHeight * .24))};
+}
+function moveLiveTouch(y){
+  var g = liveTouch;
+  if(!g) return;
+  g.travel = g.y - y;
+  var direction = g.travel > 0 ? 1 : -1;
+  if(Math.abs(g.travel) >= 48 &&
+     ((g.index === 0 && direction < 0) || (g.index === TUN_N - 1 && direction > 0))){
+    hopToScenePosition(direction > 0 ? SCENE_LAND.contact : sceneStart.live - sceneEntryTail('live'));
+    sceneTouchBlocked = true; liveTouch = null;
+    return;
+  }
+  var offset = Math.max(-1, Math.min(1, g.travel / g.distance));
+  vScroll.target = Math.max(LIVE_GRID_LO(), Math.min(LIVE_GRID_HI(), liveFramePosition(g.index) + offset * g.span));
+}
+function finishLiveTouch(cancelled){
+  var g = liveTouch;
+  liveTouch = null;
+  if(!g || sceneHop) return;
+  var step = !cancelled && Math.abs(g.travel) >= 32 ? (g.travel > 0 ? 1 : -1) : 0;
+  vScroll.target = liveFramePosition(Math.max(0, Math.min(TUN_N - 1, g.index + step)));
+}
 window.addEventListener('touchstart', function(e){
+  sceneTouchBlocked = !!sceneHop;
+  bioTouchOwned = journey.complete && !window.__sinaLock && bioOwnsInput();
+  bioTouchStart = bioTouchOwned ? e.touches[0].clientY : null;
+  bioTouchDone = false;
   touchY0 = shellAfford(e.target, 0) ? null : e.touches[0].clientY;
-  if(touchY0 !== null){ touchAnchor = vScroll.target; gestTravel = 0; gridEscape = 0; }  /* هر ژست از نو */
+  liveTouch = null;
+  if(journey.complete && !window.__sinaLock && !sceneHop && mqMobileBio.matches
+     && vScroll.scene === 'live' && e.touches.length === 1) startLiveTouch(e.touches[0].clientY);
 }, {passive:true});
 window.addEventListener('touchmove', function(e){
-  if(!journey.complete || touchY0 === null) return;
+  if(!journey.complete || (touchY0 === null && !liveTouch)) return;
   if(window.__sinaLock){ e.preventDefault(); return; }
+  if(sceneHop || sceneTouchBlocked){ e.preventDefault(); return; }
+  if(liveTouch && e.touches.length !== 1){
+    finishLiveTouch(true); touchY0 = null; return;
+  }
+  if(liveTouch){
+    e.preventDefault(); moveLiveTouch(e.touches[0].clientY); return;
+  }
+  if(bioTouchOwned){
+    e.preventDefault();
+    var travel = bioTouchStart - e.touches[0].clientY;
+    if(!bioTouchDone && Math.abs(travel) >= 32){
+      bioAdvance(travel > 0 ? 1 : -1); bioTouchDone = true;
+    }
+    return;
+  }
   var dy = touchY0 - e.touches[0].clientY;
   if(Math.abs(dy) > 2){
     var sh = shellAfford(e.target, dy), shId = shellScene(sh);
@@ -1594,77 +1814,36 @@ window.addEventListener('touchmove', function(e){
       touchY0 = e.touches[0].clientY; return;
     }
     e.preventDefault();
-    /* touch pace mirrors the wheel ratio (live = 1/3) and caps flick jumps */
-    var liveMob = mqMobileBio.matches && vScroll.scene === 'live';
-    /* آستانهٔ «عبور» بر پایهٔ مسافتِ انگشت در همین ژست است: سوایپِ کوتاه (~۱۰۰px یا
-           کمتر) یعنی مرورِ عکس‌ها، سوایپِ بلند یعنی کاربر دنبال سکشن قبلی/بعدی است.
-           تصمیم‌گیری با «بیرون رفتن از شبکه» غلط بود: هر سوایپ دوباره کلمپ و اسنپ می‌شد
-           و کاربر عملاً در گالری گیر می‌کرد (۲۲ سوایپ در آزمون واقعی پیش از اصلاح). */
-    var gLo = LIVE_GRID_LO(), gHi = LIVE_GRID_HI();
-    if(touchY0 !== null) gestTravel += Math.abs(dy);
-    var passThru = liveMob && gestTravel > 130;
-    var escaping = liveMob && (passThru || gridEscape !== 0);
-    var tf = (vScroll.scene === 'live') ? (escaping ? .0005 : .00008) : .0005;
-    /* سقفِ گامِ عبور باید به‌اندازهٔ کل عرضِ گالری باشد نه یک تکهٔ کوچک: کل شبکهٔ
-       عکس‌ها ≈ .۲۶ از محور است، پس یک سوایپِ قاطعِ انگشت (~۵۰۰px) با ضریب .0005
-       حدود .۲۵ می‌دهد. با سقف .006 هر ژست فقط ~.۰۱ می‌رفت و کاربر ناچار بود ده‌ها
-       سوایپِ کوتاه بزند (۲۲ سوایپ در آزمون واقعی پیش از اصلاح). */
-    var tcap = (liveMob && !escaping) ? .003 : (escaping ? .03 : .006);
-    var tstep = Math.max(-tcap, Math.min(tcap, dy * tf));
-    var nt = vScroll.target + tstep;
-    if(passThru) gridEscape = nt < gLo ? -1 : (nt > gHi ? 1 : 0);
-    /* مرورِ عکس: یک ژست حداکثر یک عکس (≈.015) — هرگز دو عکس. در ژستِ «عبور» این
-       کلمپ حذف می‌شود، وگرنه هرگز از گالری رد نمی‌شویم. */
-    if(liveMob && !escaping && touchAnchor !== null)
-      nt = Math.max(touchAnchor - .015, Math.min(touchAnchor + .015, nt));
-    vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, nt));
+    var tf = vScroll.scene === 'live' ? .00008 : .0005;
+    var tstep = Math.max(-.006, Math.min(.006, dy * tf));
+    if(advanceVirtual(tstep)) sceneTouchBlocked = true;
     touchY0 = e.touches[0].clientY;
   }
 }, {passive:false});
-/* موبایل/گالری: اسنپ پایان ژست به نزدیک‌ترین فریم — هر سوایپ دقیقاً روی یک عکس می‌نشیند.
-   شبکه‌ی فریم‌ها از .12 تا .84 از ابتدای صحنه کشیده شده (i=0 → .12، i=N-1 → .84).
-
-   فقط وقتی هدف *داخل* شبکه است باید کار کند. اگر کاربر از
-   عکس اول به عقب سوایپ کند، هدف بیرون شبکه می‌افتد و اسنپِ کور آن را به عکس اول
-   برمی‌گرداند — یعنی گالری تله می‌شود و هرگز به سکشن قبلی نمی‌رسی. بیرون شبکه
-   فقط لبه‌ی نزدیک گرفته می‌شود (و آن هم با کفی که پایین‌تر از آستانه‌ی خروجِ
-   صحنه است، وگرنه باز هم سقف می‌سازد). */
-function liveSnap(){
-  if(!(mqMobileBio.matches && vScroll.scene === 'live')) return;
-  var s = sceneStart.live, r = SCENE_RANGE.live;
-  var gLo = LIVE_GRID_LO(), gHi = LIVE_GRID_HI(), t = vScroll.target;
-  /* اگر این ژست از لبهٔ شبکه بیرون رفته، دیگر هیچ کلمپی نباید اعمال شود: هر
-     بازگشت به نزدیک‌ترین فریم دقیقاً همان چیزی بود که کاربر را در گالری گیر می‌کرد. */
-  if(gridEscape !== 0) return;
-  if(t >= gLo && t <= gHi){
-    var f = ((t - s) / r - .12) / .72 * (TUN_N - 1);
-    var i = Math.max(0, Math.min(TUN_N - 1, Math.round(f)));
-    vScroll.target = s + (.12 + .72 * i / (TUN_N - 1)) * r;
-  } else if(t < gLo){
-    /* در حال ترک به عقب — کف باید زیر آستانهٔ خروج (sceneStart.live - .015) باشد */
-    vScroll.target = (gLo - t < .004) ? gLo : t;
-  } else {
-    vScroll.target = (t - gHi < .004) ? gHi : t;
-  }
+function finishTouch(e){
+  finishLiveTouch(e.type === 'touchcancel');
+  touchY0 = null;
+  sceneTouchBlocked = false;
+  bioTouchStart = null; bioTouchOwned = false; bioTouchDone = false;
 }
-window.addEventListener('touchend', function(){ liveSnap(); }, {passive:true});
-window.addEventListener('touchcancel', function(){ liveSnap(); }, {passive:true});
+window.addEventListener('touchend', finishTouch, {passive:true});
+window.addEventListener('touchcancel', finishTouch, {passive:true});
 /* nav links jump directly on the virtual axis */
-/* نقطهی فرود هر لینک = جایی که صحنه کاملاً «جا افتاده» دیده میشود، نه وسط کراسفید.
-   bio: فرود بعد از محوشدن کامل استیج (tail*1.8) و رو‌ی آستانهی settled؛ شل بیو هم
-   صفر میشود تا سکشن همیشه از ابتدا باز شود، نه از جای رهاشدهی قبلی.
-   instrument: دقیقاً sceneStart — صحنه کامل ظاهرشده، فریم ۰ از سکانس سردسته و
-   تیتر اول («موسیقی») یعنی آغاز واقعی سکشن، نه میانهی انیمیشن. بقیه: فرمول قبلی. */
+/* Land beyond the previous scene's fade, including navigation links. */
 var SCENE_LAND = {};
-SCENES.forEach(function(id){ SCENE_LAND[id] = sceneStart[id] + SCENE_RANGE[id] * .12; });
+SCENES.forEach(function(id, i){
+  var start = sceneStart[id];
+  SCENE_LAND[id] = Math.max(start + SCENE_RANGE[id] * .12,
+    i ? start + sceneTail(SCENES[i - 1]) : 0);
+});
 SCENE_LAND.bio = Math.max(bioSettleV, FX.tail * 1.8);
-SCENE_LAND.instrument = sceneStart.instrument;
 Object.keys(navLinks).forEach(function(id){
   navLinks[id].addEventListener('click', function(e){
     e.preventDefault();
     if(!journey.complete) return;   // ورود فقط با دکمهی «ورود»
-    if(id === 'bio' && bioShell) bioShell.scrollTop = 0;
-    vScroll.target = SCENE_LAND[id];
+    cancelSceneHop(); bioCancelSnap();
+    if(id === 'bio' && bioShell){ bioSnapIndex = 0; bioShell.scrollTop = 0; }
+    hopToScenePosition(SCENE_LAND[id]);
   });
 });
 /* لوگو «سینا» در نوار بالا = دکمهی خانه: بازگشت به آغاز محور مجازی */
@@ -1672,7 +1851,7 @@ var markLink = document.querySelector('.site-nav .mark');
 if(markLink) markLink.addEventListener('click', function(e){
   e.preventDefault();
   if(!journey.complete) return;
-  vScroll.target = 0;
+  cancelSceneHop(); hopToScenePosition(0);
 });
 /* ---------- instrument frame sequence (driven by virtual scroll) ---------- */
 var pegCanvas = document.getElementById('pegCanvas');
@@ -1703,7 +1882,7 @@ function updatePeg(){
      play during the handoff and no dead scroll after the final movement */
   var s = sceneStart.instrument, r = SCENE_RANGE.instrument;
   var winS = s + FX.tail * .6, winE = s + r - Math.min(FX.tail, r * .12);
-  var p = (vScroll.v - winS) / (winE - winS);
+  var p = (sceneRenderPosition('instrument') - winS) / (winE - winS);
   p = Math.max(0, Math.min(1, p));
   var idx = Math.round(p * (pegCount - 1));
   if(idx !== pegFrameIndex){ pegFrameIndex = idx; drawPeg(); }
@@ -2043,9 +2222,11 @@ function tunPrimeAll(){
 buildTunnel();
 function tunSwitch(key){
   if(!tunSets[key] || key === tunSetKey) return;
+  liveTouch = null;
   tunSetKey = key;
   tunItems = tunSets[key];
   buildTunnel();
+  if(mqMobileBio.matches && vScroll.scene === 'live') vScroll.target = LIVE_GRID_LO();
   tunPrimeAll();      /* تب جدید = مجموعه‌ی تازه، باید همه بارگذاری شوند */
   _lastApplyV = -1;   /* force re-render with the new frame set */
   applyScroll();
@@ -2154,7 +2335,7 @@ window.__artLb = { open: function(i){ if(typeof i === 'number') artShow(i); artS
   }
 })();
 function tunnelUpdate(p, sectionOpacity){
-  if(cpuMode) return tunnelUpdateLite(p, sectionOpacity);
+  if(cpuMode || mqMobileBio.matches) return tunnelUpdateLite(p, sectionOpacity);
   if(!tunScene || !tunFrames || !tunFrames.length) return;
   var pc = Math.min(1, Math.max(0, (p - .12) / .72));
   var target = Math.round(pc * (TUN_N - 1)) * TUN_GAP;
@@ -2195,7 +2376,9 @@ function tunnelUpdateLite(p, sectionOpacity){
   var iF = pc * (TUN_N - 1);
   if(Math.abs(iF - tunLitCam) < .0035 && Math.abs(so - tunLitOp) < .006) return;
   tunLitCam = iF; tunLitOp = so;
-  var WIN = 3.0, best = -1, bd = 1e9;
+  var mobile = mqMobileBio.matches;
+  var WIN = mobile ? 1 : 3.0, best = -1, bd = 1e9;
+  var spacing = mobile ? Math.max(280, tunScene.clientWidth) : 165;
   for(var i = 0; i < TUN_N; i++){
     var f = tunFrames[i];
     var d = i - iF, ad = d < 0 ? -d : d;
@@ -2211,8 +2394,8 @@ function tunnelUpdateLite(p, sectionOpacity){
     var im = f.img;
     if(im && !im.getAttribute('src') && im.getAttribute('data-src')) im.src = im.getAttribute('data-src');
     var op = Math.max(0, 1 - ad / WIN);
-    var sc = 1 - Math.min(.28, ad * .1);
-    var tx = d * 165;
+    var sc = mobile ? 1 : 1 - Math.min(.28, ad * .1);
+    var tx = d * spacing;
     f.el.style.opacity = (op * so).toFixed(3);
     f.el.style.transform = 'translate(-50%,-50%) translate(' + tx.toFixed(1) + 'px,0) scale(' + sc.toFixed(3) + ')';
     if(ad < bd){ bd = ad; best = i; }
@@ -2239,7 +2422,7 @@ function bioOnScroll(){
   if(bioScrollRaf) return;
   bioScrollRaf = requestAnimationFrame(function(){
     bioScrollRaf = 0;
-    bioMirror();
+    if(bioSnapActive) bioMirror();
     updateBio360();
     bioOrbitUpdate();
   });
@@ -2297,6 +2480,13 @@ function updateBio360(){
    6 blocks × equal spacers (100svh desktop / 75svh mobile) → block i is centered at p = i/(n-1). */
 var bioFlow = document.querySelector('.bio-chapter .chapter-shell');
 var bioBlocks = Array.prototype.slice.call(document.querySelectorAll('.bio-block'));
+window.addEventListener('resize', function(){
+  if(!bioOwnsInput() || vScroll.target < Math.max(bioSettleV, FX.tail * 1.8)) return;
+  var max = Math.max(0, bioShell.scrollHeight - bioShell.clientHeight);
+  bioCancelSnap();
+  bioShell.scrollTop = max * bioSnapIndex / (bioBlocks.length - 1);
+  bioMirror(); updateBio360(); bioOrbitUpdate();
+});
 function bioSstep(t){ return t * t * (3 - 2 * t); }
 function bioOrbitUpdate(){
   if(!bioFlow || !bioBlocks.length) return;
@@ -2320,7 +2510,7 @@ function bioOrbitUpdate(){
     el.classList.toggle('live', vis > .85);
   }
 }
-window.__sina = { ranges: function(){ return SCENE_RANGE; }, jump: function(v){ vScroll.v = vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, v)); applyScroll(); },
+window.__sina = { ranges: function(){ return SCENE_RANGE; }, jump: function(v){ cancelSceneHop(); bioCancelSnap(); vScroll.v = vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, v)); applyScroll(); },
   getState: function(){ return {
   journey: journey.complete ? 'complete' : (journey.playing ? 'playing' : 'idle'),
   scene: vScroll.scene, v: +vScroll.v.toFixed(3), vTarget: +vScroll.target.toFixed(3),
@@ -2328,7 +2518,7 @@ window.__sina = { ranges: function(){ return SCENE_RANGE; }, jump: function(v){ 
   liveFrames: tunFrames.length, cpu: cpuMode
 }; } };
 /* expose virtual-scroll driver for verification & nav testing */
-window.__sina.goto = function(v){ vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, v)); };
+window.__sina.goto = function(v){ cancelSceneHop(); bioCancelSnap(); vScroll.target = Math.max(0, Math.min(RANGE_TOTAL, v)); };
 window.__sina.sceneIndex = function(id){
   var el = document.getElementById(id);
   return el ? SCENES.indexOf(id) : -1;
@@ -2336,6 +2526,7 @@ window.__sina.sceneIndex = function(id){
 window.__sina.gotoScene = function(id){
   var si = SCENES.indexOf(id);
   if(si < 0) return false;
+  cancelSceneHop(); bioCancelSnap();
   vScroll.v = vScroll.target = sceneCenter[id];
   applyScroll();
   return true;
