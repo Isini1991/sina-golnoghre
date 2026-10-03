@@ -16,11 +16,11 @@
 <title>سینا گل‌نقره — Bass / Sound / Live</title>
 <meta name="description" content="سینا گل‌نقره — بیس، صدا و اجرا">
 <meta name="theme-color" content="#000000">
-<link rel="icon" href="assets/favicon-sina.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="assets/favicon-sina.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/icon-sina-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="assets/icon-sina-16.png">
-<link rel="apple-touch-icon" href="assets/icon-sina-180.png">
+<link rel="icon" href="assets/favicon-sina.ico?v=20261003-white-s" sizes="any">
+<link rel="icon" type="image/svg+xml" href="assets/favicon-sina.svg?v=20261003-white-s">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icon-sina-32.png?v=20261003-white-s">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/icon-sina-16.png?v=20261003-white-s">
+<link rel="apple-touch-icon" href="assets/icon-sina-180.png?v=20261003-white-s">
 <style>
 @font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Vazirmatn';src:url('assets/fonts/Vazirmatn-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
@@ -1460,9 +1460,9 @@ function bioMirror(){
   var last = Math.min(bioExit(), bioExitV);
   vScroll.target = first + p * (last - first);
 }
-/* One bio gesture owns one card; only the transition may sit between cards. */
+/* Bio always lands on a card; fresh wheel input can continue at each landing. */
 var bioSnapRaf = 0, bioSnapActive = false, bioSnapIndex = 0;
-var bioWheelTime = -Infinity, bioWheelOwned = false, bioWheelTravel = 0;
+var bioWheelTime = -Infinity, bioWheelTravel = 0, bioWheelDirection = 0;
 function bioOwnsInput(){
   return bioShell && bioBlocks && bioBlocks.length > 1
     && vScroll.target < sceneStart.instrument;
@@ -1470,6 +1470,7 @@ function bioOwnsInput(){
 function bioCancelSnap(){
   cancelAnimationFrame(bioSnapRaf);
   bioSnapRaf = 0; bioSnapActive = false;
+  bioWheelTime = -Infinity; bioWheelTravel = 0; bioWheelDirection = 0;
 }
 function bioSnapTo(index){
   bioCancelSnap();
@@ -1480,11 +1481,11 @@ function bioSnapTo(index){
   var duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 420;
   bioSnapActive = true;
   function tick(now){
-    var p = duration ? Math.min(1, (now - started) / duration) : 1;
+    var p = duration ? Math.max(0, Math.min(1, (now - started) / duration)) : 1;
     bioShell.scrollTop = from + (to - from) * bioSstep(p);
     bioMirror(); updateBio360(); bioOrbitUpdate();
     if(p < 1){ bioSnapRaf = requestAnimationFrame(tick); }
-    else { bioSnapRaf = 0; bioSnapActive = false; }
+    else { bioSnapRaf = 0; bioSnapActive = false; bioContinueWheel(); }
   }
   bioSnapRaf = requestAnimationFrame(tick);
 }
@@ -1511,17 +1512,26 @@ function bioAdvance(direction){
   return true;
 }
 function bioWheel(e){
-  var now = e.timeStamp, continuing = now - bioWheelTime < 400;
-  bioWheelTime = now;
-  if(continuing && bioWheelOwned) return true;
-  if(!continuing){ bioWheelOwned = false; bioWheelTravel = 0; }
   if(!bioOwnsInput()) return false;
   var dy = e.deltaY * (e.deltaMode === 1 ? 33 : (e.deltaMode === 2 ? innerHeight : 1));
-  bioWheelTravel += dy;
+  if(!dy) return true;
+  var now = performance.now(), direction = dy > 0 ? 1 : -1;
+  if(now - bioWheelTime > 400 || direction !== bioWheelDirection) bioWheelTravel = 0;
+  bioWheelTime = now; bioWheelDirection = direction;
+  /* Keep at most one pending step, and never replay an old scrolling backlog. */
+  bioWheelTravel = Math.max(-120, Math.min(120, bioWheelTravel + dy));
+  if(bioSnapActive) return true;
   if(Math.abs(bioWheelTravel) < 12) return true;
-  bioWheelOwned = bioAdvance(bioWheelTravel > 0 ? 1 : -1);
+  direction = bioWheelTravel > 0 ? 1 : -1;
   bioWheelTravel = 0;
-  return bioWheelOwned;
+  return bioAdvance(direction);
+}
+function bioContinueWheel(){
+  if(sceneHop || !bioOwnsInput() || performance.now() - bioWheelTime > 180
+    || Math.abs(bioWheelTravel) < 60) return;
+  var direction = bioWheelDirection;
+  bioWheelTravel = 0;
+  bioAdvance(direction);
 }
 function placeScene(id){
   var el = sceneEls[id];
