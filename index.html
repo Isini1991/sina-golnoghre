@@ -6,6 +6,8 @@
 <link rel="preload" href="assets/fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Vazirmatn-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/dual/background.webp?v=11" as="image" fetchpriority="high">
+<link rel="preload" href="assets/dual/foreground3.webp?v=3" as="image" fetchpriority="high">
 <script>
 (function(){
   var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -16,6 +18,20 @@
 <title>سینا گل‌نقره — Bass / Sound / Live</title>
 <meta name="description" content="سینا گل‌نقره — بیس، صدا و اجرا">
 <meta name="theme-color" content="#000000">
+<link rel="canonical" href="https://www.sinawings.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="سینا گل‌نقره">
+<meta property="og:locale" content="fa_IR">
+<meta property="og:title" content="سینا گل‌نقره — Bass / Sound / Live">
+<meta property="og:description" content="سینا گل‌نقره — بیس، صدا و اجرا">
+<meta property="og:url" content="https://www.sinawings.com/">
+<meta property="og:image" content="https://www.sinawings.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="سینا گل‌نقره — Bass / Sound / Live">
+<meta name="twitter:description" content="سینا گل‌نقره — بیس، صدا و اجرا">
+<meta name="twitter:image" content="https://www.sinawings.com/assets/og-image.jpg">
 <link rel="icon" href="assets/favicon-sina.ico?v=20261023-s2" sizes="any">
 <link rel="icon" type="image/svg+xml" href="assets/favicon-sina.svg?v=20261023-s2">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-sina-32.png?v=20261023-s2">
@@ -486,7 +502,7 @@ html.ios .t-frame figcaption{backdrop-filter:none!important;-webkit-backdrop-fil
       <video
         class="wingvid wing-webm"
         id="wingVid"
-        src="content/wings_alpha.webm"
+        data-src="content/wings_alpha.webm?v=2"
         autoplay
         muted
         loop
@@ -498,10 +514,28 @@ html.ios .t-frame figcaption{backdrop-filter:none!important;-webkit-backdrop-fil
       <img
         class="wingvid wing-ios"
         id="wingIOS"
-        src="content/wings_ios.webp?v=10"
+        data-src="content/wings_ios.webp?v=10"
         alt=""
         aria-hidden="true"
         draggable="false">
+<script>
+/* load only the hero-wings asset this device actually shows (iOS: animated WebP, others: WebM),
+   after the hero textures are in (so they never fight over bandwidth); retried on error */
+window.__loadWings = function(){
+  if(window.__wingsLoaded) return;
+  window.__wingsLoaded = true;
+  var d = document.documentElement, v = document.getElementById('wingVid'), i = document.getElementById('wingIOS');
+  var el = d.classList.contains('ios') ? i : v;
+  if(!el) return;
+  var base = el.getAttribute('data-src'), n = 0;
+  el.addEventListener('error', function(){
+    if(++n <= 3) setTimeout(function(){ el.src = base + (base.indexOf('?') > -1 ? '&' : '?') + 'r=' + n; if(el === v){ var p2 = v.play && v.play(); if(p2 && p2.catch) p2.catch(function(){}); } }, 800 * n);
+  });
+  el.src = base;
+  if(el === v){ var pr = v.play && v.play(); if(pr && pr.catch) pr.catch(function(){}); }
+};
+setTimeout(window.__loadWings, 3000);
+</script>
       <button class="enterbtn" id="enterbtn" type="button">
         <span class="ring"><span class="word" data-i18n="enter.word">ورود</span></span>
       </button>
@@ -764,7 +798,10 @@ if(noGL){
   /* graceful fallback: show static foreground instead of blocking entire site */
   canvas.style.display = 'none';
   var fgFall = document.getElementById('wingIOS');
-  if(fgFall) fgFall.style.display = 'block';
+  if(fgFall){
+    if(!fgFall.getAttribute('src') && fgFall.getAttribute('data-src')) fgFall.src = fgFall.getAttribute('data-src');
+    fgFall.style.display = 'block';
+  }
   var ebFall = document.getElementById('enterbtn');
   if(ebFall) ebFall.classList.add('ready');
 }
@@ -1113,19 +1150,46 @@ function loadTex(t, image){
 var texB = makeTex();
 var texF = makeTex();
 
+/* hero textures: retried on error/stall, and the idle-frozen render loop is woken when they land
+   (before: a texture arriving after ~120 idle frames was never drawn -> blank opening until refresh) */
+var heroTexDone = {bg:false, fg:false};
+function heroTexSettled(){ if(heroTexDone.bg && heroTexDone.fg && window.__loadWings) window.__loadWings(); }
+function loadHeroImg(img, src, onOk, key){
+  var tries = 0, settled = false, timer = 0;
+  function attempt(){
+    clearTimeout(timer);
+    img.src = tries ? src + (src.indexOf('?') > -1 ? '&' : '?') + 'r=' + tries : src;
+    timer = setTimeout(function(){ if(!settled) fail(); }, 12000 + tries * 4000);   /* stalled download */
+  }
+  function fail(){
+    if(settled) return;
+    clearTimeout(timer);
+    if(++tries <= 4){ setTimeout(attempt, 400 * tries); return; }
+    settled = true; heroTexDone[key] = true;
+    if(key === 'bg' && enterBtn) enterBtn.classList.add('ready');   /* never leave the visitor without the Enter button */
+    heroTexSettled();
+  }
+  img.onload = function(){
+    if(settled) return;
+    settled = true; clearTimeout(timer);
+    onOk();
+    idleSkips = 0;                       /* wake the render loop so the new texture is actually drawn */
+    heroTexDone[key] = true; heroTexSettled();
+  };
+  img.onerror = fail;
+  attempt();
+}
 var bgImg = new Image();
-bgImg.src = 'assets/dual/background.webp?v=11';
-bgImg.onload = function(){
+loadHeroImg(bgImg, 'assets/dual/background.webp?v=11', function(){
   imgW = bgImg.naturalWidth; imgH = bgImg.naturalHeight;
   loadTex(texB, bgImg);
   imgReady = true;
   if(enterBtn) enterBtn.classList.add('ready');
-};
+}, 'bg');
 var fgImg = new Image();
-fgImg.src = 'assets/dual/foreground3.webp?v=3';
-fgImg.onload = function(){
+loadHeroImg(fgImg, 'assets/dual/foreground3.webp?v=3', function(){
   loadTex(texF, fgImg);
-};
+}, 'fg');
 
 /* ---------- mouse parallax (smoothed) ---------- */
 var mouse = {x:0, y:0, tx:0, ty:0, depth:0, tdepth:0};
@@ -1149,8 +1213,13 @@ function resize(){
   canvas.width  = Math.round(W * dpr);
   canvas.height = Math.round(H * dpr);
   if(!noGL) gl.viewport(0, 0, canvas.width, canvas.height);
+  idleSkips = 0;                         /* resizing clears the canvas: draw again */
 }
 window.addEventListener('resize', resize);
+document.addEventListener('visibilitychange', function(){ if(!document.hidden) idleSkips = 0; });
+/* GPU context loss (low-memory phones): allow restore; if it happens before entering, reload cleanly */
+canvas.addEventListener('webglcontextlost', function(e){ e.preventDefault(); });
+canvas.addEventListener('webglcontextrestored', function(){ if(!journey.complete) location.reload(); });
 resize();
 
 /* ---------- journey driver (button, not scroll) ---------- */
@@ -1179,6 +1248,8 @@ function startJourney(){
   journey.t0 = performance.now();
   /* راهنما دیگر مخفی نمیشود — در تمام صحنه‌ها visible است */
   enterBtn.classList.add('gone');
+  startBioLoad();
+  setTimeout(startPegLoad, 2200);
   if(wingVid){
     wingVid.classList.add('gone');
     setTimeout(function(){ try{ wingVid.pause(); }catch(err){} }, 950);
@@ -1581,6 +1652,9 @@ function setScene(id){
   if(!id && pegFrameIndex !== 0){ pegFrameIndex = 0; drawPeg(); }
   if(id !== 'live') liveTouch = null;
   stageEl.classList.toggle('gone', !!id);
+  /* safety nets: whatever way a scene is reached (nav link, hop, jump), its assets start loading */
+  if(id === 'bio') startBioLoad();
+  if(id === 'instrument' || id === 'sound' || id === 'live'){ startBioLoad(); startPegLoad(true); }
   SCENES.forEach(function(s){
     var a = navLinks[s];
     if(a) a.classList.toggle('cur', s === id);
@@ -2107,15 +2181,21 @@ window.__albumTabClick = function(i){
 })();
 window.__albumEn = applyAlbum;
 window.ALBUMS = ALBUMS;
-for(var pi = 0; pi < pegCount; pi++){
-  (function(idx){
-    var im = new Image(); im.decoding = 'async';
-    im.onload = function(){ if(idx === pegFrameIndex) drawPeg(); };
-    /* idle-defer: spread 120 headstock frames over idle callbacks to avoid parse-time jank */
-    function loadPeg(){ im.src = pegSrc(idx); pegFrames[idx] = im; }
-    if(window.requestIdleCallback) window.requestIdleCallback(loadPeg, {timeout:5000+idx*40});
-    else setTimeout(loadPeg, 50+idx*8);
-  })(pi);
+var pegLoadStarted = false;
+function startPegLoad(fast){
+  if(pegLoadStarted) return;
+  pegLoadStarted = true;
+  for(var pi = 0; pi < pegCount; pi++){
+    (function(idx){
+      var im = new Image(); im.decoding = 'async';
+      im.onload = function(){ if(idx === pegFrameIndex) drawPeg(); };
+      (function(){ var n = 0; im.onerror = function(){ if(++n <= 2) setTimeout(function(){ im.src = pegSrc(idx) + '&r=' + n; }, 700 * n); }; })();
+      /* idle-defer: spread the 120 headstock frames over idle callbacks (starts after the visitor enters) */
+      function loadPeg(){ im.src = pegSrc(idx); pegFrames[idx] = im; }
+      if(window.requestIdleCallback) window.requestIdleCallback(loadPeg, {timeout:(fast ? 150 : 1500) + idx*25});
+      else setTimeout(loadPeg, 50+idx*8);
+    })(pi);
+  }
 }
 window.addEventListener('resize', function(){ sizePegCanvas(); drawPeg(); });
 setTimeout(function(){ sizePegCanvas(); }, 80);
@@ -2467,20 +2547,24 @@ function bioOnScroll(){
 }
 if(bioShell) bioShell.addEventListener('scroll', bioOnScroll, {passive:true});
 function bioSrc(i){ return 'assets/bio-360/sina-' + String(i * 2 + 1).padStart(3, '0') + '.webp'; }
-if(bioCanvas && BIO360_N > 0){
+var bioLoadStarted = false;
+function startBioLoad(){
+  if(bioLoadStarted || !bioCanvas || BIO360_N <= 0) return;
+  bioLoadStarted = true;
   for(var bi = 0; bi < BIO360_N; bi++){
     var bim = new Image();
     bim.onload = (function(bidx){                       /* reload mid-bio: first draw may hit before the
                                                            frame's image arrives → redraw on arrival */
       return function(){ if(bidx === bioFrameIndex) drawBio360(); };
     })(bi);
-    /* idle-defer: spread bio360 frames over idle callbacks */
-    function loadBio(idx, img){ img.src = bioSrc(idx); bioFrames.push(img); }
-    if(window.requestIdleCallback) window.requestIdleCallback((function(ii,im){ return function(){ loadBio(ii,im); }; })(bi,bim), {timeout:5000+bi*80});
+    (function(img, idx){ var n = 0; img.onerror = function(){ if(++n <= 2) setTimeout(function(){ img.src = bioSrc(idx) + '?r=' + n; }, 700 * n); }; })(bim, bi);
+    /* idle-defer: spread bio360 frames over idle callbacks (starts when the visitor enters) */
+    function loadBio(idx, img){ bioFrames[idx] = img; img.src = bioSrc(idx); }
+    if(window.requestIdleCallback) window.requestIdleCallback((function(ii,im){ return function(){ loadBio(ii,im); }; })(bi,bim), {timeout:300+bi*30});
     else setTimeout((function(ii,im){ return function(){ loadBio(ii,im); }; })(bi,bim), 100+bi*12);
   }
-  if(bioStage) bioStage.classList.add('has-frames');
 }
+if(bioCanvas && BIO360_N > 0 && bioStage) bioStage.classList.add('has-frames');
 function sizeBio360(){
   if(!bioCanvas || !bioCtx || !BIO360_N) return;
   var r = bioCanvas.getBoundingClientRect();
