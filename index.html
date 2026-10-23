@@ -463,6 +463,12 @@ body.cpu .bio360-canvas{display:none}
 body.cpu .scroll-rail{display:none}
 /* keep the fallback static image from being an oversized shadow layer */
 body.cpu .stage{box-shadow:none}
+/* iOS / WebKit: the 3D corridor (preserve-3d + overflow clip + rounded corners + backdrop-filter)
+   renders badly there. The same depth look is drawn with flat 2D projection instead (see tunnelUpdate). */
+html.ios .tunnel{perspective:none!important;isolation:isolate}
+html.ios .tunnel-scene{transform-style:flat!important}
+html.ios .t-frame{transform-style:flat!important;will-change:transform,opacity}
+html.ios .t-frame figcaption{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 </style>
 </head>
 <body>
@@ -2188,6 +2194,7 @@ var TUN_LABEL_EN = { band: 'Carnivalesque', live: 'Live Stage', poster: 'Poster'
 window.__tunLabel = function(item){ return TUN_LABEL_EN[item.type] || 'Live Stage'; };
 var TUN_N = tunItems.length, TUN_GAP = 540, TUN_FOCUS = 430, TUN_PERSP = 1150;
 var tunFrames = [], tunCur = -1;
+var tunIOS = document.documentElement.classList.contains('ios');   /* WebKit on iPhone/iPad: flat projected tunnel */
 var tunScene = document.getElementById('tunnelScene');
 var tunCount = document.getElementById('tunnelCount');
 var tunType = document.getElementById('tunnelType');
@@ -2207,7 +2214,7 @@ function buildTunnel(){
     var liteSrc = dir + 'lite/' + item.file + '.webp';
     var fig = document.createElement('figure');
     fig.className = 't-frame' + (item.tall ? ' t-tall' : '');
-    var imgAttr = cpuMode ? ('data-src="' + liteSrc + '" decoding="async"') : ('src="' + fullSrc + '" loading="lazy" decoding="async"');
+    var imgAttr = cpuMode ? ('data-src="' + liteSrc + '" decoding="async"') : ('src="' + fullSrc + '"' + (tunIOS ? '' : ' loading="lazy"') + ' decoding="async"');
     fig.innerHTML = '<img ' + imgAttr + ' alt="' + item.alt + '">' +
       '<figcaption><span>' + item.label + '</span><b>' + item.badge + '</b></figcaption>';
     tunScene.appendChild(fig);
@@ -2381,7 +2388,15 @@ function tunnelUpdate(p, sectionOpacity){
     if(rel < -1500) op *= Math.max(0, (rel + 2300) / 800);
     f.el.style.opacity = (op * (sectionOpacity || 1)).toFixed(3);
     var settle = Math.min(1, dd / 640);
-    f.el.style.transform = 'translate3d(calc(-50% + ' + (f.x * settle).toFixed(1) + 'px),calc(-50% + ' + (f.y * settle).toFixed(1) + 'px),' + rel.toFixed(1) + 'px) rotateY(' + (f.ry * settle).toFixed(2) + 'deg)';
+    if(tunIOS){
+      /* same corridor, projected by hand: scale = P/(P-z) about the tunnel centre, depth order via z-index */
+      var ps = TUN_PERSP / (TUN_PERSP - rel);
+      var psx = ps * Math.cos(f.ry * settle * Math.PI / 180);
+      f.el.style.zIndex = String(Math.round(rel + 4000));
+      f.el.style.transform = 'translate(calc(-50% + ' + (f.x * settle * ps).toFixed(1) + 'px),calc(-50% + ' + (f.y * settle * ps).toFixed(1) + 'px)) scale(' + psx.toFixed(4) + ',' + ps.toFixed(4) + ')';
+    }else{
+      f.el.style.transform = 'translate3d(calc(-50% + ' + (f.x * settle).toFixed(1) + 'px),calc(-50% + ' + (f.y * settle).toFixed(1) + 'px),' + rel.toFixed(1) + 'px) rotateY(' + (f.ry * settle).toFixed(2) + 'deg)';
+    }
     f.el.style.filter = mobile || dd < 40 ? 'none' : 'blur(' + Math.min(13, dd / 110).toFixed(1) + 'px) brightness(' + Math.max(.22, 1 - dd / 2400).toFixed(2) + ')';
     if(dd < bd){ bd = dd; best = i; }
   }
