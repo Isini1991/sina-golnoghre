@@ -6,6 +6,8 @@
 <link rel="preload" href="assets/fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Vazirmatn-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/dual/background.webp?v=11" as="image" fetchpriority="high">
+<link rel="preload" href="assets/dual/foreground3.webp?v=3" as="image" fetchpriority="high">
 <script>
 (function(){
   var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -16,6 +18,20 @@
 <title>سینا گل‌نقره — Bass / Sound / Live</title>
 <meta name="description" content="سینا گل‌نقره — بیس، صدا و اجرا">
 <meta name="theme-color" content="#000000">
+<link rel="canonical" href="https://www.sinawings.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="سینا گل‌نقره">
+<meta property="og:locale" content="fa_IR">
+<meta property="og:title" content="سینا گل‌نقره — Bass / Sound / Live">
+<meta property="og:description" content="سینا گل‌نقره — بیس، صدا و اجرا">
+<meta property="og:url" content="https://www.sinawings.com/">
+<meta property="og:image" content="https://www.sinawings.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="سینا گل‌نقره — Bass / Sound / Live">
+<meta name="twitter:description" content="سینا گل‌نقره — بیس، صدا و اجرا">
+<meta name="twitter:image" content="https://www.sinawings.com/assets/og-image.jpg">
 <link rel="icon" href="assets/favicon-sina.ico?v=20261023-s2" sizes="any">
 <link rel="icon" type="image/svg+xml" href="assets/favicon-sina.svg?v=20261023-s2">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-sina-32.png?v=20261023-s2">
@@ -480,7 +496,7 @@ body.cpu .stage{box-shadow:none}
       <video
         class="wingvid wing-webm"
         id="wingVid"
-        src="content/wings_alpha.webm"
+        data-src="content/wings_alpha.webm?v=2"
         autoplay
         muted
         loop
@@ -492,10 +508,23 @@ body.cpu .stage{box-shadow:none}
       <img
         class="wingvid wing-ios"
         id="wingIOS"
-        src="content/wings_ios.webp?v=10"
+        data-src="content/wings_ios.webp?v=10"
         alt=""
         aria-hidden="true"
         draggable="false">
+<script>
+/* load only the hero-wings asset this device actually shows (iOS: animated WebP, others: WebM) */
+(function(){
+  var d = document.documentElement, v = document.getElementById('wingVid'), i = document.getElementById('wingIOS');
+  if(d.classList.contains('ios')){
+    if(i) i.src = i.getAttribute('data-src');
+  }else if(v){
+    v.src = v.getAttribute('data-src');
+    var pr = v.play && v.play();
+    if(pr && pr.catch) pr.catch(function(){});
+  }
+})();
+</script>
       <button class="enterbtn" id="enterbtn" type="button">
         <span class="ring"><span class="word" data-i18n="enter.word">ورود</span></span>
       </button>
@@ -758,7 +787,10 @@ if(noGL){
   /* graceful fallback: show static foreground instead of blocking entire site */
   canvas.style.display = 'none';
   var fgFall = document.getElementById('wingIOS');
-  if(fgFall) fgFall.style.display = 'block';
+  if(fgFall){
+    if(!fgFall.getAttribute('src') && fgFall.getAttribute('data-src')) fgFall.src = fgFall.getAttribute('data-src');
+    fgFall.style.display = 'block';
+  }
   var ebFall = document.getElementById('enterbtn');
   if(ebFall) ebFall.classList.add('ready');
 }
@@ -1173,6 +1205,8 @@ function startJourney(){
   journey.t0 = performance.now();
   /* راهنما دیگر مخفی نمیشود — در تمام صحنه‌ها visible است */
   enterBtn.classList.add('gone');
+  startBioLoad();
+  setTimeout(startPegLoad, 2200);
   if(wingVid){
     wingVid.classList.add('gone');
     setTimeout(function(){ try{ wingVid.pause(); }catch(err){} }, 950);
@@ -1575,6 +1609,10 @@ function setScene(id){
   if(!id && pegFrameIndex !== 0){ pegFrameIndex = 0; drawPeg(); }
   if(id !== 'live') liveTouch = null;
   stageEl.classList.toggle('gone', !!id);
+  /* safety nets: whatever way a scene is reached (nav link, hop, jump), its assets start loading */
+  if(id === 'bio') startBioLoad();
+  if(id === 'instrument' || id === 'sound' || id === 'live'){ startBioLoad(); startPegLoad(true); }
+  if(id === 'sound') tunPrimeAll();
   SCENES.forEach(function(s){
     var a = navLinks[s];
     if(a) a.classList.toggle('cur', s === id);
@@ -2101,15 +2139,20 @@ window.__albumTabClick = function(i){
 })();
 window.__albumEn = applyAlbum;
 window.ALBUMS = ALBUMS;
-for(var pi = 0; pi < pegCount; pi++){
-  (function(idx){
-    var im = new Image(); im.decoding = 'async';
-    im.onload = function(){ if(idx === pegFrameIndex) drawPeg(); };
-    /* idle-defer: spread 120 headstock frames over idle callbacks to avoid parse-time jank */
-    function loadPeg(){ im.src = pegSrc(idx); pegFrames[idx] = im; }
-    if(window.requestIdleCallback) window.requestIdleCallback(loadPeg, {timeout:5000+idx*40});
-    else setTimeout(loadPeg, 50+idx*8);
-  })(pi);
+var pegLoadStarted = false;
+function startPegLoad(fast){
+  if(pegLoadStarted) return;
+  pegLoadStarted = true;
+  for(var pi = 0; pi < pegCount; pi++){
+    (function(idx){
+      var im = new Image(); im.decoding = 'async';
+      im.onload = function(){ if(idx === pegFrameIndex) drawPeg(); };
+      /* idle-defer: spread the 120 headstock frames over idle callbacks (starts after the visitor enters) */
+      function loadPeg(){ im.src = pegSrc(idx); pegFrames[idx] = im; }
+      if(window.requestIdleCallback) window.requestIdleCallback(loadPeg, {timeout:(fast ? 150 : 1500) + idx*25});
+      else setTimeout(loadPeg, 50+idx*8);
+    })(pi);
+  }
 }
 window.addEventListener('resize', function(){ sizePegCanvas(); drawPeg(); });
 setTimeout(function(){ sizePegCanvas(); }, 80);
@@ -2207,7 +2250,7 @@ function buildTunnel(){
     var liteSrc = dir + 'lite/' + item.file + '.webp';
     var fig = document.createElement('figure');
     fig.className = 't-frame' + (item.tall ? ' t-tall' : '');
-    var imgAttr = cpuMode ? ('data-src="' + liteSrc + '" decoding="async"') : ('src="' + fullSrc + '" loading="lazy" decoding="async"');
+    var imgAttr = cpuMode ? ('data-src="' + liteSrc + '" decoding="async"') : ('data-src="' + fullSrc + '" decoding="async"');
     fig.innerHTML = '<img ' + imgAttr + ' alt="' + item.alt + '">' +
       '<figcaption><span>' + item.label + '</span><b>' + item.badge + '</b></figcaption>';
     tunScene.appendChild(fig);
@@ -2227,9 +2270,21 @@ function buildTunnel(){
    ولی اگر کاربر مستقیم با لینک ناوبری وارد گالری شود، دوربین وسط تونل است و
    فریم‌های دور هرگز از راه updateTunnel نمی‌رسند → کادر خالی. برای همین به‌محض
    ورود به صحنه‌ی گالری کل مجموعه یک‌بار بارگذاری می‌شود (lite است، ~۱۵KB). */
+var tunRestTimer = 0;
 function tunPrimeAll(){
   if(!tunFrames.length) return;
-  for(var i = 0; i < tunFrames.length; i++){
+  /* full-size mode: first few frames now, the rest shortly after + by camera proximity (tunnelUpdate) */
+  var n = cpuMode ? tunFrames.length : Math.min(5, tunFrames.length);
+  if(!cpuMode && n < tunFrames.length && !tunRestTimer){
+    tunRestTimer = setTimeout(function(){
+      tunRestTimer = 0;
+      for(var k = 0; k < tunFrames.length; k++){
+        var rim = tunFrames[k].img;
+        if(rim && !rim.getAttribute('src') && rim.getAttribute('data-src')) rim.src = rim.getAttribute('data-src');
+      }
+    }, 1200);
+  }
+  for(var i = 0; i < n; i++){
     var im = tunFrames[i].img;
     if(im && !im.getAttribute('src') && im.getAttribute('data-src')) im.src = im.getAttribute('data-src');
   }
@@ -2361,6 +2416,13 @@ function tunnelUpdate(p, sectionOpacity){
   else tunCam += (target - tunCam) * .12;
   tunSettling = !mobile && Math.abs(target - tunCam) > .5;
   var cam = tunCam;
+  /* load the frames around the camera on demand (they were lazy before, but all fired at once) */
+  var ci = Math.round(cam / TUN_GAP);
+  for(var q = ci - 2; q <= ci + 6; q++){
+    if(q < 0 || q >= TUN_N) continue;
+    var qi = tunFrames[q].img;
+    if(qi && !qi.getAttribute('src') && qi.getAttribute('data-src')) qi.src = qi.getAttribute('data-src');
+  }
   var best = -1, bd = 1e9;
   for(var i = 0; i < TUN_N; i++){
     var f = tunFrames[i];
@@ -2452,23 +2514,31 @@ function bioOnScroll(){
 }
 if(bioShell) bioShell.addEventListener('scroll', bioOnScroll, {passive:true});
 function bioSrc(i){ return 'assets/bio-360/sina-' + String(i * 2 + 1).padStart(3, '0') + '.webp'; }
-if(bioCanvas && BIO360_N > 0){
+var bioLoadStarted = false;
+function startBioLoad(){
+  if(bioLoadStarted || !bioCanvas || BIO360_N <= 0) return;
+  bioLoadStarted = true;
   for(var bi = 0; bi < BIO360_N; bi++){
     var bim = new Image();
     bim.onload = (function(bidx){                       /* reload mid-bio: first draw may hit before the
                                                            frame's image arrives → redraw on arrival */
       return function(){ if(bidx === bioFrameIndex) drawBio360(); };
     })(bi);
-    /* idle-defer: spread bio360 frames over idle callbacks */
-    function loadBio(idx, img){ img.src = bioSrc(idx); bioFrames.push(img); }
-    if(window.requestIdleCallback) window.requestIdleCallback((function(ii,im){ return function(){ loadBio(ii,im); }; })(bi,bim), {timeout:5000+bi*80});
+    /* idle-defer: spread bio360 frames over idle callbacks (starts when the visitor enters) */
+    function loadBio(idx, img){ bioFrames[idx] = img; img.src = bioSrc(idx); }
+    if(window.requestIdleCallback) window.requestIdleCallback((function(ii,im){ return function(){ loadBio(ii,im); }; })(bi,bim), {timeout:300+bi*30});
     else setTimeout((function(ii,im){ return function(){ loadBio(ii,im); }; })(bi,bim), 100+bi*12);
   }
-  if(bioStage) bioStage.classList.add('has-frames');
+}
+if(bioCanvas && BIO360_N > 0 && bioStage) bioStage.classList.add('has-frames');
+var bioBoxW = 0, bioBoxH = 0;
+if(bioCanvas && window.ResizeObserver){
+  /* layout size is cached by an observer — no forced layout read on every frame change */
+  new ResizeObserver(function(es){ var cr = es[0].contentRect; bioBoxW = cr.width; bioBoxH = cr.height; }).observe(bioCanvas);
 }
 function sizeBio360(){
   if(!bioCanvas || !bioCtx || !BIO360_N) return;
-  var r = bioCanvas.getBoundingClientRect();
+  var r = bioBoxW ? {width:bioBoxW, height:bioBoxH} : bioCanvas.getBoundingClientRect();
   var dpr = Math.min(window.devicePixelRatio || 1, 2);
   var w = Math.max(2, Math.round(r.width * dpr)), h = Math.max(2, Math.round(r.height * dpr));
   if(bioCanvas.width !== w || bioCanvas.height !== h){ bioCanvas.width = w; bioCanvas.height = h; }
