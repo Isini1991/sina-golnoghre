@@ -44,6 +44,9 @@
 @font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Darvish';src:url('assets/fonts/darvish/Darvish%20%5B@FontiranIR%5D/Darvish-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
 *{margin:0;padding:0;box-sizing:border-box}
+/* Android Chrome paints a blue/grey rectangle on tap — the design has its own pressed/hover states */
+*{-webkit-tap-highlight-color:transparent}
+button,a,[role=button],summary,label{touch-action:manipulation}
 body{
   background:#000;color:#fff;
   font-family:'Darvish','Vazirmatn',system-ui,sans-serif;
